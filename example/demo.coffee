@@ -4,6 +4,7 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
 	$builder.registerComponent 'sampleInput',
 		group: 'Additional'
 		label: 'Sample'
+		show_label: yes
 		description: 'From html template'
 		placeholder: 'placeholder'
 		required: no

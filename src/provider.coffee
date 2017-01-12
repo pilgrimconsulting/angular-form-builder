@@ -42,6 +42,7 @@ angular.module 'builder.provider', []
             name: name
             group: component.group ? 'Default'
             label: component.label ? ''
+            show_label: component.show_label ? yes
             description: component.description ? ''
             placeholder: component.placeholder ? ''
             text: component.text ? ''
@@ -75,6 +76,7 @@ angular.module 'builder.provider', []
             editable: formObject.editable ? component.editable
             index: formObject.index ? 0
             label: formObject.label ? component.label
+            show_label: formObject.show_label ? component.show_label
             description: formObject.description ? component.description
             placeholder: formObject.placeholder ? component.placeholder
             options: formObject.options ? component.options

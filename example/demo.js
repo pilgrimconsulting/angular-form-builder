@@ -4,6 +4,7 @@
       return $builder.registerComponent('sampleInput', {
         group: 'Additional',
         label: 'Sample',
+        show_label: true,
         description: 'From html template',
         placeholder: 'placeholder',
         required: false,

@@ -26,7 +26,7 @@ angular.module 'builder.controller', ['builder.provider']
         ###
         1. Copy origin formObject (ng-repeat="object in formObjects") to scope.
         2. Setup optionsText with formObject.options.
-        3. Watch scope.label, .description, .placeholder, .required, .inline, .options then copy to origin formObject.
+        3. Watch scope.label, .show_label .description, .placeholder, .required, .inline, .options then copy to origin formObject.
         4. Watch scope.optionsText then convert to scope.options.
         5. setup validationOptions
         ###
@@ -34,9 +34,10 @@ angular.module 'builder.controller', ['builder.provider']
 
         $scope.optionsText = formObject.options.join '\n'
 
-        $scope.$watch '[label, description, placeholder, required, inline, options, validation, text, header,
+        $scope.$watch '[label, show_label, description, placeholder, required, inline, options, validation, text, header,
  footer, align, style]', ->
             formObject.label = $scope.label
+            formObject.show_label = $scope.show_label
             formObject.description = $scope.description
             formObject.placeholder = $scope.placeholder
             formObject.required = $scope.required
@@ -65,6 +66,7 @@ angular.module 'builder.controller', ['builder.provider']
             ###
             @model =
                 label: $scope.label
+                show_label: $scope.show_label
                 description: $scope.description
                 placeholder: $scope.placeholder
                 required: $scope.required
@@ -82,6 +84,7 @@ angular.module 'builder.controller', ['builder.provider']
             ###
             return if not @model
             $scope.label = @model.label
+            $scope.show_label = @model.show_label
             $scope.description = @model.description
             $scope.placeholder = @model.placeholder
             $scope.required = @model.required
@@ -165,6 +168,7 @@ angular.module 'builder.controller', ['builder.provider']
         input =
             id: $scope.formObject.id
             label: $scope.formObject.label
+            show_label: $scope.formObject.show_label
             value: value ? ''
         $scope.$parent.input.splice $scope.$index, 1, input
 ]
