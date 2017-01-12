@@ -70,6 +70,9 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
 ]
 
 
+
+
+
 .controller 'DemoController', ['$scope', '$builder', '$validator', ($scope, $builder, $validator) ->
 # ----------------------------------------
 # builder
@@ -87,38 +90,45 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
 	$scope.pages = []
 
 
-	divider = $builder.addFormObject 'default',
-		id: 'divider'
-		component: 'divider'
-		label: 'Building elevation A'
-	radio = $builder.addFormObject 'default',
-		id: 'radio0'
-		component: 'radio'
-		inline: yes
-		label: 'What is the condition of the sign can?'
-		description: ''
-		options: ['1', '2', '3', '4', 5]
-	radio = $builder.addFormObject 'default',
-		id: 'radio1'
-		component: 'radio'
-		inline: yes
-		label: 'What is the condition of the sign face?'
-		description: ''
-		options: [1,2,3,4,5]
-	radio = $builder.addFormObject 'default',
-		id: 'radio2'
-		component: 'radio'
-		inline: yes
-		label: 'Observed while illumination on?'
-		description: ''
-		options: ['Yes', 'No']
-	radio = $builder.addFormObject 'default',
-		id: 'radio2'
-		component: 'radio'
-		inline: yes
-		label: 'If yes, were there any problems with illumination?'
-		description: ''
-		options: ['Yes', 'No']
+	json = [{"id":"divider","component":"divider","editable":true,"index":0,"label":"Building elevation A","description":"","placeholder":"","options":[],"required":false,"inline":false,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio0","component":"radio","editable":true,"index":1,"label":"What is the condition of the sign can?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio1","component":"radio","editable":true,"index":2,"label":"What is the condition of the sign face?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":3,"label":"Observed while illumination on?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":4,"label":"If yes, were there any problems with illumination?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""}]
+
+	json.map((component, index)=>
+		$builder.addFormObject 'default', component
+	)
+
+
+#	divider = $builder.addFormObject 'default',
+#		id: 'divider'
+#		component: 'divider'
+#		label: 'Building elevation A'
+#	radio = $builder.addFormObject 'default',
+#		id: 'radio0'
+#		component: 'radio'
+#		inline: yes
+#		label: 'What is the condition of the sign can?'
+#		description: ''
+#		options: ['1', '2', '3', '4', 5]
+#	radio = $builder.addFormObject 'default',
+#		id: 'radio1'
+#		component: 'radio'
+#		inline: yes
+#		label: 'What is the condition of the sign face?'
+#		description: ''
+#		options: [1,2,3,4,5]
+#	radio = $builder.addFormObject 'default',
+#		id: 'radio2'
+#		component: 'radio'
+#		inline: yes
+#		label: 'Observed while illumination on?'
+#		description: ''
+#		options: ['Yes', 'No']
+#	radio = $builder.addFormObject 'default',
+#		id: 'radio2'
+#		component: 'radio'
+#		inline: yes
+#		label: 'If yes, were there any problems with illumination?'
+#		description: ''
+#		options: ['Yes', 'No']
 
 	###	divider = $builder.addFormObject 'default',
 		id: 'divider'
