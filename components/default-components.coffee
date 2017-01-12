@@ -342,6 +342,45 @@ Global.__fbComponents.default = ($builderProvider) ->
 
 
 	# ----------------------------------------
+	# image
+	# ----------------------------------------
+	$builderProvider.registerComponent 'image',
+		group: 'Default'
+		label: 'Image'
+		show_label: yes
+		required: no
+		template:
+			"""
+			<div class="form-group">
+					<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+					<div class='col-sm-8' ng-class="{'col-sm-offset-4': !show_label}">
+							<img class='img-thumbnail' ng-src='https://placeholdit.imgix.net/~text?txtsize=28&bg=cccccc&txt=200%C3%97200&w=200&h=200'/>
+					</div>
+			</div>
+			"""
+		popoverTemplate:
+			"""
+				<form>
+					<div class="checkbox">
+							<label>
+									<input type='checkbox' ng-model='show_label' />
+									Show label
+							</label>
+					</div>
+					<div class="form-group" ng-hide='!show_label'>
+							<label class='control-label'>Label</label>
+								<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					</div>
+					<hr/>
+					<div class='form-group'>
+							<input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
+							<input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
+							<input type='button' ng-click="popover.remove($event)" class='btn btn-danger' value='Delete'/>
+					</div>
+				</form>
+			"""
+
+	# ----------------------------------------
 	# Text Panel
 	# ----------------------------------------
 	$builderProvider.registerComponent 'panel',
