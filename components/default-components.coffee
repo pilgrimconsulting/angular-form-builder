@@ -1,6 +1,9 @@
-angular.module 'builder.components', ['builder', 'validator.rules']
 
-.config ['$builderProvider', ($builderProvider) ->
+Global = this
+
+!Global.__fbComponents && (Global.__fbComponents = {})
+
+Global.__fbComponents.divider = ($builderProvider) ->
 
 	# ----------------------------------------
 	# Text Divider
@@ -34,46 +37,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
 			</form>
 			"""
 
-	# ----------------------------------------
-	# Button
-	# ----------------------------------------
-	$builderProvider.registerComponent 'button',
-		group: 'Default'
-		label: 'Button'
-		style: 'default'
-#		description: 'default'
-#				required: no
-		options: ['default', 'primary', 'success', 'warning', 'danger']
-		arrayToText: yes
-		template:
-			"""
-			<p></p>
-					<button type="button" class="btn btn-{{style}}">{{label}}</button>
-			<p></p>
-			"""
-		popoverTemplate:
-			"""
-      <form>
-          <div class="form-group">
-              <label class='control-label'>Label</label>
-              <input type='text' ng-model="label" validator="[required]" class='form-control'/>
-          </div>
-					<div class="form-group">
-              <label class='control-label'>Style</label>
-							<select ng-options="value for value in options" id="{{formName+index}}" class="form-control"
-									ng-model="style" ng-init="style = options[0]"/>
-					</div>
-
-          <hr/>
-          <div class='form-group'>
-              <input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
-              <input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
-              <input type='button' ng-click="popover.remove($event)" class='btn btn-danger' value='Delete'/>
-          </div>
-      </form>
-      """
-
-
+Global.__fbComponents.default = ($builderProvider) ->
 	# ----------------------------------------
 	# text input
 	# ----------------------------------------
@@ -390,5 +354,20 @@ angular.module 'builder.components', ['builder', 'validator.rules']
 			</form>
 			"""
 
+components = [
+	'divider',
+	'default',
+	'button'
 ]
 
+config = ($builderProvider) ->
+#	Global.components.map (component) ->
+	for component of Global.__fbComponents
+		console.log component
+#		Global[component].$inject = ['$builderProvider']
+#		Global[component]($builderProvider)
+		Global.__fbComponents[component].$inject = ['$builderProvider']
+		Global.__fbComponents[component]($builderProvider)
+
+angular.module 'builder.components', ['builder', 'validator.rules']
+.config config
