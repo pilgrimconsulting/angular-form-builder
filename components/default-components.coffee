@@ -381,7 +381,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 			"""
 
 	# ----------------------------------------
-	# image
+	# carousel
 	# ----------------------------------------
 	$builderProvider.registerComponent 'carousel',
 		group: 'Default'
@@ -440,6 +440,45 @@ Global.__fbComponents.default = ($builderProvider) ->
 					</div>
 				</form>
 			"""
+
+	# ----------------------------------------
+	# carousel
+	# ----------------------------------------
+	$builderProvider.registerComponent 'section',
+		group: 'Default'
+		label: 'Collapsed section'
+		show_label: yes
+		required: no
+		template:
+			"""
+			 	<uib-accordion>
+					<div uib-accordion-group class="panel-default" heading="{{label}}" is-open="true" is-disabled="false">
+						<p></p>
+					</div>
+			 	</uib-accordion>
+  		"""
+		popoverTemplate:
+			"""
+				<form>
+					<div class="checkbox">
+							<label>
+									<input type='checkbox' ng-model='show_label' />
+									Show label
+							</label>
+					</div>
+					<div class="form-group" ng-hide='!show_label'>
+							<label class='control-label'>Label</label>
+								<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					</div>
+					<hr/>
+					<div class='form-group'>
+							<input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
+							<input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
+							<input type='button' ng-click="popover.remove($event)" class='btn btn-danger' value='Delete'/>
+					</div>
+				</form>
+			"""
+
 
 	# ----------------------------------------
 	# Text Panel
