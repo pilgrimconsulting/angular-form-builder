@@ -451,9 +451,26 @@ Global.__fbComponents.default = ($builderProvider) ->
 		required: no
 		template:
 			"""
+				<script type="text/ng-template" id="group-template.html" ng-init='isOpen = true'>
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a href tabindex="0" class="accordion-toggle" uib-accordion-transclude="heading">
+								<span uib-accordion-header>
+									{{layout}}
+								</span>
+							</a>
+						</h4>
+					</div>
+					<div class="panel-collapse collapse" uib-collapse="!isOpen">
+						<div class="panel-body" style="text-align: right" ng-transclude></div>
+					</div>
+				</script>
 			 	<uib-accordion>
-					<div uib-accordion-group class="panel-default" heading="{{label}}" is-open="true" is-disabled="false">
-						<p></p>
+					<div uib-accordion-group class="panel-default" is-open="isOpen" is-disabled="false">
+						<uib-accordion-heading>
+							Custom template with custom header template <i class="pull-right glyphicon" ng-click="toggleOpen()" ng-class="{'glyphicon-chevron-down': isOpen, 'glyphicon-chevron-right': !isOpen}"></i>
+						</uib-accordion-heading>
+						World
 					</div>
 			 	</uib-accordion>
   		"""
