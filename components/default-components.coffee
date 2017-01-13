@@ -456,7 +456,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 						<h4 class="panel-title">
 							<a href tabindex="0" class="accordion-toggle" uib-accordion-transclude="heading">
 								<span uib-accordion-header>
-									{{layout}}
+									{{label}}
 								</span>
 							</a>
 						</h4>
@@ -468,9 +468,9 @@ Global.__fbComponents.default = ($builderProvider) ->
 			 	<uib-accordion>
 					<div uib-accordion-group class="panel-default" is-open="isOpen" is-disabled="false">
 						<uib-accordion-heading>
-							Custom template with custom header template <i class="pull-right glyphicon" ng-click="toggleOpen()" ng-class="{'glyphicon-chevron-down': isOpen, 'glyphicon-chevron-right': !isOpen}"></i>
+							{{label}} <i class="pull-right glyphicon" ng-click="toggleOpen()" ng-class="{'glyphicon-chevron-down': isOpen, 'glyphicon-chevron-right': !isOpen}"></i>
 						</uib-accordion-heading>
-						World
+						<p></p>
 					</div>
 			 	</uib-accordion>
   		"""
