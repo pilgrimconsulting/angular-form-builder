@@ -1,7 +1,13 @@
 <form>
-    <div class="form-group">
+    <div class="checkbox">
+        <label>
+            <input type='checkbox' ng-model='show_label' />
+            Show label
+        </label>
+    </div>
+    <div class="form-group" ng-hide='!show_label'>
         <label class='control-label'>Label</label>
-        <input type='text' ng-model="label" validator="[required]" class='form-control'/>
+        <input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
     </div>
     <div class="form-group">
         <label class='control-label'>Description</label>

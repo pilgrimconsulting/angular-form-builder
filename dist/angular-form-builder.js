@@ -24,15 +24,16 @@
         /*
         1. Copy origin formObject (ng-repeat="object in formObjects") to scope.
         2. Setup optionsText with formObject.options.
-        3. Watch scope.label, .description, .placeholder, .required, .inline, .options then copy to origin formObject.
+        3. Watch scope.label, .show_label .description, .placeholder, .required, .inline, .options then copy to origin formObject.
         4. Watch scope.optionsText then convert to scope.options.
         5. setup validationOptions
          */
         var component;
         copyObjectToScope(formObject, $scope);
         $scope.optionsText = formObject.options.join('\n');
-        $scope.$watch('[label, description, placeholder, required, inline, options, validation, text, header, footer, align, style]', function() {
+        $scope.$watch('[label, show_label, description, placeholder, required, inline, options, validation, text, header, footer, align, style]', function() {
           formObject.label = $scope.label;
+          formObject.show_label = $scope.show_label;
           formObject.description = $scope.description;
           formObject.placeholder = $scope.placeholder;
           formObject.required = $scope.required;
@@ -73,6 +74,7 @@
            */
           return this.model = {
             label: $scope.label,
+            show_label: $scope.show_label,
             description: $scope.description,
             placeholder: $scope.placeholder,
             required: $scope.required,
@@ -95,6 +97,7 @@
             return;
           }
           $scope.label = this.model.label;
+          $scope.show_label = this.model.show_label;
           $scope.description = this.model.description;
           $scope.placeholder = this.model.placeholder;
           $scope.required = this.model.required;
@@ -177,6 +180,7 @@
         input = {
           id: $scope.formObject.id,
           label: $scope.formObject.label,
+          show_label: $scope.formObject.show_label,
           value: value != null ? value : ''
         };
         return $scope.$parent.input.splice($scope.$index, 1, input);
@@ -1020,25 +1024,26 @@
       "default": []
     };
     this.convertComponent = function(name, component) {
-      var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       result = {
         name: name,
         group: (_ref = component.group) != null ? _ref : 'Default',
         label: (_ref1 = component.label) != null ? _ref1 : '',
-        description: (_ref2 = component.description) != null ? _ref2 : '',
-        placeholder: (_ref3 = component.placeholder) != null ? _ref3 : '',
-        text: (_ref4 = component.text) != null ? _ref4 : '',
-        header: (_ref5 = component.header) != null ? _ref5 : '',
-        footer: (_ref6 = component.footer) != null ? _ref6 : '',
-        style: (_ref7 = component.style) != null ? _ref7 : '',
-        editable: (_ref8 = component.editable) != null ? _ref8 : true,
-        required: (_ref9 = component.required) != null ? _ref9 : false,
-        inline: (_ref10 = component.inline) != null ? _ref10 : false,
-        validation: (_ref11 = component.validation) != null ? _ref11 : '/.*/',
-        validationOptions: (_ref12 = component.validationOptions) != null ? _ref12 : [],
-        options: (_ref13 = component.options) != null ? _ref13 : [],
-        align: (_ref14 = component.align) != null ? _ref14 : [],
-        arrayToText: (_ref15 = component.arrayToText) != null ? _ref15 : false,
+        show_label: (_ref2 = component.show_label) != null ? _ref2 : true,
+        description: (_ref3 = component.description) != null ? _ref3 : '',
+        placeholder: (_ref4 = component.placeholder) != null ? _ref4 : '',
+        text: (_ref5 = component.text) != null ? _ref5 : '',
+        header: (_ref6 = component.header) != null ? _ref6 : '',
+        footer: (_ref7 = component.footer) != null ? _ref7 : '',
+        style: (_ref8 = component.style) != null ? _ref8 : '',
+        editable: (_ref9 = component.editable) != null ? _ref9 : true,
+        required: (_ref10 = component.required) != null ? _ref10 : false,
+        inline: (_ref11 = component.inline) != null ? _ref11 : false,
+        validation: (_ref12 = component.validation) != null ? _ref12 : '/.*/',
+        validationOptions: (_ref13 = component.validationOptions) != null ? _ref13 : [],
+        options: (_ref14 = component.options) != null ? _ref14 : [],
+        align: (_ref15 = component.align) != null ? _ref15 : [],
+        arrayToText: (_ref16 = component.arrayToText) != null ? _ref16 : false,
         template: component.template,
         templateUrl: component.templateUrl,
         popoverTemplate: component.popoverTemplate,
@@ -1053,7 +1058,7 @@
       return result;
     };
     this.convertFormObject = function(name, formObject) {
-      var component, result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      var component, result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       if (formObject == null) {
         formObject = {};
       }
@@ -1067,17 +1072,18 @@
         editable: (_ref = formObject.editable) != null ? _ref : component.editable,
         index: (_ref1 = formObject.index) != null ? _ref1 : 0,
         label: (_ref2 = formObject.label) != null ? _ref2 : component.label,
-        description: (_ref3 = formObject.description) != null ? _ref3 : component.description,
-        placeholder: (_ref4 = formObject.placeholder) != null ? _ref4 : component.placeholder,
-        options: (_ref5 = formObject.options) != null ? _ref5 : component.options,
-        required: (_ref6 = formObject.required) != null ? _ref6 : component.required,
-        inline: (_ref7 = formObject.inline) != null ? _ref7 : component.inline,
-        validation: (_ref8 = formObject.validation) != null ? _ref8 : component.validation,
-        text: (_ref9 = formObject.text) != null ? _ref9 : component.text,
-        header: (_ref10 = formObject.header) != null ? _ref10 : component.header,
-        footer: (_ref11 = formObject.footer) != null ? _ref11 : component.footer,
-        align: (_ref12 = formObject.align) != null ? _ref12 : component.align,
-        style: (_ref13 = formObject.style) != null ? _ref13 : component.style
+        show_label: (_ref3 = formObject.show_label) != null ? _ref3 : component.show_label,
+        description: (_ref4 = formObject.description) != null ? _ref4 : component.description,
+        placeholder: (_ref5 = formObject.placeholder) != null ? _ref5 : component.placeholder,
+        options: (_ref6 = formObject.options) != null ? _ref6 : component.options,
+        required: (_ref7 = formObject.required) != null ? _ref7 : component.required,
+        inline: (_ref8 = formObject.inline) != null ? _ref8 : component.inline,
+        validation: (_ref9 = formObject.validation) != null ? _ref9 : component.validation,
+        text: (_ref10 = formObject.text) != null ? _ref10 : component.text,
+        header: (_ref11 = formObject.header) != null ? _ref11 : component.header,
+        footer: (_ref12 = formObject.footer) != null ? _ref12 : component.footer,
+        align: (_ref13 = formObject.align) != null ? _ref13 : component.align,
+        style: (_ref14 = formObject.style) != null ? _ref14 : component.style
       };
       return result;
     };
