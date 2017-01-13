@@ -395,10 +395,13 @@ Global.__fbComponents.default = ($builderProvider) ->
 						<label for="{{formName+index}}" class="col-sm-12" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 					</div>
 					<div class='clearfix'>
-						<div class='col-sm-6 text-center'>
+						<div class='col-sm-4 text-center'>
 							<img class='img-thumbnail' ng-src='https://placeholdit.imgix.net/~text?txtsize=28&bg=cccccc&txt=200%C3%97200&w=200&h=200'/>
 						</div>
-						<div class='col-sm-6 text-center'>
+						<div class='col-sm-4 text-center'>
+							<img class='img-thumbnail' ng-src='https://placeholdit.imgix.net/~text?txtsize=28&bg=cccccc&txt=200%C3%97200&w=200&h=200'/>
+						</div>
+						<div class='col-sm-4 text-center'>
 							<img class='img-thumbnail' ng-src='https://placeholdit.imgix.net/~text?txtsize=28&bg=cccccc&txt=200%C3%97200&w=200&h=200'/>
 						</div>
 					</div>
@@ -407,10 +410,10 @@ Global.__fbComponents.default = ($builderProvider) ->
 					</div>
 
 					<div class='clearfix'>
-						<div class='col-sm-6 text-center'>
+						<div class='col-sm-6 text-right'>
 							<button class='btn btn-success' disabled>Take a picture</button>
 						</div>
-						<div class='col-sm-6 text-center'>
+						<div class='col-sm-6 text-left'>
 							<button class='btn btn-success' disabled>Add from gallery</button>
 						</div>
 					</div>
