@@ -4,7 +4,7 @@
   copyObjectToScope = function(object, scope) {
 
     /*
-    Copy object (ng-repeat="object in objects") to scope without `hashKey`.
+    	Copy object (ng-repeat="object in objects") to scope without `hashKey`.
      */
     var key, value;
     for (key in object) {
@@ -22,11 +22,11 @@
       $scope.setupScope = function(formObject) {
 
         /*
-        1. Copy origin formObject (ng-repeat="object in formObjects") to scope.
-        2. Setup optionsText with formObject.options.
-        3. Watch scope.label, .show_label .description, .placeholder, .required, .inline, .options then copy to origin formObject.
-        4. Watch scope.optionsText then convert to scope.options.
-        5. setup validationOptions
+        		1. Copy origin formObject (ng-repeat="object in formObjects") to scope.
+        		2. Setup optionsText with formObject.options.
+        		3. Watch scope.label, .show_label .description, .placeholder, .required, .inline, .options then copy to origin formObject.
+        		4. Watch scope.optionsText then convert to scope.options.
+        		5. setup validationOptions
          */
         var component;
         copyObjectToScope(formObject, $scope);
@@ -70,7 +70,7 @@
         backup: function() {
 
           /*
-          Backup input value.
+          			Backup input value.
            */
           return this.model = {
             label: $scope.label,
@@ -91,7 +91,7 @@
         rollback: function() {
 
           /*
-          Rollback input value.
+          			Rollback input value.
            */
           if (!this.model) {
             return;
@@ -133,6 +133,15 @@
         }
         return _results;
       };
+      $scope.addComponentToEnd = function($event, component) {
+        if ($event != null) {
+          $event.preventDefault();
+        }
+        console.log(component.group, component.name);
+        return $builder.addFormObject('default', {
+          component: component.name
+        });
+      };
       $scope.groups = $builder.groups;
       $scope.activeGroup = $scope.groups[0];
       $scope.allComponents = $builder.components;
@@ -173,8 +182,8 @@
       return $scope.updateInput = function(value) {
 
         /*
-        Copy current scope.input[X] to $parent.input.
-        @param value: The input value.
+        		Copy current scope.input[X] to $parent.input.
+        		@param value: The input value.
          */
         var input;
         input = {
@@ -437,13 +446,15 @@
         }
       };
     }
-  ]).directive('fbComponents', function() {
-    return {
-      restrict: 'A',
-      template: "        <ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n            <li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n                <a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n            </li>\n        </ul>\n        <div class='form-horizontal col-sm-12 elementList'>\n            <div ng-repeat=\"component in components\">\n	<div class=\"form-group element-wrapper\">\n		<div class=\"col-sm-1\">\n			<button type='button' class='btn btn-danger btn-sm' ng-click=''>+</button>\n		</div>\n		<div class=\"col-sm-11\">\n			<div class='fb-component' fb-component=\"component\"></div>\n		</div>\n</div>\n        </div>",
-      controller: 'fbComponentsController'
-    };
-  }).directive('fbComponent', [
+  ]).directive('fbComponents', [
+    '$injector', function($injector) {
+      return {
+        restrict: 'A',
+        template: "        <ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n            <li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n                <a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n            </li>\n        </ul>\n        <div class='form-horizontal col-sm-12 elementList'>\n            <div ng-repeat=\"component in components\">\n	<div class=\"form-group element-wrapper\">\n		<div class=\"col-sm-1\">{{component.name}}\n			<button type='button' class='btn btn-success btn-sm'\n					ng-click='addComponentToEnd($event, component)'>+</button>\n		</div>\n		<div class=\"col-sm-11\">\n			<div class='fb-component' fb-component=\"component\"></div>\n		</div>\n</div>\n        </div>",
+        controller: 'fbComponentsController'
+      };
+    }
+  ]).directive('fbComponent', [
     '$injector', function($injector) {
       var $builder, $compile, $drag;
       $builder = $injector.get('$builder');

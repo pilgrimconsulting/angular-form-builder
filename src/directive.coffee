@@ -256,7 +256,8 @@ angular.module 'builder.directive', [
 # ----------------------------------------
 # fb-components
 # ----------------------------------------
-.directive 'fbComponents', ->
+.directive 'fbComponents', ['$injector', ($injector) ->
+#	$builder = $injector.get '$builder'
     restrict: 'A'
     template:
         """
@@ -268,8 +269,9 @@ angular.module 'builder.directive', [
         <div class='form-horizontal col-sm-12 elementList'>
             <div ng-repeat="component in components">
 				<div class="form-group element-wrapper">
-					<div class="col-sm-1">
-						<button type='button' class='btn btn-danger btn-sm' ng-click=''>+</button>
+					<div class="col-sm-1">{{component.name}}
+						<button type='button' class='btn btn-success btn-sm'
+								ng-click='addComponentToEnd($event, component)'>+</button>
 					</div>
 					<div class="col-sm-11">
 						<div class='fb-component' fb-component="component"></div>
@@ -278,6 +280,11 @@ angular.module 'builder.directive', [
         </div>
         """
     controller: 'fbComponentsController'
+#	link: (scope, element) ->
+#		 providers
+#		$builder = $injector.get '$builder'
+
+]
 
 # ----------------------------------------
 # fb-component
