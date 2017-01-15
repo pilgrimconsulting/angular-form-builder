@@ -381,6 +381,123 @@ Global.__fbComponents.default = ($builderProvider) ->
 			"""
 
 	# ----------------------------------------
+	# carousel
+	# ----------------------------------------
+	$builderProvider.registerComponent 'carousel',
+		group: 'Default'
+		label: 'Carousel'
+		show_label: yes
+		required: no
+		template:
+			"""
+			<div class="form-group">
+					<div class='clearfix text-center margin-bottom-15'>
+						<label for="{{formName+index}}" class="col-sm-12" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+					</div>
+					<div class='clearfix'>
+						<div class='col-sm-4 text-center'>
+							<img class='img-thumbnail' ng-src='https://placeholdit.imgix.net/~text?txtsize=28&bg=cccccc&txt=200%C3%97200&w=200&h=200'/>
+						</div>
+						<div class='col-sm-4 text-center'>
+							<img class='img-thumbnail' ng-src='https://placeholdit.imgix.net/~text?txtsize=28&bg=cccccc&txt=200%C3%97200&w=200&h=200'/>
+						</div>
+						<div class='col-sm-4 text-center'>
+							<img class='img-thumbnail' ng-src='https://placeholdit.imgix.net/~text?txtsize=28&bg=cccccc&txt=200%C3%97200&w=200&h=200'/>
+						</div>
+					</div>
+					<div class='clearfix'>
+						<div class='col-sm-12'><hr></div>
+					</div>
+
+					<div class='clearfix'>
+						<div class='col-sm-6 text-right'>
+							<button class='btn btn-success' disabled>Take a picture</button>
+						</div>
+						<div class='col-sm-6 text-left'>
+							<button class='btn btn-success' disabled>Add from gallery</button>
+						</div>
+					</div>
+			</div>
+			"""
+		popoverTemplate:
+			"""
+				<form>
+					<div class="checkbox">
+							<label>
+									<input type='checkbox' ng-model='show_label' />
+									Show label
+							</label>
+					</div>
+					<div class="form-group" ng-hide='!show_label'>
+							<label class='control-label'>Label</label>
+								<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					</div>
+					<hr/>
+					<div class='form-group'>
+							<input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
+							<input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
+							<input type='button' ng-click="popover.remove($event)" class='btn btn-danger' value='Delete'/>
+					</div>
+				</form>
+			"""
+
+	# ----------------------------------------
+	# carousel
+	# ----------------------------------------
+	$builderProvider.registerComponent 'section',
+		group: 'Default'
+		label: 'Collapsed section'
+		show_label: yes
+		required: no
+		template:
+			"""
+				<script type="text/ng-template" id="group-template.html" ng-init='isOpen = true'>
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a href tabindex="0" class="accordion-toggle" uib-accordion-transclude="heading">
+								<span uib-accordion-header>
+									{{label}}
+								</span>
+							</a>
+						</h4>
+					</div>
+					<div class="panel-collapse collapse" uib-collapse="!isOpen">
+						<div class="panel-body" style="text-align: right" ng-transclude></div>
+					</div>
+				</script>
+			 	<uib-accordion>
+					<div uib-accordion-group class="panel-default" is-open="isOpen" is-disabled="false">
+						<uib-accordion-heading>
+							{{label}} <i class="pull-right glyphicon" ng-click="toggleOpen()" ng-class="{'glyphicon-chevron-down': isOpen, 'glyphicon-chevron-right': !isOpen}"></i>
+						</uib-accordion-heading>
+						<p></p>
+					</div>
+			 	</uib-accordion>
+  		"""
+		popoverTemplate:
+			"""
+				<form>
+					<div class="checkbox">
+							<label>
+									<input type='checkbox' ng-model='show_label' />
+									Show label
+							</label>
+					</div>
+					<div class="form-group" ng-hide='!show_label'>
+							<label class='control-label'>Label</label>
+								<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					</div>
+					<hr/>
+					<div class='form-group'>
+							<input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
+							<input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
+							<input type='button' ng-click="popover.remove($event)" class='btn btn-danger' value='Delete'/>
+					</div>
+				</form>
+			"""
+
+
+	# ----------------------------------------
 	# Text Panel
 	# ----------------------------------------
 	$builderProvider.registerComponent 'panel',
