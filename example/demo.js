@@ -142,9 +142,43 @@
       ];
       json.map((function(_this) {
         return function(component, index) {
-          return $builder.addFormObject('default', component);
+          return $builder.addFormObject('0', component);
         };
       })(this));
+
+      /*divider = $builder.addFormObject 'default',
+      		id: 'divider'
+      		component: 'divider'
+      		label: 'Building elevation A'
+      	radio = $builder.addFormObject 'default',
+      		id: 'radio0'
+      		component: 'radio'
+      		inline: yes
+      		label: 'What is the condition of the sign can?'
+      		description: ''
+      		options: ['1', '2', '3', '4', 5]
+      	radio = $builder.addFormObject 'default',
+      		id: 'radio1'
+      		component: 'radio'
+      		inline: yes
+      		label: 'What is the condition of the sign face?'
+      		description: ''
+      		options: [1,2,3,4,5]
+      	radio = $builder.addFormObject 'default',
+      		id: 'radio2'
+      		component: 'radio'
+      		inline: yes
+      		label: 'Observed while illumination on?'
+      		description: ''
+      		options: ['Yes', 'No']
+      	radio = $builder.addFormObject 'default',
+      		id: 'radio2'
+      		component: 'radio'
+      		inline: yes
+      		label: 'If yes, were there any problems with illumination?'
+      		description: ''
+      		options: ['Yes', 'No']
+       */
 
       /*	divider = $builder.addFormObject 'default',
       		id: 'divider'
@@ -283,7 +317,7 @@
       		label: 'ADD A SIGN'
       		description: 'primary'
        */
-      $scope.form = $builder.forms['default'];
+      $scope.form = $builder.forms[$builder.currentForm];
       $scope.input = [];
       $scope.defaultValue = {};
       return $scope.submit = function() {

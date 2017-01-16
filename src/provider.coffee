@@ -30,8 +30,13 @@ angular.module 'builder.provider', []
     # forms
     #   builder mode: `fb-builder` you could drag and drop to build the form.
     #   form mode: `fb-form` this is the form for end-user to input value.
-    @forms =
-        default: []
+    @defaultForm = 0
+    @currentForm = 0
+    @forms = {}
+    @forms[@defaultForm] = []
+#	@forms =
+#        0: []
+
 
 
     # ----------------------------------------
@@ -220,6 +225,7 @@ angular.module 'builder.provider', []
         components: @components
         groups: @groups
         forms: @forms
+        currentForm: @currentForm
         broadcastChannel: @broadcastChannel
         registerComponent: @registerComponent
         addFormObject: @addFormObject

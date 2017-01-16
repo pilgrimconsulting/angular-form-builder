@@ -138,7 +138,7 @@
           $event.preventDefault();
         }
         console.log(component.group, component.name);
-        return $builder.addFormObject('default', {
+        return $builder.addFormObject($builder.currentForm || 0, {
           component: component.name
         });
       };
@@ -160,6 +160,7 @@
       var $builder, $timeout;
       $builder = $injector.get('$builder');
       $timeout = $injector.get('$timeout');
+      $scope.currentForm = $builder.currentForm;
       if ($scope.input == null) {
         $scope.input = [];
       }
@@ -195,6 +196,73 @@
         return $scope.$parent.input.splice($scope.$index, 1, input);
       };
     }
+  ]).controller('PaginationController', [
+    '$scope', '$injector', function($scope, $injector) {
+      var $builder;
+      $builder = $injector.get('$builder');
+      console.log($builder.forms);
+      $scope.prev = false;
+      $scope.next = false;
+      $scope.updatePage = function() {
+        var count, page;
+        count = 0;
+        for (page in $builder.forms) {
+          if ($builder.forms.hasOwnProperty(page)) {
+            ++count;
+          }
+        }
+        $scope.pageCount = count;
+        $scope.pages = $builder.forms;
+        $scope.currentPage = $builder.currentForm;
+        $scope.prev = $builder.currentForm > 0 ? true : false;
+        return $scope.next = $scope.pageCount > ($builder.currentForm + 1) ? true : false;
+      };
+      $scope.addPage = function(pageCount) {
+        $builder.forms[$scope.pageCount] = [];
+        console.log(pageCount, $scope.pageCount, $builder.forms);
+        return $scope.updatePage();
+      };
+      $scope.deletePage = function(pageNumber) {
+        var current, page, pageObj, _ref;
+        delete $builder.forms[pageNumber];
+        _ref = $builder.forms;
+        for (page in _ref) {
+          pageObj = _ref[page];
+          console.log(current, page, pageObj);
+          if (page > pageNumber) {
+            $builder.forms[page - 1] = $builder.forms[page];
+          }
+        }
+        delete $builder.forms[$scope.pageCount - 1];
+        $builder.currentForm = current;
+        $scope.updatePage();
+        current = $builder.forms[pageNumber - 1] ? pageNumber - 1 : pageNumber + 1;
+        return $scope.goPage(current);
+      };
+      $scope.goPage = function(page) {
+        if (page === $builder.currentForm) {
+          return false;
+        }
+        if ($builder.forms[page]) {
+          $builder.currentForm = page;
+          $scope.updatePage();
+          return true;
+        } else {
+          return false;
+        }
+      };
+      $scope.goF = function() {
+        var pageNumber;
+        pageNumber = $builder.currentForm + 1;
+        return $scope.goPage(pageNumber);
+      };
+      $scope.goB = function() {
+        var pageNumber;
+        pageNumber = $builder.currentForm - 1;
+        return $scope.goPage(pageNumber);
+      };
+      return $scope.updatePage();
+    }
   ]);
 
 }).call(this);
@@ -210,15 +278,24 @@
         scope: {
           fbBuilder: '='
         },
-        template: "<div class='form-horizontal'>\n    <div class='fb-form-object-editable' ng-repeat=\"object in formObjects\"\n        fb-form-object-editable=\"object\"></div>\n</div>",
+        template: "<div class='form-horizontal' fb-page={{currentPage}}>\n    <div class='fb-form-object-editable' ng-repeat=\"object in formObjects\"\n        fb-form-object-editable=\"object\"></div>\n</div>",
+        controller: 'PaginationController',
         link: function(scope, element, attrs) {
           var beginMove, _base, _name;
-          scope.formName = attrs.fbBuilder;
-          if ((_base = $builder.forms)[_name = scope.formName] == null) {
+          scope.formNumber = attrs.fbPage || $builder.currentForm;
+          if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
             _base[_name] = [];
           }
-          scope.formObjects = $builder.forms[scope.formName];
+          scope.formObjects = $builder.forms[scope.formNumber];
           beginMove = true;
+          scope.currentPage = 1;
+          scope.$watch(function() {
+            return $builder.currentForm;
+          }, function(current, prev) {
+            console.log(arguments, 'page change');
+            scope.formNumber = current;
+            return scope.formObjects = $builder.forms[scope.formNumber];
+          });
           $(element).addClass('fb-builder');
           return $drag.droppable($(element), {
             move: function(e) {
@@ -277,7 +354,7 @@
                 }
               } else if (isHover) {
                 if (draggable.mode === 'mirror') {
-                  $builder.insertFormObject(scope.formName, $(element).find('.empty').index('.fb-form-object-editable'), {
+                  $builder.insertFormObject(scope.formNumber, $(element).find('.empty').index('.fb-form-object-editable'), {
                     component: draggable.object.componentName
                   });
                 }
@@ -287,7 +364,7 @@
                   if (oldIndex < newIndex) {
                     newIndex--;
                   }
-                  $builder.updateFormObjectIndex(scope.formName, oldIndex, newIndex);
+                  $builder.updateFormObjectIndex(scope.formNumber, oldIndex, newIndex);
                 }
               }
               return $(element).find('.empty').remove();
@@ -374,7 +451,7 @@
               The delete event of the popover.
                */
               $event.preventDefault();
-              $builder.removeFormObject(scope.$parent.formName, scope.$parent.$index);
+              $builder.removeFormObject(scope.$parent.formNumber, scope.$parent.$index);
               $(element).popover('hide');
             },
             shown: function() {
@@ -492,7 +569,7 @@
         restrict: 'A',
         require: 'ngModel',
         scope: {
-          formName: '@fbForm',
+          formNumber: '@fbForm',
           input: '=ngModel',
           "default": '=fbDefault'
         },
@@ -501,10 +578,21 @@
         link: function(scope, element, attrs) {
           var $builder, _base, _name;
           $builder = $injector.get('$builder');
-          if ((_base = $builder.forms)[_name = scope.formName] == null) {
+          scope.$watch(function() {
+            return $builder.currentForm;
+          }, function(current, prev) {
+            var _base, _name;
+            console.log(arguments, 'page change');
+            scope.formNumber = current;
+            if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
+              _base[_name] = [];
+            }
+            return scope.form = $builder.forms[scope.formNumber];
+          });
+          if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
             _base[_name] = [];
           }
-          return scope.form = $builder.forms[scope.formName];
+          return scope.form = $builder.forms[scope.formNumber];
         }
       };
     }
@@ -572,6 +660,14 @@
             }
           });
         }
+      };
+    }
+  ]).directive('fbPages', [
+    '$injector', function($injector) {
+      return {
+        restrict: 'A',
+        template: "<div class=\"fb-builderPagination\">\n	<div class=\"pull-left\">\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n		        ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !next}\" ng-click=\"goF()\">></button>\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" ng-init=\"currentPage=0\">\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right disabled\"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n			        aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
+        controller: 'PaginationController'
       };
     }
   ]);
@@ -1031,9 +1127,10 @@
     this.broadcastChannel = {
       updateInput: '$updateInput'
     };
-    this.forms = {
-      "default": []
-    };
+    this.defaultForm = 0;
+    this.currentForm = 0;
+    this.forms = {};
+    this.forms[this.defaultForm] = [];
     this.convertComponent = function(name, component) {
       var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       result = {
@@ -1278,6 +1375,7 @@
             components: _this.components,
             groups: _this.groups,
             forms: _this.forms,
+            currentForm: _this.currentForm,
             broadcastChannel: _this.broadcastChannel,
             registerComponent: _this.registerComponent,
             addFormObject: _this.addFormObject,

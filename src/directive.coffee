@@ -22,19 +22,31 @@ angular.module 'builder.directive', [
         fbBuilder: '='
     template:
         """
-        <div class='form-horizontal'>
+        <div class='form-horizontal' fb-page={{currentPage}}>
             <div class='fb-form-object-editable' ng-repeat="object in formObjects"
                 fb-form-object-editable="object"></div>
         </div>
         """
+    controller: 'PaginationController'
     link: (scope, element, attrs) ->
         # ----------------------------------------
         # valuables
         # ----------------------------------------
-        scope.formName = attrs.fbBuilder
-        $builder.forms[scope.formName] ?= []
-        scope.formObjects = $builder.forms[scope.formName]
+#        scope.formNumber = attrs.fbBuilder
+#        scope.formNumber = attrs.fbPage
+        scope.formNumber = attrs.fbPage || $builder.currentForm
+        $builder.forms[scope.formNumber] ?= []
+        scope.formObjects = $builder.forms[scope.formNumber]
         beginMove = yes
+        scope.currentPage = 1
+
+        scope.$watch () ->
+	        $builder.currentForm
+        , (current, prev) ->
+	        console.log(arguments, 'page change')
+	        scope.formNumber = current
+	        scope.formObjects = $builder.forms[scope.formNumber]
+#        , yes
 
         $(element).addClass 'fb-builder'
         $drag.droppable $(element),
@@ -96,15 +108,16 @@ angular.module 'builder.directive', [
                 else if isHover
                     if draggable.mode is 'mirror'
                         # insert a form object
-                        $builder.insertFormObject scope.formName, $(element).find('.empty').index('.fb-form-object-editable'),
+                        $builder.insertFormObject scope.formNumber, $(element).find('.empty').index('.fb-form-object-editable'),
                             component: draggable.object.componentName
                     if draggable.mode is 'drag'
                         # update the index of form objects
                         oldIndex = draggable.object.formObject.index
                         newIndex = $(element).find('.empty').index('.fb-form-object-editable')
                         newIndex-- if oldIndex < newIndex
-                        $builder.updateFormObjectIndex scope.formName, oldIndex, newIndex
+                        $builder.updateFormObjectIndex scope.formNumber, oldIndex, newIndex
                 $(element).find('.empty').remove()
+
 ]
 
 # ----------------------------------------
@@ -183,7 +196,7 @@ angular.module 'builder.directive', [
                 ###
                 $event.preventDefault()
 
-                $builder.removeFormObject scope.$parent.formName, scope.$parent.$index
+                $builder.removeFormObject scope.$parent.formNumber, scope.$parent.$index
                 $(element).popover 'hide'
                 return
             shown: ->
@@ -252,7 +265,6 @@ angular.module 'builder.directive', [
             no
 ]
 
-
 # ----------------------------------------
 # fb-components
 # ----------------------------------------
@@ -314,7 +326,6 @@ angular.module 'builder.directive', [
             $(element).html view
 ]
 
-
 # ----------------------------------------
 # fb-form
 # ----------------------------------------
@@ -323,7 +334,7 @@ angular.module 'builder.directive', [
     require: 'ngModel'  # form data (end-user input value)
     scope:
         # input model for scops in ng-repeat
-        formName: '@fbForm'
+        formNumber: '@fbForm'
         input: '=ngModel'
         default: '=fbDefault'
     template:
@@ -334,10 +345,19 @@ angular.module 'builder.directive', [
     link: (scope, element, attrs) ->
         # providers
         $builder = $injector.get '$builder'
+#        scope.currentForm = $builder.currentForm
+
+        scope.$watch () ->
+            $builder.currentForm
+        , (current, prev) ->
+            console.log(arguments, 'page change')
+            scope.formNumber = current
+            $builder.forms[scope.formNumber] ?= []
+            scope.form = $builder.forms[scope.formNumber]
 
         # get the form for controller
-        $builder.forms[scope.formName] ?= []
-        scope.form = $builder.forms[scope.formName]
+        $builder.forms[scope.formNumber] ?= []
+        scope.form = $builder.forms[scope.formNumber]
 ]
 
 # ----------------------------------------
@@ -402,4 +422,60 @@ angular.module 'builder.directive', [
                 scope.inputArray = value
             else
                 scope.inputText = value
+]
+
+# ----------------------------------------
+# fb-pages
+# ----------------------------------------
+.directive 'fbPages', ['$injector', ($injector) ->
+# providers
+#	$builder = $injector.get '$builder'
+	restrict: 'A'
+	template:
+		"""
+		<div class="fb-builderPagination">
+			<div class="pull-left">
+				<button type="button" class="btn btn-primary btn-small _pull-right"
+				        ng-class="{disabled: !currentPage}" ng-click="goB()"><</button>
+				<button type="button" class="btn btn-primary btn-small _pull-right"
+						ng-class="{disabled: !next}" ng-click="goF()">></button>
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+							aria-expanded="false" aria-haspopup="true">Page
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu" >
+						<li ng-repeat="(key, value) in pages"><a ng-click="goPage(+key)">{{+key+1}}</a></li>
+					</ul>
+				</div>
+			</div>
+			<span class="panel-title" ng-init="currentPage=0">
+				Page <b>\#<span ng-model="page">{{currentPage+1}}</span></b> / {{pageCount}}
+			</span>
+
+			<div class="pull-right">
+				<button type="button" class="btn btn-danger btn-small _pull-right disabled"
+						ng-class="{disabled: pageCount == 1}" ng-click="deletePage(currentPage)">-</button>
+				<!-- Split button -->
+				<div class="btn-group">
+					<button type="button" class="btn btn-success" ng-click="addPage(pageCount)">Add</button>
+					<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+					        aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="" ng-click="addPage(pageCount)">Page</a></li>
+						<li role="separator" class="divider"></li>
+						<li><a href="">Section</a></li>
+						<li><a href="">Component</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="clearfix"></div>
+		</div>
+		"""
+	controller: 'PaginationController'
 ]

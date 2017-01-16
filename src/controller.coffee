@@ -117,7 +117,7 @@ angular.module 'builder.controller', ['builder.provider']
 	$scope.addComponentToEnd = ($event, component) ->
 		$event?.preventDefault()
 		console.log(component.group, component.name)
-		$builder.addFormObject('default',
+		$builder.addFormObject( $builder.currentForm || 0,
 			component: component.name
 		)
 
@@ -144,6 +144,7 @@ angular.module 'builder.controller', ['builder.provider']
 	$builder = $injector.get '$builder'
 	$timeout = $injector.get '$timeout'
 
+	$scope.currentForm = $builder.currentForm
 	# set default for input
 	$scope.input ?= []
 	$scope.$watch 'form', ->
@@ -155,6 +156,7 @@ angular.module 'builder.controller', ['builder.provider']
 		$timeout ->
 			$scope.$broadcast $builder.broadcastChannel.updateInput
 	, yes
+
 ]
 
 
@@ -178,4 +180,75 @@ angular.module 'builder.controller', ['builder.provider']
 			show_label: $scope.formObject.show_label
 			value: value ? ''
 		$scope.$parent.input.splice $scope.$index, 1, input
+]
+
+# ----------------------------------------
+# PaginationController
+# ----------------------------------------
+.controller 'PaginationController', ['$scope', '$injector', ($scope, $injector) ->
+# providers
+	$builder = $injector.get '$builder'
+	console.log($builder.forms)
+
+#	$scope.pages = []
+#	$scope.pages = $builder.forms
+#	$scope.currentPage = $builder.currentForm
+#	$scope.pageCount = 0
+	$scope.prev = false
+	$scope.next = false
+
+	$scope.updatePage = () ->
+		count = 0
+		for page of $builder.forms
+#			console.log(page)
+			if ($builder.forms.hasOwnProperty(page))
+				++count
+		$scope.pageCount = count
+		$scope.pages = $builder.forms
+		$scope.currentPage = $builder.currentForm
+		$scope.prev = if ($builder.currentForm > 0) then true else false
+		$scope.next = if ($scope.pageCount > ($builder.currentForm+1)) then true else false
+
+#	$scope.$watch 'forms', ->
+#		$scope.updatePage()
+#		console.log('Change Count')
+#	, yes
+
+	$scope.addPage = (pageCount) ->
+#		$event?.preventDefault()
+		$builder.forms[$scope.pageCount] = []
+		console.log(pageCount, $scope.pageCount, $builder.forms)
+		$scope.updatePage()
+
+	$scope.deletePage = (pageNumber) ->
+		delete $builder.forms[pageNumber]
+		for page, pageObj of $builder.forms
+			console.log(current,page,pageObj)
+			if page > pageNumber
+				$builder.forms[page - 1] = $builder.forms[page]
+		delete $builder.forms[$scope.pageCount - 1]
+		$builder.currentForm = current
+#		console.log(current)
+		$scope.updatePage()
+		current = if $builder.forms[pageNumber-1] then pageNumber-1 else pageNumber+1
+		$scope.goPage(current)
+
+	$scope.goPage = (page) ->
+		return false if page == $builder.currentForm
+		if $builder.forms[page]
+			$builder.currentForm = page
+			$scope.updatePage()
+			true
+		else
+			false
+
+	$scope.goF = () ->
+		pageNumber = $builder.currentForm + 1
+		$scope.goPage(pageNumber)
+
+	$scope.goB = () ->
+		pageNumber = $builder.currentForm - 1
+		$scope.goPage(pageNumber)
+
+	$scope.updatePage()
 ]
