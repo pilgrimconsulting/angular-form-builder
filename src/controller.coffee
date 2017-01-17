@@ -199,12 +199,16 @@ angular.module 'builder.controller', ['builder.provider']
 
 	$scope.updatePage = () ->
 		count = 0
-		for page of $builder.forms
-#			console.log(page)
-			if ($builder.forms.hasOwnProperty(page))
-				++count
+		forms = $builder.forms
+		if typeof forms.length == 'number'
+			count = forms.length
+		else
+			for page of forms
+				# console.log(page)
+				if (forms.hasOwnProperty(page))
+					++count
 		$scope.pageCount = count
-		$scope.pages = $builder.forms
+		$scope.pages = forms
 		$scope.currentPage = $builder.currentForm
 		$scope.prev = if ($builder.currentForm > 0) then true else false
 		$scope.next = if ($scope.pageCount > ($builder.currentForm+1)) then true else false
@@ -221,16 +225,20 @@ angular.module 'builder.controller', ['builder.provider']
 		$scope.updatePage()
 
 	$scope.deletePage = (pageNumber) ->
-		delete $builder.forms[pageNumber]
-		for page, pageObj of $builder.forms
-			console.log(current,page,pageObj)
-			if page > pageNumber
-				$builder.forms[page - 1] = $builder.forms[page]
-		delete $builder.forms[$scope.pageCount - 1]
-		$builder.currentForm = current
+		forms = $builder.forms
+		delete forms[pageNumber]
+		if typeof forms.length == 'number'
+			forms.splice(pageNumber, 1)
+		else
+			for page, pageObj of forms
+				console.log(current,page,pageObj)
+				if page > pageNumber
+					forms[page - 1] = forms[page]
+		delete forms[$scope.pageCount - 1]
+		currentForm = current
 #		console.log(current)
 		$scope.updatePage()
-		current = if $builder.forms[pageNumber-1] then pageNumber-1 else pageNumber+1
+		current = if forms[pageNumber-1] then pageNumber-1 else pageNumber+1
 		$scope.goPage(current)
 
 	$scope.goPage = (page) ->

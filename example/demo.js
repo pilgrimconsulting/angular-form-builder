@@ -142,7 +142,7 @@
       ];
       json.map((function(_this) {
         return function(component, index) {
-          return $builder.addFormObject('0', component);
+          return $builder.addFormObject(0, component);
         };
       })(this));
 

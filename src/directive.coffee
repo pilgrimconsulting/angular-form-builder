@@ -450,7 +450,7 @@ angular.module 'builder.directive', [
 					</ul>
 				</div>
 			</div>
-			<span class="panel-title" ng-init="currentPage=0">
+			<span class="panel-title" >
 				Page <b>\#<span ng-model="page">{{currentPage+1}}</span></b> / {{pageCount}}
 			</span>
 
