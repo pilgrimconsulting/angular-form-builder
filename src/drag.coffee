@@ -27,6 +27,7 @@ angular.module 'builder.drag', []
         down: {}
         move: {}
         up: {}
+    @innerDropHover = false
     @eventMouseMove = ->
     @eventMouseUp = ->
     $ =>
@@ -301,6 +302,7 @@ angular.module 'builder.drag', []
         data: @data
         draggable: @draggable
         droppable: @droppable
+        innerDropHover : @innerDropHover
     @get.$inject = ['$injector']
     @$get = @get
     return

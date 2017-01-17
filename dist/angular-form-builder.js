@@ -268,7 +268,97 @@
 }).call(this);
 
 (function() {
-  angular.module('builder.directive', ['builder.provider', 'builder.controller', 'builder.drag', 'validator']).directive('fbBuilder', [
+  angular.module('builder.directive', ['builder.provider', 'builder.controller', 'builder.drag', 'validator']).directive('fbSection', [
+    '$injector', function($injector) {
+      var $builder, $drag;
+      $builder = $injector.get('$builder');
+      $drag = $injector.get('$drag');
+      return {
+        restrict: 'A',
+        scope: {
+          fbSection: '='
+        },
+        template: "<div class='fb-section-object-editable'\n		fb-section-object-editable=\"object\">\n	<p>section</p><br/><br/>\n</div>",
+        link: function(scope, element, attr) {
+          $(element).addClass('fb-section');
+          return $drag.droppable($(element), {
+            move: function(e) {
+              var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
+              if (beginMove) {
+                $("div.fb-section-object-editable").popover('hide');
+                beginMove = false;
+              }
+              $formObjects = $(element).find('.fb-section-object-editable:not(.empty,.dragging)');
+              if ($formObjects.length === 0) {
+                if ($(element).find('.fb-section-object-editable.empty').length === 0) {
+                  $(element).find('>div:first').append($("<div class='fb-section-object-editable empty'></div>"));
+                }
+                return;
+              }
+              positions = [];
+              positions.push(-1000);
+              for (index = _i = 0, _ref = $formObjects.length; _i < _ref; index = _i += 1) {
+                $formObject = $($formObjects[index]);
+                offset = $formObject.offset();
+                height = $formObject.height();
+                positions.push(offset.top + height / 2);
+              }
+              positions.push(positions[positions.length - 1] + 1000);
+              for (index = _j = 1, _ref1 = positions.length; _j < _ref1; index = _j += 1) {
+                if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
+                  $(element).find('.empty').remove();
+                  $empty = $("<div class='fb-section-object-editable empty'></div>");
+                  if (index - 1 < $formObjects.length) {
+                    $empty.insertBefore($($formObjects[index - 1]));
+                  } else {
+                    $empty.insertAfter($($formObjects[index - 2]));
+                  }
+                  break;
+                }
+              }
+            },
+            out: function() {
+              var beginMove;
+              if (beginMove) {
+                $("div.fb-section-object-editable").popover('hide');
+                beginMove = false;
+              }
+              return $(element).find('.empty').remove();
+            },
+            up: function(e, isHover, draggable) {
+              var beginMove, formObject, newIndex, oldIndex;
+              beginMove = true;
+              if (!$drag.isMouseMoved()) {
+                $(element).find('.empty').remove();
+                return;
+              }
+              if (!isHover && draggable.mode === 'drag') {
+                formObject = draggable.object.formObject;
+                if (formObject.editable) {
+                  $builder.removeFormObject(attrs.fbBuilder, formObject.index);
+                }
+              } else if (isHover) {
+                if (draggable.mode === 'mirror') {
+                  $builder.insertFormObject(scope.formNumber, $(element).find('.empty').index('.fb-section-object-editable'), {
+                    component: draggable.object.componentName
+                  });
+                }
+                if (draggable.mode === 'drag') {
+                  oldIndex = draggable.object.formObject.index;
+                  newIndex = $(element).find('.empty').index('.fb-section-object-editable');
+                  if (oldIndex < newIndex) {
+                    newIndex--;
+                  }
+                  $builder.updateFormObjectIndex(scope.formNumber, oldIndex, newIndex);
+                }
+              }
+              return $(element).find('.empty').remove();
+            }
+          });
+        }
+      };
+    }
+  ]).directive('fbBuilder', [
     '$injector', function($injector) {
       var $builder, $drag;
       $builder = $injector.get('$builder');
@@ -278,7 +368,7 @@
         scope: {
           fbBuilder: '='
         },
-        template: "<div class='form-horizontal' fb-page={{currentPage}}>\n    <div class='fb-form-object-editable' ng-repeat=\"object in formObjects\"\n        fb-form-object-editable=\"object\"></div>\n</div>",
+        template: "<div class='form-horizontal' fb-page={{currentPage}}>\n	<div class='fb-form-object-editable ' ng-repeat=\"object in formObjects\"\n		fb-form-object-editable=\"object\" fb-draggable='allow'></div>\n</div>",
         controller: 'PaginationController',
         link: function(scope, element, attrs) {
           var beginMove, _base, _name;
@@ -437,7 +527,7 @@
             save: function($event) {
 
               /*
-              The save event of the popover.
+              				The save event of the popover.
                */
               $event.preventDefault();
               $validator.validate(scope).success(function() {
@@ -448,7 +538,7 @@
             remove: function($event) {
 
               /*
-              The delete event of the popover.
+              				The delete event of the popover.
                */
               $event.preventDefault();
               $builder.removeFormObject(scope.$parent.formNumber, scope.$parent.$index);
@@ -457,7 +547,7 @@
             shown: function() {
 
               /*
-              The shown event of the popover.
+              				The shown event of the popover.
                */
               scope.data.backup();
               return popover.isClickedSave = false;
@@ -465,7 +555,160 @@
             cancel: function($event) {
 
               /*
-              The cancel event of the popover.
+              				The cancel event of the popover.
+               */
+              scope.data.rollback();
+              if ($event) {
+                $event.preventDefault();
+                $(element).popover('hide');
+              }
+            }
+          };
+          $(element).on('show.bs.popover', function() {
+            var $popover, elementOrigin, popoverTop;
+            if ($drag.isMouseMoved()) {
+              return false;
+            }
+            $("div.fb-form-object-editable:not(." + popover.id + ")").popover('hide');
+            $popover = $("form." + popover.id).closest('.popover');
+            if ($popover.length > 0) {
+              elementOrigin = $(element).offset().top + $(element).height() / 2;
+              popoverTop = elementOrigin - $popover.height() / 2;
+              $popover.css({
+                position: 'absolute',
+                top: popoverTop
+              });
+              $popover.show();
+              setTimeout(function() {
+                $popover.addClass('in');
+                return $(element).triggerHandler('shown.bs.popover');
+              }, 0);
+              return false;
+            }
+          });
+          $(element).on('shown.bs.popover', function() {
+            $(".popover ." + popover.id + " input:first").select();
+            scope.$apply(function() {
+              return scope.popover.shown();
+            });
+          });
+          return $(element).on('hide.bs.popover', function() {
+            var $popover;
+            $popover = $("form." + popover.id).closest('.popover');
+            if (!popover.isClickedSave) {
+              if (scope.$$phase || scope.$root.$$phase) {
+                scope.popover.cancel();
+              } else {
+                scope.$apply(function() {
+                  return scope.popover.cancel();
+                });
+              }
+            }
+            $popover.removeClass('in');
+            setTimeout(function() {
+              return $popover.hide();
+            }, 300);
+            return false;
+          });
+        }
+      };
+    }
+  ]).directive('fbSectionObjectEditable', [
+    '$injector', function($injector) {
+      var $builder, $compile, $drag, $validator;
+      $builder = $injector.get('$builder');
+      $drag = $injector.get('$drag');
+      $compile = $injector.get('$compile');
+      $validator = $injector.get('$validator');
+      return {
+        restrict: 'A',
+        controller: 'fbFormObjectEditableController',
+        scope: {
+          formObject: '=fbFormObjectEditable'
+        },
+        link: function(scope, element) {
+          var popover;
+          scope.inputArray = [];
+          scope.$component = $builder.components[scope.formObject.component];
+          scope.setupScope(scope.formObject);
+          scope.$watch('$component.template', function(template) {
+            var view;
+            if (!template) {
+              return;
+            }
+            view = $compile(template)(scope);
+            return $(element).html(view);
+          });
+          $(element).on('click', function() {
+            return false;
+          });
+          console.log($(element).attr('fb-draggable'));
+          if ($(element).attr('fb-draggable') === 'allow') {
+            $drag.draggable($(element), {
+              object: {
+                formObject: scope.formObject
+              }
+            });
+          }
+          if (!scope.formObject.editable) {
+            return;
+          }
+          popover = {};
+          scope.$watch('$component.popoverTemplate', function(template) {
+            if (!template) {
+              return;
+            }
+            $(element).removeClass(popover.id);
+            popover = {
+              id: "fb-" + (Math.random().toString().substr(2)),
+              isClickedSave: false,
+              view: null,
+              html: template
+            };
+            popover.html = $(popover.html).addClass(popover.id);
+            popover.view = $compile(popover.html)(scope);
+            $(element).addClass(popover.id);
+            return $(element).popover({
+              html: true,
+              title: scope.$component.label,
+              content: popover.view,
+              container: 'body',
+              placement: $builder.config.popoverPlacement
+            });
+          });
+          scope.popover = {
+            save: function($event) {
+
+              /*
+              				The save event of the popover.
+               */
+              $event.preventDefault();
+              $validator.validate(scope).success(function() {
+                popover.isClickedSave = true;
+                return $(element).popover('hide');
+              });
+            },
+            remove: function($event) {
+
+              /*
+              				The delete event of the popover.
+               */
+              $event.preventDefault();
+              $builder.removeFormObject(scope.$parent.formNumber, scope.$parent.$index);
+              $(element).popover('hide');
+            },
+            shown: function() {
+
+              /*
+              				The shown event of the popover.
+               */
+              scope.data.backup();
+              return popover.isClickedSave = false;
+            },
+            cancel: function($event) {
+
+              /*
+              				The cancel event of the popover.
                */
               scope.data.rollback();
               if ($event) {
@@ -527,7 +770,7 @@
     '$injector', function($injector) {
       return {
         restrict: 'A',
-        template: "        <ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n            <li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n                <a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n            </li>\n        </ul>\n        <div class='form-horizontal col-sm-12 elementList'>\n            <div ng-repeat=\"component in components\">\n	<div class=\"form-group element-wrapper\">\n		<div class=\"col-sm-1\">{{component.name}}\n			<button type='button' class='btn btn-success btn-sm'\n					ng-click='addComponentToEnd($event, component)'>+</button>\n		</div>\n		<div class=\"col-sm-11\">\n			<div class='fb-component' fb-component=\"component\"></div>\n		</div>\n</div>\n        </div>",
+        template: "<ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n	<li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n		<a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n	</li>\n</ul>\n<div class='form-horizontal col-sm-12 elementList'>\n	<div ng-repeat=\"component in components\">\n		<div class=\"form-group element-wrapper\">\n			<div class=\"col-sm-1\">{{component.name}}\n				<button type='button' class='btn btn-success btn-sm'\n						ng-click='addComponentToEnd($event, component)'>+</button>\n			</div>\n			<div class=\"col-sm-11\">\n				<div class='fb-component' fb-component=\"component\" ng-component=\"{{component.name}}\"></div>\n			</div>\n	</div>\n</div>",
         controller: 'fbComponentsController'
       };
     }
@@ -666,7 +909,7 @@
     '$injector', function($injector) {
       return {
         restrict: 'A',
-        template: "<div class=\"fb-builderPagination\">\n	<div class=\"pull-left\">\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n		        ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !next}\" ng-click=\"goF()\">></button>\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" ng-init=\"currentPage=0\">\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right disabled\"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n			        aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
+        template: "<div class=\"fb-builderPagination\">\n	<div class=\"pull-left\">\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !next}\" ng-click=\"goF()\">></button>\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" ng-init=\"currentPage=0\">\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right disabled\"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
         controller: 'PaginationController'
       };
     }
@@ -694,6 +937,7 @@
       move: {},
       up: {}
     };
+    this.innerDropHover = false;
     this.eventMouseMove = function() {};
     this.eventMouseUp = function() {};
     $((function(_this) {
@@ -1074,7 +1318,8 @@
         isMouseMoved: this.isMouseMoved,
         data: this.data,
         draggable: this.draggable,
-        droppable: this.droppable
+        droppable: this.droppable,
+        innerDropHover: this.innerDropHover
       };
     };
     this.get.$inject = ['$injector'];
