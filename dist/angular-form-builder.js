@@ -205,6 +205,7 @@
       $scope.next = false;
       $scope.updatePage = function() {
         var count, forms, page;
+        console.log('update');
         count = 0;
         forms = $builder.forms;
         if (typeof forms.length === 'number') {
@@ -224,34 +225,31 @@
       };
       $scope.addPage = function(pageCount) {
         $builder.forms[$scope.pageCount] = [];
-        console.log(pageCount, $scope.pageCount, $builder.forms);
         return $scope.updatePage();
       };
       $scope.deletePage = function(pageNumber) {
-        var current, currentForm, forms, page, pageObj;
+        var current, forms, page, pageObj;
         forms = $builder.forms;
-        delete forms[pageNumber];
+        current = forms[pageNumber + 1] ? pageNumber + 1 : pageNumber - 1;
+        console.log(pageNumber, forms, current);
         if (typeof forms.length === 'number') {
           forms.splice(pageNumber, 1);
         } else {
+          delete forms[pageNumber];
           for (page in forms) {
             pageObj = forms[page];
-            console.log(current, page, pageObj);
             if (page > pageNumber) {
               forms[page - 1] = forms[page];
             }
           }
+          delete forms[$scope.pageCount - 1];
         }
-        delete forms[$scope.pageCount - 1];
-        currentForm = current;
-        $scope.updatePage();
-        current = forms[pageNumber - 1] ? pageNumber - 1 : pageNumber + 1;
-        return $scope.goPage(current);
+        $builder.currentForm = current > pageNumber ? pageNumber : current;
+        $scope.currentPage = false;
+        return $scope.currentPage = pageNumber;
       };
       $scope.goPage = function(page) {
-        if (page === $builder.currentForm) {
-          return false;
-        }
+        console.log('GO PAGE', page, $builder.currentForm, $builder.forms);
         if ($builder.forms[page]) {
           $builder.currentForm = page;
           $scope.updatePage();
@@ -287,7 +285,7 @@
         scope: {
           fbBuilder: '='
         },
-        template: "<div class='form-horizontal' fb-page={{currentPage}}>\n    <div class='fb-form-object-editable' ng-repeat=\"object in formObjects\"\n        fb-form-object-editable=\"object\"></div>\n</div>",
+        template: "<div class='form-horizontal' fb-page={{currentPage}} fb-page-count={{pageCount}}>\n	<div class='fb-form-object-editable' ng-repeat=\"object in formObjects\"\n		fb-form-object-editable=\"object\"></div>\n</div>",
         controller: 'PaginationController',
         link: function(scope, element, attrs) {
           var beginMove, _base, _name;
@@ -298,11 +296,16 @@
           scope.formObjects = $builder.forms[scope.formNumber];
           beginMove = true;
           scope.currentPage = 1;
-          scope.$watch(function() {
-            return $builder.currentForm;
-          }, function(current, prev) {
-            console.log(arguments, 'page change');
-            scope.formNumber = current;
+          scope.$watchGroup([
+            function() {
+              return $builder.forms[$builder.currentForm];
+            }, function() {
+              return $builder.forms.length;
+            }
+          ], function(current, prev) {
+            console.log(arguments, 'page change -> change pagin', $builder.currentForm);
+            scope.formNumber = $builder.currentForm;
+            scope.currentPage = $builder.currentForm;
             return scope.formObjects = $builder.forms[scope.formNumber];
           });
           $(element).addClass('fb-builder');
@@ -446,7 +449,7 @@
             save: function($event) {
 
               /*
-              The save event of the popover.
+              				The save event of the popover.
                */
               $event.preventDefault();
               $validator.validate(scope).success(function() {
@@ -457,7 +460,7 @@
             remove: function($event) {
 
               /*
-              The delete event of the popover.
+              				The delete event of the popover.
                */
               $event.preventDefault();
               $builder.removeFormObject(scope.$parent.formNumber, scope.$parent.$index);
@@ -466,7 +469,7 @@
             shown: function() {
 
               /*
-              The shown event of the popover.
+              				The shown event of the popover.
                */
               scope.data.backup();
               return popover.isClickedSave = false;
@@ -474,7 +477,7 @@
             cancel: function($event) {
 
               /*
-              The cancel event of the popover.
+              				The cancel event of the popover.
                */
               scope.data.rollback();
               if ($event) {
@@ -536,7 +539,7 @@
     '$injector', function($injector) {
       return {
         restrict: 'A',
-        template: "        <ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n            <li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n                <a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n            </li>\n        </ul>\n        <div class='form-horizontal col-sm-12 elementList'>\n            <div ng-repeat=\"component in components\">\n	<div class=\"form-group element-wrapper\">\n		<div class=\"col-sm-1\">{{component.name}}\n			<button type='button' class='btn btn-success btn-sm'\n					ng-click='addComponentToEnd($event, component)'>+</button>\n		</div>\n		<div class=\"col-sm-11\">\n			<div class='fb-component' fb-component=\"component\"></div>\n		</div>\n</div>\n        </div>",
+        template: "<ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n	<li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n		<a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n	</li>\n</ul>\n<div class='form-horizontal col-sm-12 elementList'>\n	<div ng-repeat=\"component in components\">\n		<div class=\"form-group element-wrapper\">\n			<div class=\"col-sm-1\">{{component.name}}\n				<button type='button' class='btn btn-success btn-sm'\n						ng-click='addComponentToEnd($event, component)'>+</button>\n			</div>\n			<div class=\"col-sm-11\">\n				<div class='fb-component' fb-component=\"component\"></div>\n			</div>\n	</div>\n</div>",
         controller: 'fbComponentsController'
       };
     }
@@ -673,10 +676,22 @@
     }
   ]).directive('fbPages', [
     '$injector', function($injector) {
+      var $builder;
+      $builder = $injector.get('$builder');
       return {
         restrict: 'A',
-        template: "<div class=\"fb-builderPagination\">\n	<div class=\"pull-left\">\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n		        ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !next}\" ng-click=\"goF()\">></button>\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" >\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right disabled\"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n			        aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
-        controller: 'PaginationController'
+        template: "<div class=\"fb-builderPagination\">\n	<div class=\"pull-left\">\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !next}\" ng-click=\"goF()\">></button>\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" >\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right disabled\"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
+        controller: 'PaginationController',
+        link: function(scope, element, attrs) {
+          return scope.$watch(function() {
+            return $builder.forms.length;
+          }, function() {
+            console.log(arguments, 'change pagination');
+            scope.pageCount = $builder.forms.length;
+            scope.pages = $builder.forms;
+            return scope.currentPage = $builder.currentForm;
+          });
+        }
       };
     }
   ]);

@@ -198,6 +198,7 @@ angular.module 'builder.controller', ['builder.provider']
 	$scope.next = false
 
 	$scope.updatePage = () ->
+		console.log('update')
 		count = 0
 		forms = $builder.forms
 		if typeof forms.length == 'number'
@@ -210,6 +211,7 @@ angular.module 'builder.controller', ['builder.provider']
 		$scope.pageCount = count
 		$scope.pages = forms
 		$scope.currentPage = $builder.currentForm
+#		$scope.fbBuilder = $builder.currentForm
 		$scope.prev = if ($builder.currentForm > 0) then true else false
 		$scope.next = if ($scope.pageCount > ($builder.currentForm+1)) then true else false
 
@@ -221,28 +223,36 @@ angular.module 'builder.controller', ['builder.provider']
 	$scope.addPage = (pageCount) ->
 #		$event?.preventDefault()
 		$builder.forms[$scope.pageCount] = []
-		console.log(pageCount, $scope.pageCount, $builder.forms)
+#		console.log(pageCount, $scope.pageCount, $builder.forms)
 		$scope.updatePage()
 
 	$scope.deletePage = (pageNumber) ->
 		forms = $builder.forms
-		delete forms[pageNumber]
-		if typeof forms.length == 'number'
+		current = if forms[pageNumber+1] then pageNumber+1 else pageNumber-1
+		console.log(pageNumber, forms, current)
+#		$builder.currentForm = current
+#		$scope.goPage(current)
+#		$scope.currentPage =  current
+#		$scope.current =  current
+#		$scope.updatePage()
+		if typeof forms.length == 'number' #if Array
 			forms.splice(pageNumber, 1)
-		else
+		else #if Object
+			delete forms[pageNumber]
 			for page, pageObj of forms
-				console.log(current,page,pageObj)
 				if page > pageNumber
 					forms[page - 1] = forms[page]
-		delete forms[$scope.pageCount - 1]
-		currentForm = current
-#		console.log(current)
-		$scope.updatePage()
-		current = if forms[pageNumber-1] then pageNumber-1 else pageNumber+1
-		$scope.goPage(current)
+			delete forms[$scope.pageCount - 1]
+#		$scope.currentPage = if pageNumber then pageNumber else 0
+		$builder.currentForm = if current > pageNumber then pageNumber else current
+#		$scope.updatePage()
+#		console.log($builder.currentForm, current)
+		$scope.currentPage = false
+		$scope.currentPage = pageNumber
 
 	$scope.goPage = (page) ->
-		return false if page == $builder.currentForm
+		console.log('GO PAGE',page,$builder.currentForm,$builder.forms)
+#		return false if page == $builder.currentForm
 		if $builder.forms[page]
 			$builder.currentForm = page
 			$scope.updatePage()
