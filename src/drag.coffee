@@ -253,7 +253,7 @@ angular.module 'builder.drag', []
     # ----------------------------------------
     @draggable = ($element, options={}) =>
         ###
-        Make the element could be drag.
+        Make the element able to drag.
         @param element: The jQuery element.
         @param options: Options
             mode: 'drag' [default], 'mirror'

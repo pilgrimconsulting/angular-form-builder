@@ -102,7 +102,7 @@ angular.module 'builder.directive', [
 						$builder.updateFormObjectIndex scope.formNumber, oldIndex, newIndex
 				$(element).find('.empty').remove()
 ]
-	
+
 # ----------------------------------------
 # fb-builder
 # ----------------------------------------
