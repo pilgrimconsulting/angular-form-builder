@@ -25,7 +25,9 @@
     cursor: move;
   }
 }
-
+.fb-section{
+  min-height: 100px;
+}
 .fb-form-object-editable {
   padding: 10px;
 }
@@ -52,6 +54,15 @@
   height: 80px;
   border: dashed 1px #aaa;
   background-color: #eee;
+}
+
+.fb-section-object-editable.empty {
+  cursor: default;
+  margin: 6px;
+  height: 80px;
+  border: dashed 1px #aaa;
+  background-color: #eee;
+  z-index: 700;
 }
 
 .fb-draggable.dragging {

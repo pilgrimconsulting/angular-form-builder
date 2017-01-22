@@ -447,24 +447,13 @@ Global.__fbComponents.default = ($builderProvider) ->
 		show_label: yes
 		required: no
 		template:
-#				<script type="text/ng-template" id="group-template.html" ng-init='isOpen = true'>
-#					<div class="panel-heading">
-#						<h4 class="panel-title">
-#							<a href tabindex="0" class="accordion-toggle" uib-accordion-transclude="heading">
-#								<span uib-accordion-header>{{label}}</span>
-#							</a>
-#						</h4>
-#					</div>
-#					<div class="panel-collapse collapse" uib-collapse="!isOpen">
-#						<div class="panel-body" style="text-align: right" ng-transclude></div>
-#					</div>
-#				</script>
+
 			"""
 			<div>
 			    <uib-accordion>
 					<div uib-accordion-group class="panel-default" is-open="isOpen" is-disabled="false" >
 						<uib-accordion-heading>
-							{{label}} <i class="pull-right glyphicon" ng-click="toggleOpen()" ng-azaza`zsxza`z`za` 
+							{{label}} <i class="pull-right glyphicon" ng-click="toggleOpen()" ng-azaza`zsxza`z`za`
 							ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-right': isOpen}"></i>
 						</uib-accordion-heading>
 						<div fb-section></div>

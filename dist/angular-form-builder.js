@@ -276,14 +276,16 @@
       return {
         restrict: 'A',
         scope: {
-          fbSection: '='
+          fbSection: '=',
+          fbSectionObjectEditable: '='
         },
-        template: "<div class='fb-section-object-editable'\n		fb-section-object-editable=\"object\">\n	<p>section</p><br/><br/>\n</div>",
+        template: "<div class='fb-section-object-editable' fb-section-object-editable=\"object\">\n	<div class='fb-section-object-editable ' ng-repeat=\"object in formObjects\"></div>\n</div>",
         link: function(scope, element, attr) {
           $(element).addClass('fb-section');
           return $drag.droppable($(element), {
             move: function(e) {
               var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
+              console.log("--> move");
               if (beginMove) {
                 $("div.fb-section-object-editable").popover('hide');
                 beginMove = false;
@@ -319,6 +321,7 @@
             },
             out: function() {
               var beginMove;
+              console.log("--> out");
               if (beginMove) {
                 $("div.fb-section-object-editable").popover('hide');
                 beginMove = false;
@@ -327,6 +330,9 @@
             },
             up: function(e, isHover, draggable) {
               var beginMove, formObject, newIndex, oldIndex;
+              console.log("--> up");
+              console.log(isHover);
+              console.log(draggable);
               beginMove = true;
               if (!$drag.isMouseMoved()) {
                 $(element).find('.empty').remove();
@@ -338,6 +344,7 @@
                   $builder.removeFormObject(attrs.fbBuilder, formObject.index);
                 }
               } else if (isHover) {
+                debugger;
                 if (draggable.mode === 'mirror') {
                   $builder.insertFormObject(scope.formNumber, $(element).find('.empty').index('.fb-section-object-editable'), {
                     component: draggable.object.componentName
@@ -386,80 +393,7 @@
             scope.formNumber = current;
             return scope.formObjects = $builder.forms[scope.formNumber];
           });
-          $(element).addClass('fb-builder');
-          return $drag.droppable($(element), {
-            move: function(e) {
-              var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
-              if (beginMove) {
-                $("div.fb-form-object-editable").popover('hide');
-                beginMove = false;
-              }
-              $formObjects = $(element).find('.fb-form-object-editable:not(.empty,.dragging)');
-              if ($formObjects.length === 0) {
-                if ($(element).find('.fb-form-object-editable.empty').length === 0) {
-                  $(element).find('>div:first').append($("<div class='fb-form-object-editable empty'></div>"));
-                }
-                return;
-              }
-              positions = [];
-              positions.push(-1000);
-              for (index = _i = 0, _ref = $formObjects.length; _i < _ref; index = _i += 1) {
-                $formObject = $($formObjects[index]);
-                offset = $formObject.offset();
-                height = $formObject.height();
-                positions.push(offset.top + height / 2);
-              }
-              positions.push(positions[positions.length - 1] + 1000);
-              for (index = _j = 1, _ref1 = positions.length; _j < _ref1; index = _j += 1) {
-                if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
-                  $(element).find('.empty').remove();
-                  $empty = $("<div class='fb-form-object-editable empty'></div>");
-                  if (index - 1 < $formObjects.length) {
-                    $empty.insertBefore($($formObjects[index - 1]));
-                  } else {
-                    $empty.insertAfter($($formObjects[index - 2]));
-                  }
-                  break;
-                }
-              }
-            },
-            out: function() {
-              if (beginMove) {
-                $("div.fb-form-object-editable").popover('hide');
-                beginMove = false;
-              }
-              return $(element).find('.empty').remove();
-            },
-            up: function(e, isHover, draggable) {
-              var formObject, newIndex, oldIndex;
-              beginMove = true;
-              if (!$drag.isMouseMoved()) {
-                $(element).find('.empty').remove();
-                return;
-              }
-              if (!isHover && draggable.mode === 'drag') {
-                formObject = draggable.object.formObject;
-                if (formObject.editable) {
-                  $builder.removeFormObject(attrs.fbBuilder, formObject.index);
-                }
-              } else if (isHover) {
-                if (draggable.mode === 'mirror') {
-                  $builder.insertFormObject(scope.formNumber, $(element).find('.empty').index('.fb-form-object-editable'), {
-                    component: draggable.object.componentName
-                  });
-                }
-                if (draggable.mode === 'drag') {
-                  oldIndex = draggable.object.formObject.index;
-                  newIndex = $(element).find('.empty').index('.fb-form-object-editable');
-                  if (oldIndex < newIndex) {
-                    newIndex--;
-                  }
-                  $builder.updateFormObjectIndex(scope.formNumber, oldIndex, newIndex);
-                }
-              }
-              return $(element).find('.empty').remove();
-            }
-          });
+          return $(element).addClass('fb-builder');
         }
       };
     }
