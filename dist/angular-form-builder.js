@@ -282,7 +282,7 @@
           fbSection: '=',
           fbSectionObjectEditable: '='
         },
-        template: "<div class='fb-section-object-editable'>\n	<div class='fb-section-object-editable' ng-repeat=\"object in sectionObjects\" fb-section-object-editable=\"object\" fb-draggable='allow'>\n	</div>\n</div>",
+        template: "<div class='fb-section-object-editable'>\n	<div class='fb-section-object-editable' ng-repeat=\"object in sectionObjects\" fb-form-object-editable=\"object\" fb-draggable='allow'>\n	</div>\n</div>",
         link: function(scope, element, attr) {
           var uuid;
           $(element).addClass('fb-section');
