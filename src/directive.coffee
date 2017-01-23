@@ -29,7 +29,7 @@ angular.module 'builder.directive', [
 # 	fb-form-object-editable="object" fb-draggable='allow'></div>
 		"""
 		<div class='fb-section-object-editable'>
-			<div class='fb-section-object-editable' ng-repeat="object in sectionObjects" fb-section-object-editable="object" fb-draggable='allow'>
+			<div class='fb-section-object-editable' ng-repeat="object in sectionObjects" fb-form-object-editable="object" >
 			</div>
 		</div>
 		"""
