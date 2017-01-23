@@ -37,8 +37,8 @@ angular.module 'builder.directive', [
 		$(element).addClass 'fb-section'
 		uuid = $(element).closest(".fb-form-object-editable").index()
 		scope.sectionObjects = $builder.getSectionObjects uuid
-		console.log "--------------> builder"
-		console.log $builder.forms
+#		console.log "--------------> builder"
+#		console.log $builder.forms
 		$drag.droppable $(element),
 			move: (e) ->
 				if beginMove
@@ -102,7 +102,7 @@ angular.module 'builder.directive', [
 						$builder.insertSectionObject $builder.currentForm, uuid, $(element).find('.empty').index('.fb-section-object-editable'),
 							component: draggable.object.componentName
 						scope.sectionObjects = $builder.getSectionObjects uuid
-						console.log scope.sectionObjects
+#						console.log scope.sectionObjects
 					if draggable.mode is 'drag'
 						# update the index of form objects
 						oldIndex = draggable.object.formObject.index
@@ -151,74 +151,97 @@ angular.module 'builder.directive', [
 #		, yes
 
 		$(element).addClass 'fb-builder'
-		# $drag.droppable $(element),
-		# 	move: (e) ->
-		# 		if beginMove
-		# 			# hide all popovers
-		# 			$("div.fb-form-object-editable").popover 'hide'
-		# 			beginMove = no
-		#
-		# 		$formObjects = $(element).find '.fb-form-object-editable:not(.empty,.dragging)'
-		# 		if $formObjects.length is 0
-		# 			# there are no components in the builder.
-		# 			if $(element).find('.fb-form-object-editable.empty').length is 0
-		# 				$(element).find('>div:first').append $("<div class='fb-form-object-editable empty'></div>")
-		# 			return
-		#
-		# 		# the positions could added .empty div.
-		# 		positions = []
-		# 		# first
-		# 		positions.push -1000
-		# 		for index in [0...$formObjects.length] by 1
-		# 			$formObject = $($formObjects[index])
-		# 			offset = $formObject.offset()
-		# 			height = $formObject.height()
-		# 			positions.push offset.top + height / 2
-		# 		positions.push positions[positions.length - 1] + 1000   # last
-		#
-		# 		# search where should I insert the .empty
-		# 		for index in [1...positions.length] by 1
-		# 			if e.pageY > positions[index - 1] and e.pageY <= positions[index]
-		# 				# you known, this one
-		# 				$(element).find('.empty').remove()
-		# 				$empty = $ "<div class='fb-form-object-editable empty'></div>"
-		# 				if index - 1 < $formObjects.length
-		# 					$empty.insertBefore $($formObjects[index - 1])
-		# 				else
-		# 					$empty.insertAfter $($formObjects[index - 2])
-		# 				break
-		# 		return
-		# 	out: ->
-		# 		if beginMove
-		# 			# hide all popovers
-		# 			$("div.fb-form-object-editable").popover 'hide'
-		# 			beginMove = no
-		#
-		# 		$(element).find('.empty').remove()
-		# 	up: (e, isHover, draggable) ->
-		# 		beginMove = yes
-		# 		if not $drag.isMouseMoved()
-		# 			# click event
-		# 			$(element).find('.empty').remove()
-		# 			return
-		#
-		# 		if not isHover and draggable.mode is 'drag'
-		# 			# remove the form object by draggin out
-		# 			formObject = draggable.object.formObject
-		# 			if formObject.editable
-		# 				$builder.removeFormObject attrs.fbBuilder, formObject.index
-		# 		else if isHover
-		# 			if draggable.mode is 'mirror'
-		# 				# insert a form object
-		# 				$builder.insertFormObject scope.formNumber, $(element).find('.empty').index('.fb-form-object-editable'),
-		# 					component: draggable.object.componentName
-		# 			if draggable.mode is 'drag'
-		# 				# update the index of form objects
-		# 				oldIndex = draggable.object.formObject.index
-		# 				newIndex = $(element).find('.empty').index('.fb-form-object-editable')
-		# 				newIndex-- if oldIndex < newIndex
-		# 				$builder.updateFormObjectIndex scope.formNumber, oldIndex, newIndex
-		# 		$(element).find('.empty').remove()
+
+		allowKey = 'Alt'
+		keyHold = ''
+		KeyDown = (e) =>
+			KeyID = if window.event then event.keyCode else e.keyCode;
+			switch KeyID
+				when 18 then keyName = "Alt"
+				when 17 then keyName = "Ctrl"
+			keyHold = keyName
+			console.log(keyHold)
+
+		KeyUp = (e) =>
+			KeyID = if window.event then event.keyCode else e.keyCode;
+			switch KeyID
+				when 18 then keyName = "Alt"
+				when 17 then keyName = "Ctrl"
+			if keyHold == keyName then keyHold = ""
+			console.log('UP', keyHold)
+		document.onkeydown = KeyDown
+		document.onkeyup = KeyUp
+
+		$drag.droppable $(element),
+			move: (e) ->
+				if beginMove
+					# hide all popovers
+					$("div.fb-form-object-editable").popover 'hide'
+					beginMove = no
+
+				if keyHold != allowKey then return
+				$formObjects = $(element).find '.fb-form-object-editable:not(.empty,.dragging)'
+				if $formObjects.length is 0
+					# there are no components in the builder.
+					if $(element).find('.fb-form-object-editable.empty').length is 0
+						$(element).find('>div:first').append $("<div class='fb-form-object-editable empty'></div>")
+					return
+
+				# the positions could added .empty div.
+				positions = []
+				# first
+				positions.push -1000
+				for index in [0...$formObjects.length] by 1
+					$formObject = $($formObjects[index])
+					offset = $formObject.offset()
+					height = $formObject.height()
+					positions.push offset.top + height / 2
+				positions.push positions[positions.length - 1] + 1000   # last
+
+				# search where should I insert the .empty
+				for index in [1...positions.length] by 1
+					if e.pageY > positions[index - 1] and e.pageY <= positions[index]
+						# you known, this one
+						$(element).find('.empty').remove()
+						$empty = $ "<div class='fb-form-object-editable empty'></div>"
+						if index - 1 < $formObjects.length
+							$empty.insertBefore $($formObjects[index - 1])
+						else
+							$empty.insertAfter $($formObjects[index - 2])
+						break
+				return
+			out: ->
+				if beginMove
+					# hide all popovers
+					$("div.fb-form-object-editable").popover 'hide'
+					beginMove = no
+
+				$(element).find('.empty').remove()
+			up: (e, isHover, draggable) ->
+				beginMove = yes
+				if keyHold != allowKey then return
+				if not $drag.isMouseMoved()
+					# click event
+					$(element).find('.empty').remove()
+					return
+
+				if not isHover and draggable.mode is 'drag'
+					# remove the form object by draggin out
+					formObject = draggable.object.formObject
+					if formObject.editable
+						$builder.removeFormObject attrs.fbBuilder, formObject.index
+				else if isHover
+					if draggable.mode is 'mirror'
+						# insert a form object
+						$builder.insertFormObject scope.formNumber, $(element).find('.empty').index('.fb-form-object-editable'),
+							component: draggable.object.componentName
+					if draggable.mode is 'drag'
+						# update the index of form objects
+						oldIndex = draggable.object.formObject.index
+						newIndex = $(element).find('.empty').index('.fb-form-object-editable')
+						newIndex-- if oldIndex < newIndex
+						$builder.updateFormObjectIndex scope.formNumber, oldIndex, newIndex
+				$(element).find('.empty').remove()
 
 ]
 
@@ -235,6 +258,7 @@ angular.module 'builder.directive', [
 	restrict: 'A'
 	controller: 'fbFormObjectEditableController'
 	scope:
+		isOpen: '=isOpen'
 		formObject: '=fbFormObjectEditable'
 	link: (scope, element) ->
 		scope.inputArray = [] # just for fix warning
@@ -248,6 +272,7 @@ angular.module 'builder.directive', [
 			return if not template
 			view = $compile(template) scope
 			$(element).html view
+			console.log('Component change')
 
 		# disable click event
 		$(element).on 'click', -> no
@@ -257,7 +282,10 @@ angular.module 'builder.directive', [
 #		if $(element).attr('fb-draggable') == !'allow'
 		# draggable
 
+		console.log(scope.$component.name, scope.isOpen)
+		allow = if scope.$component.name == 'section' then no else yes
 		$drag.draggable $(element),
+#			allow: allow
 			object:
 				formObject: scope.formObject
 
