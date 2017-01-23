@@ -28,15 +28,19 @@ angular.module 'builder.directive', [
 # <div class='fb-section-object-editable ' ng-repeat="object in formObjects"
 # 	fb-form-object-editable="object" fb-draggable='allow'></div>
 		"""
-		<div class='fb-section-object-editable' fb-section-object-editable="object">
-			<div class='fb-section-object-editable ' ng-repeat="object in formObjects"></div>
+		<div class='fb-section-object-editable'>
+			<div class='fb-section-object-editable' ng-repeat="object in sectionObjects" fb-section-object-editable="object" fb-draggable='allow'>
+			</div>
 		</div>
 		"""
 	link: (scope, element, attr) ->
 		$(element).addClass 'fb-section'
+		uuid = $(element).closest(".fb-form-object-editable").index()
+		scope.sectionObjects = $builder.getSectionObjects uuid
+		console.log "--------------> builder"
+		console.log $builder.forms
 		$drag.droppable $(element),
 			move: (e) ->
-				console.log "--> move"
 				if beginMove
 					# hide all popovers
 					$("div.fb-section-object-editable").popover 'hide'
@@ -74,7 +78,6 @@ angular.module 'builder.directive', [
 						break
 				return
 			out: ->
-				console.log "--> out"
 				if beginMove
 					# hide all popovers
 					$("div.fb-section-object-editable").popover 'hide'
@@ -82,9 +85,6 @@ angular.module 'builder.directive', [
 
 				$(element).find('.empty').remove()
 			up: (e, isHover, draggable) ->
-				console.log "--> up"
-				console.log isHover
-				console.log draggable
 				beginMove = yes
 				if not $drag.isMouseMoved()
 					# click event
@@ -97,11 +97,12 @@ angular.module 'builder.directive', [
 					if formObject.editable
 						$builder.removeFormObject attrs.fbBuilder, formObject.index
 				else if isHover
-					debugger
 					if draggable.mode is 'mirror'
 						# insert a form object
-						$builder.insertFormObject scope.formNumber, $(element).find('.empty').index('.fb-section-object-editable'),
+						$builder.insertSectionObject $builder.currentForm, uuid, $(element).find('.empty').index('.fb-section-object-editable'),
 							component: draggable.object.componentName
+						scope.sectionObjects = $builder.getSectionObjects uuid
+						console.log scope.sectionObjects
 					if draggable.mode is 'drag'
 						# update the index of form objects
 						oldIndex = draggable.object.formObject.index
@@ -255,13 +256,13 @@ angular.module 'builder.directive', [
 
 #		if $(element).attr('fb-draggable') == !'allow'
 		# draggable
+
 		$drag.draggable $(element),
 			object:
 				formObject: scope.formObject
 
 		# do not setup bootstrap popover
 		return if not scope.formObject.editable
-
 		# ----------------------------------------
 		# bootstrap popover
 		# ----------------------------------------
@@ -473,7 +474,7 @@ angular.module 'builder.directive', [
 		$(element).on 'show.bs.popover', ->
 			return no if $drag.isMouseMoved()
 			# hide other popovers
-			$("div.fb-form-object-editable:not(.#{popover.id})").popover 'hide'
+			$("div.fb-section-object-editable:not(.#{popover.id})").popover 'hide'
 
 			$popover = $("form.#{popover.id}").closest '.popover'
 			if $popover.length > 0

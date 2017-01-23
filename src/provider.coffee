@@ -66,6 +66,7 @@ angular.module 'builder.provider', []
             templateUrl: component.templateUrl
             popoverTemplate: component.popoverTemplate
             popoverTemplateUrl: component.popoverTemplateUrl
+            components: component.components ? []
         if not result.template and not result.templateUrl
             console.error "The template is empty."
         if not result.popoverTemplate and not result.popoverTemplateUrl
@@ -93,12 +94,19 @@ angular.module 'builder.provider', []
             footer: formObject.footer ? component.footer
             align: formObject.align ? component.align
             style: formObject.style ? component.style
+            components: formObject.components ? component.components
         result
 
     @reindexFormObject = (name) =>
         formObjects = @forms[name]
         for index in [0...formObjects.length] by 1
             formObjects[index].index = index
+        return
+
+    @reindexSectionObject = (name, sectionIndex) =>
+        sectionObjects = @forms[name][sectionIndex].components
+        for index in [0...sectionObjects.length] by 1
+            sectionObjects[index].index = index
         return
 
     @setupProviders = (injector) =>
@@ -163,6 +171,36 @@ angular.module 'builder.provider', []
         ###
         @forms[name] ?= []
         @insertFormObject name, @forms[name].length, formObject
+
+
+    @insertSectionObject = (name, sectionIndex, index, formObject={}) =>
+        ###
+        Insert the form object into the form at {index}.
+        @param name: The form name.
+        @param index: The form object index.
+        @param form: The form object.
+            id: The form object id.
+            component: {string} The component name
+            editable: {bool} Is the form object editable? (default is yes)
+            label: {string} The form object label.
+            description: {string} The form object description.
+            placeholder: {string} The form object placeholder.
+            options: {array} The form object options.
+            required: {bool} Is the form object required? (default is no)
+            inline: {bool} Is the form object inline? (default is no)
+            validation: {string} angular-validator. "/regex/" or "[rule1, rule2]".
+            [index]: {int} The form object index. It will be updated by $builder.
+        @return: The form object.
+        ###
+        @forms[name][sectionIndex].components ?= []
+        if index > @forms[name][sectionIndex].components.length then index = @forms[name][sectionIndex].components.length
+        else if index < 0 then index = 0
+        @forms[name][sectionIndex].components.splice index, 0, @convertFormObject(name, formObject)
+        @reindexSectionObject name, sectionIndex
+        @forms[name][sectionIndex].components[index]
+
+    @getSectionObjects = (sectionIndex) =>
+        if @forms[@currentForm][sectionIndex] then @forms[@currentForm][sectionIndex].components else []
 
     @insertFormObject = (name, index, formObject={}) =>
         ###
@@ -232,5 +270,7 @@ angular.module 'builder.provider', []
         insertFormObject: @insertFormObject
         removeFormObject: @removeFormObject
         updateFormObjectIndex: @updateFormObjectIndex
+        getSectionObjects: @getSectionObjects
+        insertSectionObject: @insertSectionObject
     ]
     return

@@ -446,6 +446,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		label: 'Collapsed section'
 		show_label: yes
 		required: no
+		components: []
 		template:
 
 			"""

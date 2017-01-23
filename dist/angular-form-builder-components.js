@@ -127,6 +127,7 @@
       label: 'Collapsed section',
       show_label: true,
       required: false,
+      components: [],
       template: "<div>\n    <uib-accordion>\n		<div uib-accordion-group class=\"panel-default\" is-open=\"isOpen\" is-disabled=\"false\" >\n			<uib-accordion-heading>\n				{{label}} <i class=\"pull-right glyphicon\" ng-click=\"toggleOpen()\" ng-azaza`zsxza`z`za`\n				ng-class=\"{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-right': isOpen}\"></i>\n			</uib-accordion-heading>\n			<div fb-section></div>\n		</div>\n    </uib-accordion>\n<div/>",
       popoverTemplate: "<form>\n	<div class=\"checkbox\">\n		<label>\n			<input type='checkbox' ng-model='show_label' />\n			Show label\n		</label>\n	</div>\n	<div class=\"form-group\" ng-hide='!show_label'>\n		<label class='control-label'>Label</label>\n		<input type='text' ng-model=\"label\" validator=\"{{show_label ? '[required]' : ''}}\" class='form-control'/>\n	</div>\n		<hr/>\n	<div class='form-group'>\n		<input type='submit' ng-click=\"popover.save($event)\" class='btn btn-primary' value='Save'/>\n		<input type='button' ng-click=\"popover.cancel($event)\" class='btn btn-default' value='Cancel'/>\n		<input type='button' ng-click=\"popover.remove($event)\" class='btn btn-danger' value='Delete'/>\n	</div>\n</form>"
     });

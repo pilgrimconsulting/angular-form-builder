@@ -35,7 +35,7 @@ angular.module 'builder.controller', ['builder.provider']
 		$scope.optionsText = formObject.options.join '\n'
 
 		$scope.$watch '[label, show_label, description, placeholder, required, inline, options, validation, text, header,
- footer, align, style]', ->
+ footer, align, style, components]', ->
 			formObject.label = $scope.label
 			formObject.show_label = $scope.show_label
 			formObject.description = $scope.description
@@ -49,6 +49,7 @@ angular.module 'builder.controller', ['builder.provider']
 			formObject.footer = $scope.footer
 			formObject.align = $scope.align
 			formObject.style = $scope.style
+			formObject.components = $scope.components
 		, yes
 
 		$scope.$watch 'optionsText', (text) ->
@@ -78,6 +79,7 @@ angular.module 'builder.controller', ['builder.provider']
 				footer: $scope.footer
 				align: $scope.align
 				style: $scope.style
+				components: $scope.components
 		rollback: ->
 			###
 			Rollback input value.
@@ -96,6 +98,7 @@ angular.module 'builder.controller', ['builder.provider']
 			$scope.footer = @model.footer
 			$scope.align = @model.align
 			$scope.style = @model.style
+			$scope.components = @model.components
 ]
 
 

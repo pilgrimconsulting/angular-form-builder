@@ -31,7 +31,7 @@
         var component;
         copyObjectToScope(formObject, $scope);
         $scope.optionsText = formObject.options.join('\n');
-        $scope.$watch('[label, show_label, description, placeholder, required, inline, options, validation, text, header, footer, align, style]', function() {
+        $scope.$watch('[label, show_label, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function() {
           formObject.label = $scope.label;
           formObject.show_label = $scope.show_label;
           formObject.description = $scope.description;
@@ -44,7 +44,8 @@
           formObject.header = $scope.header;
           formObject.footer = $scope.footer;
           formObject.align = $scope.align;
-          return formObject.style = $scope.style;
+          formObject.style = $scope.style;
+          return formObject.components = $scope.components;
         }, true);
         $scope.$watch('optionsText', function(text) {
           var x;
@@ -85,7 +86,8 @@
             header: $scope.header,
             footer: $scope.footer,
             align: $scope.align,
-            style: $scope.style
+            style: $scope.style,
+            components: $scope.components
           };
         },
         rollback: function() {
@@ -108,7 +110,8 @@
           $scope.header = this.model.header;
           $scope.footer = this.model.footer;
           $scope.align = this.model.align;
-          return $scope.style = this.model.style;
+          $scope.style = this.model.style;
+          return $scope.components = this.model.components;
         }
       };
     }
@@ -279,13 +282,17 @@
           fbSection: '=',
           fbSectionObjectEditable: '='
         },
-        template: "<div class='fb-section-object-editable' fb-section-object-editable=\"object\">\n	<div class='fb-section-object-editable ' ng-repeat=\"object in formObjects\"></div>\n</div>",
+        template: "<div class='fb-section-object-editable'>\n	<div class='fb-section-object-editable' ng-repeat=\"object in sectionObjects\" fb-section-object-editable=\"object\" fb-draggable='allow'>\n	</div>\n</div>",
         link: function(scope, element, attr) {
+          var uuid;
           $(element).addClass('fb-section');
+          uuid = $(element).closest(".fb-form-object-editable").index();
+          scope.sectionObjects = $builder.getSectionObjects(uuid);
+          console.log("--------------> builder");
+          console.log($builder.forms);
           return $drag.droppable($(element), {
             move: function(e) {
               var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
-              console.log("--> move");
               if (beginMove) {
                 $("div.fb-section-object-editable").popover('hide');
                 beginMove = false;
@@ -321,7 +328,6 @@
             },
             out: function() {
               var beginMove;
-              console.log("--> out");
               if (beginMove) {
                 $("div.fb-section-object-editable").popover('hide');
                 beginMove = false;
@@ -330,9 +336,6 @@
             },
             up: function(e, isHover, draggable) {
               var beginMove, formObject, newIndex, oldIndex;
-              console.log("--> up");
-              console.log(isHover);
-              console.log(draggable);
               beginMove = true;
               if (!$drag.isMouseMoved()) {
                 $(element).find('.empty').remove();
@@ -344,11 +347,12 @@
                   $builder.removeFormObject(attrs.fbBuilder, formObject.index);
                 }
               } else if (isHover) {
-                debugger;
                 if (draggable.mode === 'mirror') {
-                  $builder.insertFormObject(scope.formNumber, $(element).find('.empty').index('.fb-section-object-editable'), {
+                  $builder.insertSectionObject($builder.currentForm, uuid, $(element).find('.empty').index('.fb-section-object-editable'), {
                     component: draggable.object.componentName
                   });
+                  scope.sectionObjects = $builder.getSectionObjects(uuid);
+                  console.log(scope.sectionObjects);
                 }
                 if (draggable.mode === 'drag') {
                   oldIndex = draggable.object.formObject.index;
@@ -656,7 +660,7 @@
             if ($drag.isMouseMoved()) {
               return false;
             }
-            $("div.fb-form-object-editable:not(." + popover.id + ")").popover('hide');
+            $("div.fb-section-object-editable:not(." + popover.id + ")").popover('hide');
             $popover = $("form." + popover.id).closest('.popover');
             if ($popover.length > 0) {
               elementOrigin = $(element).offset().top + $(element).height() / 2;
@@ -1311,7 +1315,7 @@
     this.forms = {};
     this.forms[this.defaultForm] = [];
     this.convertComponent = function(name, component) {
-      var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       result = {
         name: name,
         group: (_ref = component.group) != null ? _ref : 'Default',
@@ -1334,7 +1338,8 @@
         template: component.template,
         templateUrl: component.templateUrl,
         popoverTemplate: component.popoverTemplate,
-        popoverTemplateUrl: component.popoverTemplateUrl
+        popoverTemplateUrl: component.popoverTemplateUrl,
+        components: (_ref17 = component.components) != null ? _ref17 : []
       };
       if (!result.template && !result.templateUrl) {
         console.error("The template is empty.");
@@ -1345,7 +1350,7 @@
       return result;
     };
     this.convertFormObject = function(name, formObject) {
-      var component, result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      var component, result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       if (formObject == null) {
         formObject = {};
       }
@@ -1370,7 +1375,8 @@
         header: (_ref11 = formObject.header) != null ? _ref11 : component.header,
         footer: (_ref12 = formObject.footer) != null ? _ref12 : component.footer,
         align: (_ref13 = formObject.align) != null ? _ref13 : component.align,
-        style: (_ref14 = formObject.style) != null ? _ref14 : component.style
+        style: (_ref14 = formObject.style) != null ? _ref14 : component.style,
+        components: (_ref15 = formObject.components) != null ? _ref15 : component.components
       };
       return result;
     };
@@ -1380,6 +1386,15 @@
         formObjects = _this.forms[name];
         for (index = _i = 0, _ref = formObjects.length; _i < _ref; index = _i += 1) {
           formObjects[index].index = index;
+        }
+      };
+    })(this);
+    this.reindexSectionObject = (function(_this) {
+      return function(name, sectionIndex) {
+        var index, sectionObjects, _i, _ref;
+        sectionObjects = _this.forms[name][sectionIndex].components;
+        for (index = _i = 0, _ref = sectionObjects.length; _i < _ref; index = _i += 1) {
+          sectionObjects[index].index = index;
         }
       };
     })(this);
@@ -1466,6 +1481,53 @@
           _base[name] = [];
         }
         return _this.insertFormObject(name, _this.forms[name].length, formObject);
+      };
+    })(this);
+    this.insertSectionObject = (function(_this) {
+      return function(name, sectionIndex, index, formObject) {
+        var _base;
+        if (formObject == null) {
+          formObject = {};
+        }
+
+        /*
+        Insert the form object into the form at {index}.
+        @param name: The form name.
+        @param index: The form object index.
+        @param form: The form object.
+            id: The form object id.
+            component: {string} The component name
+            editable: {bool} Is the form object editable? (default is yes)
+            label: {string} The form object label.
+            description: {string} The form object description.
+            placeholder: {string} The form object placeholder.
+            options: {array} The form object options.
+            required: {bool} Is the form object required? (default is no)
+            inline: {bool} Is the form object inline? (default is no)
+            validation: {string} angular-validator. "/regex/" or "[rule1, rule2]".
+            [index]: {int} The form object index. It will be updated by $builder.
+        @return: The form object.
+         */
+        if ((_base = _this.forms[name][sectionIndex]).components == null) {
+          _base.components = [];
+        }
+        if (index > _this.forms[name][sectionIndex].components.length) {
+          index = _this.forms[name][sectionIndex].components.length;
+        } else if (index < 0) {
+          index = 0;
+        }
+        _this.forms[name][sectionIndex].components.splice(index, 0, _this.convertFormObject(name, formObject));
+        _this.reindexSectionObject(name, sectionIndex);
+        return _this.forms[name][sectionIndex].components[index];
+      };
+    })(this);
+    this.getSectionObjects = (function(_this) {
+      return function(sectionIndex) {
+        if (_this.forms[_this.currentForm][sectionIndex]) {
+          return _this.forms[_this.currentForm][sectionIndex].components;
+        } else {
+          return [];
+        }
       };
     })(this);
     this.insertFormObject = (function(_this) {
@@ -1560,7 +1622,9 @@
             addFormObject: _this.addFormObject,
             insertFormObject: _this.insertFormObject,
             removeFormObject: _this.removeFormObject,
-            updateFormObjectIndex: _this.updateFormObjectIndex
+            updateFormObjectIndex: _this.updateFormObjectIndex,
+            getSectionObjects: _this.getSectionObjects,
+            insertSectionObject: _this.insertSectionObject
           };
         };
       })(this)
