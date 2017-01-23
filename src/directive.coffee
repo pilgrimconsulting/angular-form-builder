@@ -142,11 +142,16 @@ angular.module 'builder.directive', [
 		beginMove = yes
 		scope.currentPage = 1
 
-		scope.$watch () ->
-			$builder.currentForm
-		, (current, prev) ->
-			console.log(arguments, 'page change')
-			scope.formNumber = current
+		scope.$watchGroup [() ->
+#			$builder.currentForm
+			$builder.forms[$builder.currentForm]
+		,() ->
+#			scope.currentPage
+			$builder.forms.length
+		], (current, prev) ->
+			console.log(arguments, 'page change -> change pagin', $builder.currentForm)
+			scope.formNumber = $builder.currentForm
+			scope.currentPage = $builder.currentForm
 			scope.formObjects = $builder.forms[scope.formNumber]
 #		, yes
 
@@ -709,8 +714,8 @@ angular.module 'builder.directive', [
 # fb-pages
 # ----------------------------------------
 .directive 'fbPages', ['$injector', ($injector) ->
-# providers
-#	$builder = $injector.get '$builder'
+	# providers
+	$builder = $injector.get '$builder'
 	restrict: 'A'
 	template:
 		"""
@@ -731,7 +736,7 @@ angular.module 'builder.directive', [
 					</ul>
 				</div>
 			</div>
-			<span class="panel-title" ng-init="currentPage=0">
+			<span class="panel-title" >
 				Page <b>\#<span ng-model="page">{{currentPage+1}}</span></b> / {{pageCount}}
 			</span>
 
@@ -759,4 +764,12 @@ angular.module 'builder.directive', [
 		</div>
 		"""
 	controller: 'PaginationController'
+	link: (scope, element, attrs) ->
+		scope.$watch () ->
+			$builder.forms.length
+		, () ->
+			console.log(arguments, 'change pagination')
+			scope.pageCount = $builder.forms.length
+			scope.pages = $builder.forms
+			scope.currentPage = $builder.currentForm
 ]
