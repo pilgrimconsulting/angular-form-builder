@@ -259,8 +259,11 @@ angular.module 'builder.drag', []
             mode: 'drag' [default], 'mirror'
             defer: yes/no. defer dragging
             object: custom information
+            allow: yes/no - allow dragging at the current time
         ###
         result = []
+#        if (!options.allow)
+#            return
         if options.mode is 'mirror'
             for element in $element
                 draggable = @dragMirrorMode $(element), options.defer, options.object

@@ -207,45 +207,52 @@
       $scope.prev = false;
       $scope.next = false;
       $scope.updatePage = function() {
-        var count, page;
+        var count, forms, page;
+        console.log('update');
         count = 0;
-        for (page in $builder.forms) {
-          if ($builder.forms.hasOwnProperty(page)) {
-            ++count;
+        forms = $builder.forms;
+        if (typeof forms.length === 'number') {
+          count = forms.length;
+        } else {
+          for (page in forms) {
+            if (forms.hasOwnProperty(page)) {
+              ++count;
+            }
           }
         }
         $scope.pageCount = count;
-        $scope.pages = $builder.forms;
+        $scope.pages = forms;
         $scope.currentPage = $builder.currentForm;
         $scope.prev = $builder.currentForm > 0 ? true : false;
         return $scope.next = $scope.pageCount > ($builder.currentForm + 1) ? true : false;
       };
       $scope.addPage = function(pageCount) {
         $builder.forms[$scope.pageCount] = [];
-        console.log(pageCount, $scope.pageCount, $builder.forms);
         return $scope.updatePage();
       };
       $scope.deletePage = function(pageNumber) {
-        var current, page, pageObj, _ref;
-        delete $builder.forms[pageNumber];
-        _ref = $builder.forms;
-        for (page in _ref) {
-          pageObj = _ref[page];
-          console.log(current, page, pageObj);
-          if (page > pageNumber) {
-            $builder.forms[page - 1] = $builder.forms[page];
+        var current, forms, page, pageObj;
+        forms = $builder.forms;
+        current = forms[pageNumber + 1] ? pageNumber + 1 : pageNumber - 1;
+        console.log(pageNumber, forms, current);
+        if (typeof forms.length === 'number') {
+          forms.splice(pageNumber, 1);
+        } else {
+          delete forms[pageNumber];
+          for (page in forms) {
+            pageObj = forms[page];
+            if (page > pageNumber) {
+              forms[page - 1] = forms[page];
+            }
           }
+          delete forms[$scope.pageCount - 1];
         }
-        delete $builder.forms[$scope.pageCount - 1];
-        $builder.currentForm = current;
-        $scope.updatePage();
-        current = $builder.forms[pageNumber - 1] ? pageNumber - 1 : pageNumber + 1;
-        return $scope.goPage(current);
+        $builder.currentForm = current > pageNumber ? pageNumber : current;
+        $scope.currentPage = false;
+        return $scope.currentPage = pageNumber;
       };
       $scope.goPage = function(page) {
-        if (page === $builder.currentForm) {
-          return false;
-        }
+        console.log('GO PAGE', page, $builder.currentForm, $builder.forms);
         if ($builder.forms[page]) {
           $builder.currentForm = page;
           $scope.updatePage();
@@ -282,14 +289,12 @@
           fbSection: '=',
           fbSectionObjectEditable: '='
         },
-        template: "<div class='fb-section-object-editable'>\n	<div class='fb-section-object-editable' ng-repeat=\"object in sectionObjects\" fb-form-object-editable=\"object\" fb-draggable='allow'>\n	</div>\n</div>",
+        template: "<div class='fb-section-object-editable'>\n	<div class='fb-section-object-editable' ng-repeat=\"object in sectionObjects\" fb-form-object-editable=\"object\" >\n	</div>\n</div>",
         link: function(scope, element, attr) {
           var uuid;
           $(element).addClass('fb-section');
           uuid = $(element).closest(".fb-form-object-editable").index();
           scope.sectionObjects = $builder.getSectionObjects(uuid);
-          console.log("--------------> builder");
-          console.log($builder.forms);
           return $drag.droppable($(element), {
             move: function(e) {
               var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
@@ -352,7 +357,6 @@
                     component: draggable.object.componentName
                   });
                   scope.sectionObjects = $builder.getSectionObjects(uuid);
-                  console.log(scope.sectionObjects);
                 }
                 if (draggable.mode === 'drag') {
                   oldIndex = draggable.object.formObject.index;
@@ -382,7 +386,7 @@
         template: "<div class='form-horizontal' fb-page={{currentPage}}>\n	<div class='fb-form-object-editable ' ng-repeat=\"object in formObjects\"\n		fb-form-object-editable=\"object\" fb-draggable='allow'></div>\n</div>",
         controller: 'PaginationController',
         link: function(scope, element, attrs) {
-          var beginMove, _base, _name;
+          var KeyDown, KeyUp, allowKey, beginMove, keyHold, _base, _name;
           scope.formNumber = attrs.fbPage || $builder.currentForm;
           if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
             _base[_name] = [];
@@ -390,14 +394,134 @@
           scope.formObjects = $builder.forms[scope.formNumber];
           beginMove = true;
           scope.currentPage = 1;
-          scope.$watch(function() {
-            return $builder.currentForm;
-          }, function(current, prev) {
-            console.log(arguments, 'page change');
-            scope.formNumber = current;
+          scope.$watchGroup([
+            function() {
+              return $builder.forms[$builder.currentForm];
+            }, function() {
+              return $builder.forms.length;
+            }
+          ], function(current, prev) {
+            console.log(arguments, 'page change -> change pagin', $builder.currentForm);
+            scope.formNumber = $builder.currentForm;
+            scope.currentPage = $builder.currentForm;
             return scope.formObjects = $builder.forms[scope.formNumber];
           });
-          return $(element).addClass('fb-builder');
+          $(element).addClass('fb-builder');
+          allowKey = 'Alt';
+          keyHold = '';
+          KeyDown = (function(_this) {
+            return function(e) {
+              var KeyID, keyName;
+              KeyID = window.event ? event.keyCode : e.keyCode;
+              switch (KeyID) {
+                case 18:
+                  keyName = "Alt";
+                  break;
+                case 17:
+                  keyName = "Ctrl";
+              }
+              keyHold = keyName;
+              return console.log(keyHold);
+            };
+          })(this);
+          KeyUp = (function(_this) {
+            return function(e) {
+              var KeyID, keyName;
+              KeyID = window.event ? event.keyCode : e.keyCode;
+              switch (KeyID) {
+                case 18:
+                  keyName = "Alt";
+                  break;
+                case 17:
+                  keyName = "Ctrl";
+              }
+              if (keyHold === keyName) {
+                keyHold = "";
+              }
+              return console.log('UP', keyHold);
+            };
+          })(this);
+          document.onkeydown = KeyDown;
+          document.onkeyup = KeyUp;
+          return $drag.droppable($(element), {
+            move: function(e) {
+              var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
+              if (beginMove) {
+                $("div.fb-form-object-editable").popover('hide');
+                beginMove = false;
+              }
+              if (keyHold !== allowKey) {
+                return;
+              }
+              $formObjects = $(element).find('.fb-form-object-editable:not(.empty,.dragging)');
+              if ($formObjects.length === 0) {
+                if ($(element).find('.fb-form-object-editable.empty').length === 0) {
+                  $(element).find('>div:first').append($("<div class='fb-form-object-editable empty'></div>"));
+                }
+                return;
+              }
+              positions = [];
+              positions.push(-1000);
+              for (index = _i = 0, _ref = $formObjects.length; _i < _ref; index = _i += 1) {
+                $formObject = $($formObjects[index]);
+                offset = $formObject.offset();
+                height = $formObject.height();
+                positions.push(offset.top + height / 2);
+              }
+              positions.push(positions[positions.length - 1] + 1000);
+              for (index = _j = 1, _ref1 = positions.length; _j < _ref1; index = _j += 1) {
+                if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
+                  $(element).find('.empty').remove();
+                  $empty = $("<div class='fb-form-object-editable empty'></div>");
+                  if (index - 1 < $formObjects.length) {
+                    $empty.insertBefore($($formObjects[index - 1]));
+                  } else {
+                    $empty.insertAfter($($formObjects[index - 2]));
+                  }
+                  break;
+                }
+              }
+            },
+            out: function() {
+              if (beginMove) {
+                $("div.fb-form-object-editable").popover('hide');
+                beginMove = false;
+              }
+              return $(element).find('.empty').remove();
+            },
+            up: function(e, isHover, draggable) {
+              var formObject, newIndex, oldIndex;
+              beginMove = true;
+              if (keyHold !== allowKey) {
+                return;
+              }
+              if (!$drag.isMouseMoved()) {
+                $(element).find('.empty').remove();
+                return;
+              }
+              if (!isHover && draggable.mode === 'drag') {
+                formObject = draggable.object.formObject;
+                if (formObject.editable) {
+                  $builder.removeFormObject(attrs.fbBuilder, formObject.index);
+                }
+              } else if (isHover) {
+                if (draggable.mode === 'mirror') {
+                  $builder.insertFormObject(scope.formNumber, $(element).find('.empty').index('.fb-form-object-editable'), {
+                    component: draggable.object.componentName
+                  });
+                }
+                if (draggable.mode === 'drag') {
+                  oldIndex = draggable.object.formObject.index;
+                  newIndex = $(element).find('.empty').index('.fb-form-object-editable');
+                  if (oldIndex < newIndex) {
+                    newIndex--;
+                  }
+                  $builder.updateFormObjectIndex(scope.formNumber, oldIndex, newIndex);
+                }
+              }
+              return $(element).find('.empty').remove();
+            }
+          });
         }
       };
     }
@@ -412,10 +536,11 @@
         restrict: 'A',
         controller: 'fbFormObjectEditableController',
         scope: {
+          isOpen: '=isOpen',
           formObject: '=fbFormObjectEditable'
         },
         link: function(scope, element) {
-          var popover;
+          var allow, popover;
           scope.inputArray = [];
           scope.$component = $builder.components[scope.formObject.component];
           scope.setupScope(scope.formObject);
@@ -425,11 +550,14 @@
               return;
             }
             view = $compile(template)(scope);
-            return $(element).html(view);
+            $(element).html(view);
+            return console.log('Component change');
           });
           $(element).on('click', function() {
             return false;
           });
+          console.log(scope.$component.name, scope.isOpen);
+          allow = scope.$component.name === 'section' ? false : true;
           $drag.draggable($(element), {
             object: {
               formObject: scope.formObject
@@ -845,10 +973,22 @@
     }
   ]).directive('fbPages', [
     '$injector', function($injector) {
+      var $builder;
+      $builder = $injector.get('$builder');
       return {
         restrict: 'A',
-        template: "<div class=\"fb-builderPagination\">\n	<div class=\"pull-left\">\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !next}\" ng-click=\"goF()\">></button>\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" ng-init=\"currentPage=0\">\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right disabled\"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
-        controller: 'PaginationController'
+        template: "<div class=\"fb-builderPagination\">\n	<div class=\"pull-left\">\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n				ng-class=\"{disabled: !next}\" ng-click=\"goF()\">></button>\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" >\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right disabled\"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
+        controller: 'PaginationController',
+        link: function(scope, element, attrs) {
+          return scope.$watch(function() {
+            return $builder.forms.length;
+          }, function() {
+            console.log(arguments, 'change pagination');
+            scope.pageCount = $builder.forms.length;
+            scope.pages = $builder.forms;
+            return scope.currentPage = $builder.currentForm;
+          });
+        }
       };
     }
   ]);
@@ -1204,6 +1344,7 @@
             mode: 'drag' [default], 'mirror'
             defer: yes/no. defer dragging
             object: custom information
+            allow: yes/no - allow dragging at the current time
          */
         result = [];
         if (options.mode === 'mirror') {
@@ -1282,16 +1423,16 @@
 
 
 /*
-    component:
-        It is like a class.
-        The base components are textInput, textArea, select, check, radio.
-        User can custom the form with components.
-    formObject:
-        It is like an object (an instance of the component).
-        User can custom the label, description, required and validation of the input.
-    form:
-        This is for end-user. There are form groups int the form.
-        They can input the value to the form.
+	component:
+		It is like a class.
+		The base components are textInput, textArea, select, check, radio.
+		User can custom the form with components.
+	formObject:
+		It is like an object (an instance of the component).
+		User can custom the label, description, required and validation of the input.
+	form:
+		This is for end-user. There are form groups int the form.
+		They can input the value to the form.
  */
 
 (function() {
@@ -1310,10 +1451,9 @@
     this.broadcastChannel = {
       updateInput: '$updateInput'
     };
-    this.defaultForm = 0;
     this.currentForm = 0;
-    this.forms = {};
-    this.forms[this.defaultForm] = [];
+    this.forms = [];
+    this.forms['0'] = [];
     this.convertComponent = function(name, component) {
       var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       result = {
@@ -1381,9 +1521,9 @@
       return result;
     };
     this.reindexFormObject = (function(_this) {
-      return function(name) {
+      return function(formIndex) {
         var formObjects, index, _i, _ref;
-        formObjects = _this.forms[name];
+        formObjects = _this.forms[formIndex];
         for (index = _i = 0, _ref = formObjects.length; _i < _ref; index = _i += 1) {
           formObjects[index].index = index;
         }
@@ -1408,8 +1548,8 @@
     this.loadTemplate = function(component) {
 
       /*
-      Load template for components.
-      @param component: {object} The component of $builder.
+      		Load template for components.
+      		@param component: {object} The component of $builder.
        */
       if (component.template == null) {
         $http.get(component.templateUrl, {
@@ -1434,24 +1574,24 @@
         }
 
         /*
-        Register the component for form-builder.
-        @param name: The component name.
-        @param component: The component object.
-            group: {string} The component group.
-            label: {string} The label of the input.
-            description: {string} The description of the input.
-            placeholder: {string} The placeholder of the input.
-            editable: {bool} Is the form object editable?
-            required: {bool} Is the form object required?
-            inline: {bool} Is the form object inline?
-            validation: {string} angular-validator. "/regex/" or "[rule1, rule2]". (default is RegExp(.*))
-            validationOptions: {array} [{rule: angular-validator, label: 'option label'}] the options for the validation. (default is [])
-            options: {array} The input options.
-            arrayToText: {bool} checkbox could use this to convert input (default is no)
-            template: {string} html template
-            templateUrl: {string} The url of the template.
-            popoverTemplate: {string} html template
-            popoverTemplateUrl: {string} The url of the popover template.
+        		Register the component for form-builder.
+        		@param name: The component name.
+        		@param component: The component object.
+        			group: {string} The component group.
+        			label: {string} The label of the input.
+        			description: {string} The description of the input.
+        			placeholder: {string} The placeholder of the input.
+        			editable: {bool} Is the form object editable?
+        			required: {bool} Is the form object required?
+        			inline: {bool} Is the form object inline?
+        			validation: {string} angular-validator. "/regex/" or "[rule1, rule2]". (default is RegExp(.*))
+        			validationOptions: {array} [{rule: angular-validator, label: 'option label'}] the options for the validation. (default is [])
+        			options: {array} The input options.
+        			arrayToText: {bool} checkbox could use this to convert input (default is no)
+        			template: {string} html template
+        			templateUrl: {string} The url of the template.
+        			popoverTemplate: {string} html template
+        			popoverTemplateUrl: {string} The url of the popover template.
          */
         if (_this.components[name] == null) {
           newComponent = _this.convertComponent(name, component);
@@ -1468,57 +1608,57 @@
       };
     })(this);
     this.addFormObject = (function(_this) {
-      return function(name, formObject) {
+      return function(formIndex, formObject) {
         var _base;
         if (formObject == null) {
           formObject = {};
         }
 
         /*
-        Insert the form object into the form at last.
+        		Insert the form object into the form at last.
          */
-        if ((_base = _this.forms)[name] == null) {
-          _base[name] = [];
+        if ((_base = _this.forms)[formIndex] == null) {
+          _base[formIndex] = [];
         }
-        return _this.insertFormObject(name, _this.forms[name].length, formObject);
+        return _this.insertFormObject(formIndex, _this.forms[formIndex].length, formObject);
       };
     })(this);
     this.insertSectionObject = (function(_this) {
-      return function(name, sectionIndex, index, formObject) {
+      return function(formIndex, sectionIndex, index, formObject) {
         var _base;
         if (formObject == null) {
           formObject = {};
         }
 
         /*
-        Insert the form object into the form at {index}.
-        @param name: The form name.
-        @param index: The form object index.
-        @param form: The form object.
-            id: The form object id.
-            component: {string} The component name
-            editable: {bool} Is the form object editable? (default is yes)
-            label: {string} The form object label.
-            description: {string} The form object description.
-            placeholder: {string} The form object placeholder.
-            options: {array} The form object options.
-            required: {bool} Is the form object required? (default is no)
-            inline: {bool} Is the form object inline? (default is no)
-            validation: {string} angular-validator. "/regex/" or "[rule1, rule2]".
-            [index]: {int} The form object index. It will be updated by $builder.
-        @return: The form object.
+        		Insert the form object into the form at {index}.
+        		@param  formIndex: The form  formIndex.
+        		@param index: The form object index.
+        		@param form: The form object.
+        			id: The form object id.
+        			component: {string} The component name
+        			editable: {bool} Is the form object editable? (default is yes)
+        			label: {string} The form object label.
+        			description: {string} The form object description.
+        			placeholder: {string} The form object placeholder.
+        			options: {array} The form object options.
+        			required: {bool} Is the form object required? (default is no)
+        			inline: {bool} Is the form object inline? (default is no)
+        			validation: {string} angular-validator. "/regex/" or "[rule1, rule2]".
+        			[index]: {int} The form object index. It will be updated by $builder.
+        		@return: The form object.
          */
-        if ((_base = _this.forms[name][sectionIndex]).components == null) {
+        if ((_base = _this.forms[formIndex][sectionIndex]).components == null) {
           _base.components = [];
         }
-        if (index > _this.forms[name][sectionIndex].components.length) {
-          index = _this.forms[name][sectionIndex].components.length;
+        if (index > _this.forms[formIndex][sectionIndex].components.length) {
+          index = _this.forms[formIndex][sectionIndex].components.length;
         } else if (index < 0) {
           index = 0;
         }
-        _this.forms[name][sectionIndex].components.splice(index, 0, _this.convertFormObject(name, formObject));
-        _this.reindexSectionObject(name, sectionIndex);
-        return _this.forms[name][sectionIndex].components[index];
+        _this.forms[formIndex][sectionIndex].components.splice(index, 0, _this.convertFormObject(formIndex, formObject));
+        _this.reindexSectionObject(formIndex, sectionIndex);
+        return _this.forms[formIndex][sectionIndex].components[index];
       };
     })(this);
     this.getSectionObjects = (function(_this) {
@@ -1531,74 +1671,74 @@
       };
     })(this);
     this.insertFormObject = (function(_this) {
-      return function(name, index, formObject) {
+      return function(formIndex, index, formObject) {
         var _base;
         if (formObject == null) {
           formObject = {};
         }
 
         /*
-        Insert the form object into the form at {index}.
-        @param name: The form name.
-        @param index: The form object index.
-        @param form: The form object.
-            id: The form object id.
-            component: {string} The component name
-            editable: {bool} Is the form object editable? (default is yes)
-            label: {string} The form object label.
-            description: {string} The form object description.
-            placeholder: {string} The form object placeholder.
-            options: {array} The form object options.
-            required: {bool} Is the form object required? (default is no)
-            inline: {bool} Is the form object inline? (default is no)
-            validation: {string} angular-validator. "/regex/" or "[rule1, rule2]".
-            [index]: {int} The form object index. It will be updated by $builder.
-        @return: The form object.
+        		Insert the form object into the form at {index}.
+        		@param formIndex: The form formIndex.
+        		@param index: The form object index.
+        		@param form: The form object.
+        			id: The form object id.
+        			component: {string} The component name
+        			editable: {bool} Is the form object editable? (default is yes)
+        			label: {string} The form object label.
+        			description: {string} The form object description.
+        			placeholder: {string} The form object placeholder.
+        			options: {array} The form object options.
+        			required: {bool} Is the form object required? (default is no)
+        			inline: {bool} Is the form object inline? (default is no)
+        			validation: {string} angular-validator. "/regex/" or "[rule1, rule2]".
+        			[index]: {int} The form object index. It will be updated by $builder.
+        		@return: The form object.
          */
-        if ((_base = _this.forms)[name] == null) {
-          _base[name] = [];
+        if ((_base = _this.forms)[formIndex] == null) {
+          _base[formIndex] = [];
         }
-        if (index > _this.forms[name].length) {
-          index = _this.forms[name].length;
+        if (index > _this.forms[formIndex].length) {
+          index = _this.forms[formIndex].length;
         } else if (index < 0) {
           index = 0;
         }
-        _this.forms[name].splice(index, 0, _this.convertFormObject(name, formObject));
-        _this.reindexFormObject(name);
-        return _this.forms[name][index];
+        _this.forms[formIndex].splice(index, 0, _this.convertFormObject(formIndex, formObject));
+        _this.reindexFormObject(formIndex);
+        return _this.forms[formIndex][index];
       };
     })(this);
     this.removeFormObject = (function(_this) {
-      return function(name, index) {
+      return function(formIndex, index) {
 
         /*
-        Remove the form object by the index.
-        @param name: The form name.
-        @param index: The form object index.
+        		Remove the form object by the index.
+        		@param formIndex: The form formIndex.
+        		@param index: The form object index.
          */
         var formObjects;
-        formObjects = _this.forms[name];
+        formObjects = _this.forms[formIndex];
         formObjects.splice(index, 1);
-        return _this.reindexFormObject(name);
+        return _this.reindexFormObject(formIndex);
       };
     })(this);
     this.updateFormObjectIndex = (function(_this) {
-      return function(name, oldIndex, newIndex) {
+      return function(formIndex, oldIndex, newIndex) {
 
         /*
-        Update the index of the form object.
-        @param name: The form name.
-        @param oldIndex: The old index.
-        @param newIndex: The new index.
+        		Update the index of the form object.
+        		@param formIndex: The form formIndex.
+        		@param oldIndex: The old index.
+        		@param newIndex: The new index.
          */
         var formObject, formObjects;
         if (oldIndex === newIndex) {
           return;
         }
-        formObjects = _this.forms[name];
+        formObjects = _this.forms[formIndex];
         formObject = formObjects.splice(oldIndex, 1)[0];
         formObjects.splice(newIndex, 0, formObject);
-        return _this.reindexFormObject(name);
+        return _this.reindexFormObject(formIndex);
       };
     })(this);
     this.$get = [
