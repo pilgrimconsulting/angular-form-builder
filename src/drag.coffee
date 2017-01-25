@@ -194,6 +194,10 @@ angular.module 'builder.drag', []
         $element.addClass 'fb-draggable'
         $element.on 'mousedown', (e) =>
             e.preventDefault()
+            if $($element).find('.panel-open').length
+              return
+
+
             return if $element.hasClass 'dragging'
 
             $element.addClass 'prepare-dragging'

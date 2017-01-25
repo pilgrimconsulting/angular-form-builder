@@ -23,13 +23,13 @@ angular.module 'builder.directive', [
 	restrict: 'A'
 	scope:
 		fbSection: '=',
-		fbSectionObjectEditable: '=',
+		fbSectionObjectEditable: '='
 	template:
 # <div class='fb-section-object-editable ' ng-repeat="object in formObjects"
 # 	fb-form-object-editable="object" fb-draggable='allow'></div>
 		"""
 		<div class='fb-section-object-editable'>
-			<div class='fb-section-object-editable' ng-repeat="object in sectionObjects" fb-form-object-editable="object" >
+			<div class='fb-section-object-editable' ng-repeat="object in sectionObjects" fb-form-object-editable="object" fb-draggable='allow'>
 			</div>
 		</div>
 		"""
@@ -39,6 +39,8 @@ angular.module 'builder.directive', [
 		scope.sectionObjects = $builder.getSectionObjects uuid
 #		console.log "--------------> builder"
 #		console.log $builder.forms
+		# $drag.draggable $(element),
+
 		$drag.droppable $(element),
 			move: (e) ->
 				if beginMove
@@ -176,7 +178,6 @@ angular.module 'builder.directive', [
 			console.log('UP', keyHold)
 		document.onkeydown = KeyDown
 		document.onkeyup = KeyUp
-
 		$drag.droppable $(element),
 			move: (e) ->
 				if beginMove
