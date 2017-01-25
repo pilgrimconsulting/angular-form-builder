@@ -896,12 +896,14 @@
             if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
               _base[_name] = [];
             }
-            return scope.form = $builder.forms[scope.formNumber];
+            scope.form = $builder.forms[scope.formNumber];
+            return scope.jsonString = $builder.forms;
           });
           if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
             _base[_name] = [];
           }
-          return scope.form = $builder.forms[scope.formNumber];
+          scope.form = $builder.forms[scope.formNumber];
+          return scope.jsonString = $builder.forms;
         }
       };
     }

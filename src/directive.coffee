@@ -640,10 +640,12 @@ angular.module 'builder.directive', [
 			scope.formNumber = current
 			$builder.forms[scope.formNumber] ?= []
 			scope.form = $builder.forms[scope.formNumber]
+			scope.jsonString = $builder.forms
 
 		# get the form for controller
 		$builder.forms[scope.formNumber] ?= []
 		scope.form = $builder.forms[scope.formNumber]
+		scope.jsonString = $builder.forms
 ]
 
 # ----------------------------------------
