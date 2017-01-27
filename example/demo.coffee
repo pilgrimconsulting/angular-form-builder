@@ -1,4 +1,4 @@
-z = {
+window.jsonString = {
 	"Id": "12",
 	"Name": null,
 	"Title": "input",
@@ -117,72 +117,19 @@ z = {
 }
 
 
-translate = (string) =>
-	if typeof string == 'string'
-		json = JSON.parse(string)
-	else
-		json = string
-
-	voc = {
-		"Text": 'textInput'
-		"TextArea": 'textArea'
-		"DropDown": 'select'
-#		'label': "Title"
-	}
-
-	builder = []
-	pages = json["Pages"]
-	for page, pageIndex in pages
-		console.log('!!!',page)
-		builder[pageIndex] = []
-		elements = page["Elements"]
-		for element in elements
-			tempObj = {
-				id: element["Name"] || null
-				label: element["Title"] || null
-			}
-			section = false
-			items = element["Items"]
-			if items # Section
-				tempObj.component = 'section'
-				tempObj.components = for item in items
-					tempItem = {
-						component: voc[item["InputType"]] || null
-						id: item["Name"] || null
-						label: item["Title"] || null
-						show_label: item["ShowTitle"] || null
-						required: item["IsRequired"]
-						description: item["Description"] || ''
-					}
-					options = item["Variants"] || []
-					if options
-						tempItem.options = for option in options
-							if option["Title"] then option["Title"]
-					tempItem
-
-			else # Item
-				tempObj.component = voc[element["InputType"]] || null
-				tempObj.id = element["Name"] || null
-				tempObj.label = element["Title"] || null
-				tempObj.show_label = element["ShowTitle"] || null
-				tempObj.required = element["IsRequired"]
-				tempObj.description = element["Description"] || null
-
-			builder[pageIndex].push(tempObj)
-	console.log('FINISH',builder)
-	builder || []
-
-window.z = translate(z)
-
 
 window.json = [[{"id":"divider","component":"divider","editable":true,"index":0,"label":"Building elevation A","description":"","placeholder":"","options":[],"required":false,"inline":false,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio0","component":"radio","editable":true,"index":1,"label":"What is the condition of the sign can?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio1","component":"radio","editable":true,"index":2,"label":"What is the condition of the sign face?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":3,"label":"Observed while illumination on?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":4,"label":"If yes, were there any problems with illumination?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""}], [{"id":"radio2","component":"radio","editable":true,"index":4,"label":"If yes, were there any problems with illumination?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""}]]
 
 json =  window.json
 
-angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.bootstrap', 'ngAnimate']
+angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.bootstrap', 'ngAnimate', 'transcription']
 
-.run ['$builder', '$window', ($builder, $window) ->
-	$builder.json = $window.z
+.run ['$builder', '$window', '$transcription', ($builder, $window, $transcription) ->
+
+#	$builder.json = $window.jsonString
+
+	$builder.json = $transcription.translate($window.jsonString)
+
 #	$builder.registerComponent 'sampleInput',
 #		group: 'Additional'
 #		label: 'Sample'
@@ -254,10 +201,11 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.b
 
 
 
-.controller 'DemoController', ['$scope', '$builder', '$validator', '$window', ($scope, $builder, $validator, $window) ->
+.controller 'DemoController', ['$scope', '$builder', '$validator', ($scope, $builder, $validator) ->
 # ----------------------------------------
 # builder
 # ----------------------------------------
+
 
 #	textbox = $builder.addFormObject 'default',
 #		id: 'textbox'
@@ -296,7 +244,6 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.b
 #		isFirstDisabled: false
 #
 #	$scope.pages = []
-
 
 
 	$builder.json.map((page, pageIndex)=>

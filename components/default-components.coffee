@@ -4,6 +4,7 @@ Global = this
 !Global.__fbComponents && (Global.__fbComponents = {})
 
 Global.__fbComponents.divider = ($builderProvider) ->
+	return
 
 	# ----------------------------------------
 	# Text Divider
@@ -337,11 +338,12 @@ Global.__fbComponents.default = ($builderProvider) ->
 			"""
 
 
+Global.__fbComponents.image = ($builderProvider) ->
 	# ----------------------------------------
 	# image
 	# ----------------------------------------
 	$builderProvider.registerComponent 'image',
-		group: 'Default'
+		group: 'Images'
 		label: 'Image'
 		show_label: yes
 		required: no
@@ -377,11 +379,12 @@ Global.__fbComponents.default = ($builderProvider) ->
 			</form>
 			"""
 
+Global.__fbComponents.carousel = ($builderProvider) ->
 	# ----------------------------------------
 	# carousel
 	# ----------------------------------------
 	$builderProvider.registerComponent 'carousel',
-		group: 'Default'
+		group: 'Images'
 		label: 'Carousel'
 		show_label: yes
 		required: no
@@ -438,8 +441,9 @@ Global.__fbComponents.default = ($builderProvider) ->
 			</form>
 			"""
 
+Global.__fbComponents.section = ($builderProvider) ->
 	# ----------------------------------------
-	# carousel
+	# section
 	# ----------------------------------------
 	$builderProvider.registerComponent 'section',
 		group: 'Special'
@@ -484,7 +488,8 @@ Global.__fbComponents.default = ($builderProvider) ->
 			</form>
 			"""
 
-
+Global.__fbComponents.panel = ($builderProvider) ->
+	return
 	# ----------------------------------------
 	# Text Panel
 	# ----------------------------------------

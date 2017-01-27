@@ -1,7 +1,7 @@
 (function() {
-  var json, translate, z;
+  var json;
 
-  z = {
+  window.jsonString = {
     "Id": "12",
     "Name": null,
     "Title": "input",
@@ -115,87 +115,6 @@
     ]
   };
 
-  translate = (function(_this) {
-    return function(string) {
-      var builder, element, elements, item, items, json, option, options, page, pageIndex, pages, section, tempItem, tempObj, voc, _i, _j, _len, _len1;
-      if (typeof string === 'string') {
-        json = JSON.parse(string);
-      } else {
-        json = string;
-      }
-      voc = {
-        "Text": 'textInput',
-        "TextArea": 'textArea',
-        "DropDown": 'select'
-      };
-      builder = [];
-      pages = json["Pages"];
-      for (pageIndex = _i = 0, _len = pages.length; _i < _len; pageIndex = ++_i) {
-        page = pages[pageIndex];
-        console.log('!!!', page);
-        builder[pageIndex] = [];
-        elements = page["Elements"];
-        for (_j = 0, _len1 = elements.length; _j < _len1; _j++) {
-          element = elements[_j];
-          tempObj = {
-            id: element["Name"] || null,
-            label: element["Title"] || null
-          };
-          section = false;
-          items = element["Items"];
-          if (items) {
-            tempObj.component = 'section';
-            tempObj.components = (function() {
-              var _k, _len2, _results;
-              _results = [];
-              for (_k = 0, _len2 = items.length; _k < _len2; _k++) {
-                item = items[_k];
-                tempItem = {
-                  component: voc[item["InputType"]] || null,
-                  id: item["Name"] || null,
-                  label: item["Title"] || null,
-                  show_label: item["ShowTitle"] || null,
-                  required: item["IsRequired"],
-                  description: item["Description"] || ''
-                };
-                options = item["Variants"] || [];
-                if (options) {
-                  tempItem.options = (function() {
-                    var _l, _len3, _results1;
-                    _results1 = [];
-                    for (_l = 0, _len3 = options.length; _l < _len3; _l++) {
-                      option = options[_l];
-                      if (option["Title"]) {
-                        _results1.push(option["Title"]);
-                      } else {
-                        _results1.push(void 0);
-                      }
-                    }
-                    return _results1;
-                  })();
-                }
-                _results.push(tempItem);
-              }
-              return _results;
-            })();
-          } else {
-            tempObj.component = voc[element["InputType"]] || null;
-            tempObj.id = element["Name"] || null;
-            tempObj.label = element["Title"] || null;
-            tempObj.show_label = element["ShowTitle"] || null;
-            tempObj.required = element["IsRequired"];
-            tempObj.description = element["Description"] || null;
-          }
-          builder[pageIndex].push(tempObj);
-        }
-      }
-      console.log('FINISH', builder);
-      return builder || [];
-    };
-  })(this);
-
-  window.z = translate(z);
-
   window.json = [
     [
       {
@@ -308,12 +227,12 @@
 
   json = window.json;
 
-  angular.module('app', ['builder', 'builder.components', 'validator.rules', 'ui.bootstrap', 'ngAnimate']).run([
-    '$builder', '$window', function($builder, $window) {
-      return $builder.json = $window.z;
+  angular.module('app', ['builder', 'builder.components', 'validator.rules', 'ui.bootstrap', 'ngAnimate', 'transcription']).run([
+    '$builder', '$window', '$transcription', function($builder, $window, $transcription) {
+      return $builder.json = $transcription.translate($window.jsonString);
     }
   ]).controller('DemoController', [
-    '$scope', '$builder', '$validator', '$window', function($scope, $builder, $validator, $window) {
+    '$scope', '$builder', '$validator', function($scope, $builder, $validator) {
       $builder.json.map((function(_this) {
         return function(page, pageIndex) {
           return page.map(function(component) {
