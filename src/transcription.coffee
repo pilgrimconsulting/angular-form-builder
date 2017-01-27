@@ -25,17 +25,20 @@ angular.module 'transcription', []
 		'label': 'Title'
 	}
 
-	@translate = (json) =>
+	@checkType = (json) =>
 		if typeof json == 'string'
 			json = JSON.parse(json)
-		else if typeof json == 'object' and !json.length
+		else if typeof json == 'object' and json.length != 0
 			json = json
 		else
-			if json.length
+			if json.length >= 0
 				type = 'array'
 			else
 				type = typeof json
-			return throw new Error("Input data format is not supported. \n Expecting Object or JSON String, but receive #{type}")
+			return throw new Error("Input data format is not supported. \n Expecting Object or JSON String, but receive '#{type}'")
+
+	@translate = (json) =>
+		json = @checkType(json)
 
 		builder = []
 		pages = json["Pages"]

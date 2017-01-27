@@ -1803,21 +1803,27 @@
       'Hint': 'description',
       'label': 'Title'
     };
-    this.translate = (function(_this) {
+    this.checkType = (function(_this) {
       return function(json) {
-        var builder, element, elements, item, items, option, options, page, pageIndex, pages, section, tempItem, tempObj, type, _i, _j, _len, _len1;
+        var type;
         if (typeof json === 'string') {
-          json = JSON.parse(json);
-        } else if (typeof json === 'object' && !json.length) {
-          json = json;
+          return json = JSON.parse(json);
+        } else if (typeof json === 'object' && json.length !== 0) {
+          return json = json;
         } else {
-          if (json.length) {
+          if (json.length >= 0) {
             type = 'array';
           } else {
             type = typeof json;
           }
-          throw new Error("Input data format is not supported. \n Expecting Object or JSON String, but receive " + type);
+          throw new Error("Input data format is not supported. \n Expecting Object or JSON String, but receive '" + type + "'");
         }
+      };
+    })(this);
+    this.translate = (function(_this) {
+      return function(json) {
+        var builder, element, elements, item, items, option, options, page, pageIndex, pages, section, tempItem, tempObj, _i, _j, _len, _len1;
+        json = _this.checkType(json);
         builder = [];
         pages = json["Pages"];
         if (!pages) {
