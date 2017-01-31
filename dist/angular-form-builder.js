@@ -1,5 +1,6 @@
 (function() {
-  var copyObjectToScope;
+  var copyObjectToScope,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   copyObjectToScope = function(object, scope) {
 
@@ -275,9 +276,6 @@
     }
   ]);
 
-}).call(this);
-
-(function() {
   angular.module('builder.directive', ['builder.provider', 'builder.controller', 'builder.drag', 'validator']).directive('fbSection', [
     '$injector', function($injector) {
       var $builder, $drag;
@@ -993,9 +991,6 @@
     }
   ]);
 
-}).call(this);
-
-(function() {
   angular.module('builder.drag', []).provider('$drag', function() {
     var $injector, $rootScope, delay;
     $injector = null;
@@ -1408,38 +1403,27 @@
     this.$get = this.get;
   });
 
-}).call(this);
-
-(function() {
   angular.module('builder', ['builder.directive']);
 
-}).call(this);
-
-(function() {
   angular.module('app', ['builder', 'builder.components', 'validator.rules']).controller('PaginController', [
     '$scope', '$builder', '$validator', function($scope, $builder, $validator) {
       return $scope.pages = [$builder.forms['default']];
     }
   ]);
 
-}).call(this);
 
-
-/*
-	component:
-		It is like a class.
-		The base components are textInput, textArea, select, check, radio.
-		User can custom the form with components.
-	formObject:
-		It is like an object (an instance of the component).
-		User can custom the label, description, required and validation of the input.
-	form:
-		This is for end-user. There are form groups int the form.
-		They can input the value to the form.
- */
-
-(function() {
-  var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  /*
+  	component:
+  		It is like a class.
+  		The base components are textInput, textArea, select, check, radio.
+  		User can custom the form with components.
+  	formObject:
+  		It is like an object (an instance of the component).
+  		User can custom the label, description, required and validation of the input.
+  	form:
+  		This is for end-user. There are form groups int the form.
+  		They can input the value to the form.
+   */
 
   angular.module('builder.provider', []).provider('$builder', function() {
     var $http, $injector, $templateCache;
@@ -1775,3 +1759,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=angular-form-builder.js.map

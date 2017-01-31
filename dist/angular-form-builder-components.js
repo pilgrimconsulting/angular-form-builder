@@ -1,5 +1,5 @@
 (function() {
-  var Global;
+  var Global, config;
 
   Global = this;
 
@@ -16,11 +16,6 @@
       popoverTemplate: "<form>\n	<div class=\"form-group\">\n		<label class='control-label'>Label</label>\n		<input type='text' ng-model=\"label\" validator=\"[required]\" class='form-control'/>\n	</div>\n	<div class=\"form-group\">\n		<label class='control-label'>Style</label>\n		<select ng-options=\"value for value in options\" id=\"{{formName+index}}\" class=\"form-control\"\n				ng-init=\"style = options[0]\" ng-model=\"style\" />\n	</div>\n	<hr/>\n	<div class='form-group'>\n	  <input type='submit' ng-click=\"popover.save($event)\" class='btn btn-primary' value='Save'/>\n	  <input type='button' ng-click=\"popover.cancel($event)\" class='btn btn-default' value='Cancel'/>\n	  <input type='button' ng-click=\"popover.remove($event)\" class='btn btn-danger' value='Delete'/>\n	</div>\n</form>"
     });
   };
-
-}).call(this);
-
-(function() {
-  var Global, config;
 
   Global = this;
 
@@ -157,3 +152,5 @@
   angular.module('builder.components', ['builder', 'validator.rules']).config(config);
 
 }).call(this);
+
+//# sourceMappingURL=angular-form-builder-components.js.map
