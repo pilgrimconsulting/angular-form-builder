@@ -109,11 +109,128 @@
                 ]
               }
             ]
+          }, {
+            "Id": "7",
+            "Name": null,
+            "Title": "Section01",
+            "ShowTitle": true,
+            "IsMultipleSection": false,
+            "ExtraProperties": {
+              "BrandingPackageType": {
+                "Name": "BrandingPackageType",
+                "Value": 1
+              }
+            },
+            "Items": [
+              {
+                "Id": "3",
+                "Name": "input002",
+                "Title": "Input002",
+                "ShowTitle": true,
+                "ExtraProperties": {},
+                "Description": "InputDesc",
+                "InputType": "Text",
+                "IsRequired": false,
+                "VisibilityConditions": ""
+              }, {
+                "Id": "4",
+                "Name": "input003",
+                "Title": "Input003",
+                "ShowTitle": true,
+                "ExtraProperties": {},
+                "Description": "InputDesc",
+                "InputType": "DropDown",
+                "IsRequired": false,
+                "VisibilityConditions": "",
+                "IsMultipleSelection": false,
+                "Variants": [
+                  {
+                    "Id": "5",
+                    "Name": "var1",
+                    "Title": "Variant 1",
+                    "ShowTitle": true,
+                    "ExtraProperties": {},
+                    "Value": "1"
+                  }, {
+                    "Id": "6",
+                    "Name": "var2",
+                    "Title": "Variant 2",
+                    "ShowTitle": true,
+                    "ExtraProperties": {},
+                    "Value": "2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }, {
+        "Id": "7",
+        "Name": null,
+        "Title": "Page0",
+        "ShowTitle": true,
+        "ExtraProperties": {},
+        "Elements": [
+          {
+            "Id": "7",
+            "Name": null,
+            "Title": "Section10",
+            "ShowTitle": true,
+            "IsMultipleSection": false,
+            "ExtraProperties": {
+              "BrandingPackageType": {
+                "Name": "BrandingPackageType",
+                "Value": 1
+              }
+            },
+            "Items": [
+              {
+                "Id": "3",
+                "Name": "input010",
+                "Title": "Input010",
+                "ShowTitle": true,
+                "ExtraProperties": {},
+                "Description": "InputDesc",
+                "InputType": "Text",
+                "IsRequired": false,
+                "VisibilityConditions": ""
+              }, {
+                "Id": "4",
+                "Name": "input011",
+                "Title": "Input011",
+                "ShowTitle": true,
+                "ExtraProperties": {},
+                "Description": "InputDesc",
+                "InputType": "DropDown",
+                "IsRequired": false,
+                "VisibilityConditions": "",
+                "IsMultipleSelection": false,
+                "Variants": [
+                  {
+                    "Id": "5",
+                    "Name": "var1",
+                    "Title": "Variant 1",
+                    "ShowTitle": true,
+                    "ExtraProperties": {},
+                    "Value": "1"
+                  }, {
+                    "Id": "6",
+                    "Name": "var2",
+                    "Title": "Variant 2",
+                    "ShowTitle": true,
+                    "ExtraProperties": {},
+                    "Value": "2"
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
     ]
   };
+
+  window.dev = true;
 
   window.json = [
     [
@@ -424,3 +541,5 @@
   ]);
 
 }).call(this);
+
+//# sourceMappingURL=demo.js.map

@@ -45,7 +45,7 @@ angular.module 'transcription', []
 		if !pages
 			builder
 		for page, pageIndex in pages
-			console.log('!!!',page)
+			window.dev && console.log('!!!',page)
 			builder[pageIndex] = []
 			elements = page["Elements"]
 			for element in elements
@@ -81,7 +81,7 @@ angular.module 'transcription', []
 					tempObj.description = element["Description"] || null
 
 				builder[pageIndex].push(tempObj)
-		console.log('FINISH',builder)
+#		window.dev && console.log('FINISH',builder)
 		builder
 
 	# ----------------------------------------

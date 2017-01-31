@@ -110,13 +110,134 @@ window.jsonString = {
 							]
 						}
 					]
+				},
+				{
+					"Id": "7",
+					"Name": null,
+					"Title": "Section01",
+					"ShowTitle": true,
+					"IsMultipleSection": false,
+					"ExtraProperties": {
+						"BrandingPackageType": {
+							"Name": "BrandingPackageType",
+							"Value": 1
+						}
+					},
+					"Items": [
+						{
+							"Id": "3",
+							"Name": "input002",
+							"Title": "Input002",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "Text",
+							"IsRequired": false,
+							"VisibilityConditions": ""
+						},
+						{
+							"Id": "4",
+							"Name": "input003",
+							"Title": "Input003",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "DropDown",
+							"IsRequired": false,
+							"VisibilityConditions": "",
+							"IsMultipleSelection": false,
+							"Variants": [
+								{
+									"Id": "5",
+									"Name": "var1",
+									"Title": "Variant 1",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "1"
+								},
+								{
+									"Id": "6",
+									"Name": "var2",
+									"Title": "Variant 2",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "2"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"Id": "7",
+			"Name": null,
+			"Title": "Page0",
+			"ShowTitle": true,
+			"ExtraProperties": {},
+			"Elements":[
+				{
+					"Id": "7",
+					"Name": null,
+					"Title": "Section10",
+					"ShowTitle": true,
+					"IsMultipleSection": false,
+					"ExtraProperties": {
+						"BrandingPackageType": {
+							"Name": "BrandingPackageType",
+							"Value": 1
+						}
+					},
+					"Items": [
+						{
+							"Id": "3",
+							"Name": "input010",
+							"Title": "Input010",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "Text",
+							"IsRequired": false,
+							"VisibilityConditions": ""
+						},
+						{
+							"Id": "4",
+							"Name": "input011",
+							"Title": "Input011",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "DropDown",
+							"IsRequired": false,
+							"VisibilityConditions": "",
+							"IsMultipleSelection": false,
+							"Variants": [
+								{
+									"Id": "5",
+									"Name": "var1",
+									"Title": "Variant 1",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "1"
+								},
+								{
+									"Id": "6",
+									"Name": "var2",
+									"Title": "Variant 2",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "2"
+								}
+							]
+						}
+					]
 				}
 			]
 		}
 	]
 }
 
-
+window.dev = true
 
 window.json = [[{"id":"divider","component":"divider","editable":true,"index":0,"label":"Building elevation A","description":"","placeholder":"","options":[],"required":false,"inline":false,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio0","component":"radio","editable":true,"index":1,"label":"What is the condition of the sign can?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio1","component":"radio","editable":true,"index":2,"label":"What is the condition of the sign face?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":3,"label":"Observed while illumination on?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":4,"label":"If yes, were there any problems with illumination?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""}], [{"id":"radio2","component":"radio","editable":true,"index":4,"label":"If yes, were there any problems with illumination?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""}]]
 

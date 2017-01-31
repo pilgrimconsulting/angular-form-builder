@@ -120,7 +120,7 @@ angular.module 'builder.controller', ['builder.provider']
 
 	$scope.addComponentToEnd = ($event, component) ->
 		$event?.preventDefault()
-		console.log(component.group, component.name)
+#		console.log(component.group, component.name)
 		$builder.addFormObject( $builder.currentForm || 0,
 			component: component.name
 		)
@@ -192,7 +192,7 @@ angular.module 'builder.controller', ['builder.provider']
 .controller 'PaginationController', ['$scope', '$injector', ($scope, $injector) ->
 # providers
 	$builder = $injector.get '$builder'
-	console.log($builder.forms)
+#	console.log($builder.forms)
 
 #	$scope.pages = []
 #	$scope.pages = $builder.forms
@@ -202,7 +202,7 @@ angular.module 'builder.controller', ['builder.provider']
 	$scope.next = false
 
 	$scope.updatePage = () ->
-		console.log('update')
+#		console.log('update')
 		count = 0
 		forms = $builder.forms
 		if typeof forms.length == 'number'
@@ -233,7 +233,7 @@ angular.module 'builder.controller', ['builder.provider']
 	$scope.deletePage = (pageNumber) ->
 		forms = $builder.forms
 		current = if forms[pageNumber+1] then pageNumber+1 else pageNumber-1
-		console.log(pageNumber, forms, current)
+#		console.log(pageNumber, forms, current)
 #		$builder.currentForm = current
 #		$scope.goPage(current)
 #		$scope.currentPage =  current
@@ -255,7 +255,7 @@ angular.module 'builder.controller', ['builder.provider']
 		$scope.currentPage = pageNumber
 
 	$scope.goPage = (page) ->
-		console.log('GO PAGE',page,$builder.currentForm,$builder.forms)
+#		console.log('GO PAGE',page,$builder.currentForm,$builder.forms)
 #		return false if page == $builder.currentForm
 		if $builder.forms[page]
 			$builder.currentForm = page
