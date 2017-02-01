@@ -27,6 +27,7 @@ angular.module 'builder.drag', []
         down: {}
         move: {}
         up: {}
+    @innerDropHover = false
     @eventMouseMove = ->
     @eventMouseUp = ->
     $ =>
@@ -193,6 +194,10 @@ angular.module 'builder.drag', []
         $element.addClass 'fb-draggable'
         $element.on 'mousedown', (e) =>
             e.preventDefault()
+            if $($element).find('.panel-open').length
+              return
+
+
             return if $element.hasClass 'dragging'
 
             $element.addClass 'prepare-dragging'
@@ -252,14 +257,17 @@ angular.module 'builder.drag', []
     # ----------------------------------------
     @draggable = ($element, options={}) =>
         ###
-        Make the element could be drag.
+        Make the element able to drag.
         @param element: The jQuery element.
         @param options: Options
             mode: 'drag' [default], 'mirror'
             defer: yes/no. defer dragging
             object: custom information
+            allow: yes/no - allow dragging at the current time
         ###
         result = []
+#        if (!options.allow)
+#            return
         if options.mode is 'mirror'
             for element in $element
                 draggable = @dragMirrorMode $(element), options.defer, options.object
@@ -301,6 +309,7 @@ angular.module 'builder.drag', []
         data: @data
         draggable: @draggable
         droppable: @droppable
+        innerDropHover : @innerDropHover
     @get.$inject = ['$injector']
     @$get = @get
     return

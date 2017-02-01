@@ -14,6 +14,14 @@ bower_components
 # compass
 .sass-cache
 
+# dist + exxample
+dist/angular-form-builder-components.src.coffee
+dist/angular-form-builder.src.coffee
+
+# map
+dist/angular-form-builder-components.js.map
+dist/angular-form-builder.js.map
+example/demo.js.map
 
 #Test
 /test/*

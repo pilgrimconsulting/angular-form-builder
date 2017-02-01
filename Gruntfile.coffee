@@ -29,6 +29,8 @@ module.exports = (grunt) ->
 					outputStyle: 'compressed'
 
 		coffee:
+			options:
+				sourceMap: true
 			source:
 				files:
 					'dist/angular-form-builder.js': ['src/*.coffee']
@@ -64,6 +66,7 @@ module.exports = (grunt) ->
 				files: ['src/*.coffee', 'components/*.coffee', 'example/*.coffee']
 				tasks: ['coffee']
 				options:
+					sourceMap: true
 					spawn: no
 					livereload: LIVERELOAD_PORT
 #										livereload: true

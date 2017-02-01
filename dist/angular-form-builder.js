@@ -32,7 +32,7 @@
         var component;
         copyObjectToScope(formObject, $scope);
         $scope.optionsText = formObject.options.join('\n');
-        $scope.$watch('[label, show_label, description, placeholder, required, inline, options, validation, text, header, footer, align, style]', function() {
+        $scope.$watch('[label, show_label, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function() {
           formObject.label = $scope.label;
           formObject.show_label = $scope.show_label;
           formObject.description = $scope.description;
@@ -45,7 +45,8 @@
           formObject.header = $scope.header;
           formObject.footer = $scope.footer;
           formObject.align = $scope.align;
-          return formObject.style = $scope.style;
+          formObject.style = $scope.style;
+          return formObject.components = $scope.components;
         }, true);
         $scope.$watch('optionsText', function(text) {
           var x;
@@ -86,7 +87,8 @@
             header: $scope.header,
             footer: $scope.footer,
             align: $scope.align,
-            style: $scope.style
+            style: $scope.style,
+            components: $scope.components
           };
         },
         rollback: function() {
@@ -109,7 +111,8 @@
           $scope.header = this.model.header;
           $scope.footer = this.model.footer;
           $scope.align = this.model.align;
-          return $scope.style = this.model.style;
+          $scope.style = this.model.style;
+          return $scope.components = this.model.components;
         }
       };
     }
@@ -138,7 +141,6 @@
         if ($event != null) {
           $event.preventDefault();
         }
-        console.log(component.group, component.name);
         return $builder.addFormObject($builder.currentForm || 0, {
           component: component.name
         });
@@ -201,12 +203,10 @@
     '$scope', '$injector', function($scope, $injector) {
       var $builder;
       $builder = $injector.get('$builder');
-      console.log($builder.forms);
       $scope.prev = false;
       $scope.next = false;
       $scope.updatePage = function() {
         var count, forms, page;
-        console.log('update');
         count = 0;
         forms = $builder.forms;
         if (typeof forms.length === 'number') {
@@ -232,7 +232,6 @@
         var current, forms, page, pageObj;
         forms = $builder.forms;
         current = forms[pageNumber + 1] ? pageNumber + 1 : pageNumber - 1;
-        console.log(pageNumber, forms, current);
         if (typeof forms.length === 'number') {
           forms.splice(pageNumber, 1);
         } else {
@@ -250,7 +249,6 @@
         return $scope.currentPage = pageNumber;
       };
       $scope.goPage = function(page) {
-        console.log('GO PAGE', page, $builder.currentForm, $builder.forms);
         if ($builder.forms[page]) {
           $builder.currentForm = page;
           $scope.updatePage();
@@ -281,19 +279,20 @@
       return {
         restrict: 'A',
         scope: {
-          fbBuilder: '='
+          fbBuilder: '=',
+          fbObject: '='
         },
-        template: "<div class='form-horizontal' fb-page={{currentPage}} fb-page-count={{pageCount}}>\n	<div class='fb-form-object-editable' ng-repeat=\"object in formObjects\"\n		fb-form-object-editable=\"object\"></div>\n</div>",
+        template: "<div class='form-horizontal' fb-page={{currentPage}}>\n	<div class='fb-form-object-editable '\n		ng-repeat=\"object in formObjects\"\n		fb-form-object-editable=\"object\"\n		fb-component-name='object.component'\n		fb-draggable='allow'\n		fb-indexIn='indexIn'\n		current-page='currentPage'\n		parent-section='false'\n	></div>\n</div>",
         controller: 'PaginationController',
         link: function(scope, element, attrs) {
-          var beginMove, _base, _name;
+          var KeyDown, KeyUp, allowKey, beginMove, keyHold, _base, _name;
           scope.formNumber = attrs.fbPage || $builder.currentForm;
           if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
             _base[_name] = [];
           }
           scope.formObjects = $builder.forms[scope.formNumber];
           beginMove = true;
-          scope.currentPage = 1;
+          scope.currentPage = 0;
           scope.$watchGroup([
             function() {
               return $builder.forms[$builder.currentForm];
@@ -301,18 +300,54 @@
               return $builder.forms.length;
             }
           ], function(current, prev) {
-            console.log(arguments, 'page change -> change pagin', $builder.currentForm);
             scope.formNumber = $builder.currentForm;
             scope.currentPage = $builder.currentForm;
             return scope.formObjects = $builder.forms[scope.formNumber];
           });
           $(element).addClass('fb-builder');
+          allowKey = 'Alt';
+          keyHold = '';
+          KeyDown = (function(_this) {
+            return function(e) {
+              var KeyID, keyName;
+              KeyID = window.event ? event.keyCode : e.keyCode;
+              switch (KeyID) {
+                case 18:
+                  keyName = "Alt";
+                  break;
+                case 17:
+                  keyName = "Ctrl";
+              }
+              return keyHold = keyName;
+            };
+          })(this);
+          KeyUp = (function(_this) {
+            return function(e) {
+              var KeyID, keyName;
+              KeyID = window.event ? event.keyCode : e.keyCode;
+              switch (KeyID) {
+                case 18:
+                  keyName = "Alt";
+                  break;
+                case 17:
+                  keyName = "Ctrl";
+              }
+              if (keyHold === keyName) {
+                return keyHold = "";
+              }
+            };
+          })(this);
+          document.onkeydown = KeyDown;
+          document.onkeyup = KeyUp;
           return $drag.droppable($(element), {
             move: function(e) {
               var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
               if (beginMove) {
                 $("div.fb-form-object-editable").popover('hide');
                 beginMove = false;
+              }
+              if (keyHold !== allowKey) {
+                return;
               }
               $formObjects = $(element).find('.fb-form-object-editable:not(.empty,.dragging)');
               if ($formObjects.length === 0) {
@@ -353,13 +388,18 @@
             up: function(e, isHover, draggable) {
               var formObject, newIndex, oldIndex;
               beginMove = true;
+              if (keyHold !== allowKey) {
+                return;
+              }
               if (!$drag.isMouseMoved()) {
                 $(element).find('.empty').remove();
                 return;
               }
               if (!isHover && draggable.mode === 'drag') {
+                console.lo;
                 formObject = draggable.object.formObject;
                 if (formObject.editable) {
+                  console.log('removeFormObject', attrs.fbBuilder, formObject.index);
                   $builder.removeFormObject(attrs.fbBuilder, formObject.index);
                 }
               } else if (isHover) {
@@ -394,20 +434,37 @@
         restrict: 'A',
         controller: 'fbFormObjectEditableController',
         scope: {
-          formObject: '=fbFormObjectEditable'
+          isOpen: '=isOpen',
+          formObject: '=fbFormObjectEditable',
+          sectionIndex: '=sectionIndex',
+          componentName: '=fbComponentName',
+          currentPage: '='
         },
         link: function(scope, element) {
           var popover;
           scope.inputArray = [];
+          scope.formNumber = scope.$parent.formNumber;
+          scope.componentIndex = scope.$parent.$index;
+          scope.simplePreview = $builder.simplePreview;
           scope.$component = $builder.components[scope.formObject.component];
-          scope.setupScope(scope.formObject);
+          scope.setupScope(scope.formObject, scope.componentName, scope.formNumber, scope.currentPage, scope.simplePreview);
           scope.$watch('$component.template', function(template) {
             var view;
             if (!template) {
               return;
             }
             view = $compile(template)(scope);
-            return $(element).html(view);
+            $(element).html(view);
+            return console.log('Component change');
+          });
+          scope.$watch('$parent.$index', function() {
+            return scope.componentIndex = scope.$parent.$index;
+          });
+          scope.$watch(function() {
+            return $builder.simplePreview;
+          }, function() {
+            console.log('z', $builder.simplePreview);
+            return scope.simplePreview = $builder.simplePreview;
           });
           $(element).on('click', function() {
             return false;
@@ -417,9 +474,6 @@
               formObject: scope.formObject
             }
           });
-          if (!scope.formObject.editable) {
-            return;
-          }
           popover = {};
           scope.$watch('$component.popoverTemplate', function(template) {
             if (!template) {
@@ -461,7 +515,11 @@
               				The delete event of the popover.
                */
               $event.preventDefault();
-              $builder.removeFormObject(scope.$parent.formNumber, scope.$parent.$index);
+              if (scope.$parent.fbSection === 'section') {
+                $builder.removeSectionObject(scope.$parent.formNumber, scope.componentIndex, scope.$parent.$index);
+              } else {
+                $builder.removeFormObject(scope.$parent.formNumber, scope.componentIndex);
+              }
               $(element).popover('hide');
             },
             shown: function() {
@@ -484,8 +542,10 @@
               }
             }
           };
-          $(element).on('show.bs.popover', function() {
+          $(element).on('show.bs.popover', function(e) {
             var $popover, elementOrigin, popoverTop;
+            console.log('Click to Popover');
+            e.stopPropagation();
             if ($drag.isMouseMoved()) {
               return false;
             }
@@ -535,9 +595,11 @@
     }
   ]).directive('fbComponents', [
     '$injector', function($injector) {
+      var $builder;
+      $builder = $injector.get('$builder');
       return {
         restrict: 'A',
-        template: "<ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n	<li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n		<a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n	</li>\n</ul>\n<div class='form-horizontal col-sm-12 elementList'>\n	<div ng-repeat=\"component in components\">\n		<div class=\"form-group element-wrapper\">\n			<div class=\"col-sm-1\">{{component.name}}\n				<button type='button' class='btn btn-success btn-sm'\n						ng-click='addComponentToEnd($event, component)'>+</button>\n			</div>\n			<div class=\"col-sm-11\">\n				<div class='fb-component' fb-component=\"component\"></div>\n			</div>\n	</div>\n</div>",
+        template: "<ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n	<li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n		<a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n	</li>\n</ul>\n<div class='form-horizontal col-sm-12 elementList'>\n	<div ng-repeat=\"component in components\">\n		<div class=\"form-group element-wrapper\">\n			<div class=\"col-sm-1\">\n				<button type='button' class='btn btn-success btn-sm'\n						ng-click='addComponentToEnd($event, component)'>+</button>\n			</div>\n			<div class=\"col-sm-11\">\n				<div class='fb-component' fb-component=\"component\" ng-component=\"{{component.name}}\" ng-if='!_$builder.simplePreview'></div>\n				<!--div class=\"col-sm-12 fb-component\" ng-if='$builder.simplePreview'>\n					<div class=\"panel panel-default\">\n						<div class=\"panel-body text-center\">\n							{{component.name}}\n						</div>\n					</div>\n				</div-->\n			</div>\n	</div>\n</div>",
         controller: 'fbComponentsController'
       };
     }
@@ -554,7 +616,8 @@
         },
         controller: 'fbComponentController',
         link: function(scope, element) {
-          scope.copyObjectToScope(scope.component);
+          scope.simplePreview = $builder.simplePreview;
+          scope.copyObjectToScope(scope.component, scope.simplePreview);
           $drag.draggable($(element), {
             mode: 'mirror',
             defer: false,
@@ -562,13 +625,18 @@
               componentName: scope.component.name
             }
           });
-          return scope.$watch('component.template', function(template) {
+          scope.$watch('component.template', function(template) {
             var view;
             if (!template) {
               return;
             }
             view = $compile(template)(scope);
             return $(element).html(view);
+          });
+          return scope.$watch(function() {
+            return $builder.simplePreview;
+          }, function() {
+            return scope.simplePreview = $builder.simplePreview;
           });
         }
       };
@@ -592,17 +660,18 @@
             return $builder.currentForm;
           }, function(current, prev) {
             var _base, _name;
-            console.log(arguments, 'page change');
             scope.formNumber = current;
             if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
               _base[_name] = [];
             }
-            return scope.form = $builder.forms[scope.formNumber];
+            scope.form = $builder.forms[scope.formNumber];
+            return scope.jsonString = $builder.forms;
           });
           if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
             _base[_name] = [];
           }
-          return scope.form = $builder.forms[scope.formNumber];
+          scope.form = $builder.forms[scope.formNumber];
+          return scope.jsonString = $builder.forms;
         }
       };
     }
@@ -684,10 +753,127 @@
           return scope.$watch(function() {
             return $builder.forms.length;
           }, function() {
-            console.log(arguments, 'change pagination');
             scope.pageCount = $builder.forms.length;
             scope.pages = $builder.forms;
             return scope.currentPage = $builder.currentForm;
+          });
+        }
+      };
+    }
+  ]).directive('fbSection', [
+    '$injector', '$compile', function($injector, $compile) {
+      var $builder, $drag;
+      $builder = $injector.get('$builder');
+      $drag = $injector.get('$drag');
+      return {
+        restrict: 'A',
+        scope: {
+          fbSection: '=',
+          sectionIndex: '=componentIndex',
+          currentPage: '=',
+          formNumber: '='
+        },
+        template: "<div class='form-horizontal' >\n	<div style=\"min-height: 100px;\"\n		class='fb-form-object-editable parent-section'\n		ng-repeat=\"object in sectionObjects\"\n		fb-form-object-editable=\"object\"\n		fb-draggable='allow'\n		section-index='sectionIndex'\n		parent-section='true'\n	>\n	</div>\n</div>",
+        link: function(scope, element, attrs) {
+          if (scope.fbSection !== 'section') {
+            return;
+          }
+          $(element).addClass('fb-section');
+          scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
+          console.log('Init Section: ', scope.sectionIndex, scope.sectionObjects);
+          return $drag.droppable($(element), {
+            move: function(e) {
+              var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
+              if (beginMove) {
+                $("div.fb-form-object-editable").popover('hide');
+                beginMove = false;
+              }
+              $formObjects = $(element).find('.parent-section.fb-form-object-editable:not(.empty,.dragging)');
+              if ($formObjects.length === 0) {
+                if ($(element).find('.parent-section.fb-form-object-editable.empty').length === 0) {
+                  $(element).find('>div:first').append($("<div class='parent-section fb-form-object-editable empty'></div>"));
+                }
+                return;
+              }
+              positions = [];
+              positions.push(-1000);
+              for (index = _i = 0, _ref = $formObjects.length; _i < _ref; index = _i += 1) {
+                $formObject = $($formObjects[index]);
+                offset = $formObject.offset();
+                height = $formObject.height();
+                positions.push(offset.top + height / 2);
+              }
+              positions.push(positions[positions.length - 1] + 1000);
+              for (index = _j = 1, _ref1 = positions.length; _j < _ref1; index = _j += 1) {
+                if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
+                  $(element).find('.empty').remove();
+                  $empty = $("<div class='parent-section fb-form-object-editable empty'></div>");
+                  if (index - 1 < $formObjects.length) {
+                    $empty.insertBefore($($formObjects[index - 1]));
+                  } else {
+                    $empty.insertAfter($($formObjects[index - 2]));
+                  }
+                  break;
+                }
+              }
+            },
+            out: function() {
+              var beginMove;
+              if (beginMove) {
+                $("div.fb-form-object-editable").popover('hide');
+                beginMove = false;
+              }
+              return $(element).find('.empty').remove();
+            },
+            up: function(e, isHover, draggable) {
+              var beginMove, elementIndex, formObject, newIndex, oldIndex;
+              beginMove = true;
+              if (!$drag.isMouseMoved()) {
+                $(element).find('.empty').remove();
+                return;
+              }
+              if (!isHover && draggable.mode === 'drag') {
+                formObject = draggable.object.formObject;
+                console.error(draggable.object);
+                console.log('removeSectionObject', attrs.fbBuilder, $builder.currentForm, formObject.index, formObject.editable, formObject, draggable.object.formObject);
+              } else if (isHover) {
+                if (draggable.mode === 'mirror') {
+                  elementIndex = $(element).find('.empty').index();
+                  $builder.insertSectionObject($builder.currentForm, scope.sectionIndex, elementIndex, {
+                    component: draggable.object.componentName
+                  });
+                  scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
+                }
+                if (draggable.mode === 'drag') {
+                  oldIndex = draggable.object.formObject.index;
+                  newIndex = $(element).find('.empty').index();
+                  console.warn('newIndex', newIndex, element, $(element).find('.empty'));
+                  if (oldIndex < newIndex) {
+                    newIndex--;
+                  }
+                  $builder.updateSectionObjectIndex(scope.formNumber, scope.sectionIndex, oldIndex, newIndex);
+                }
+              }
+              return $(element).find('.empty').remove();
+            }
+          });
+        }
+      };
+    }
+  ]).directive('fbSimplePreview', [
+    '$injector', function($injector) {
+      var $builder;
+      $builder = $injector.get('$builder');
+      return {
+        restrict: 'A',
+        scope: {
+          simplePreview: '=fbSimplePreview'
+        },
+        link: function(scope, element) {
+          $builder.simplePreview = scope.simplePreview;
+          console.log('a', scope.simplePreview);
+          return scope.$watch('simplePreview', function() {
+            return $builder.simplePreview = scope.simplePreview;
           });
         }
       };
@@ -713,6 +899,7 @@
       move: {},
       up: {}
     };
+    this.innerDropHover = false;
     this.eventMouseMove = function() {};
     this.eventMouseUp = function() {};
     $((function(_this) {
@@ -944,6 +1131,9 @@
         $element.addClass('fb-draggable');
         $element.on('mousedown', function(e) {
           e.preventDefault();
+          if ($($element).find('.panel-open').length) {
+            return;
+          }
           if ($element.hasClass('dragging')) {
             return;
           }
@@ -1035,12 +1225,13 @@
         }
 
         /*
-        Make the element could be drag.
+        Make the element able to drag.
         @param element: The jQuery element.
         @param options: Options
             mode: 'drag' [default], 'mirror'
             defer: yes/no. defer dragging
             object: custom information
+            allow: yes/no - allow dragging at the current time
          */
         result = [];
         if (options.mode === 'mirror') {
@@ -1093,7 +1284,8 @@
         isMouseMoved: this.isMouseMoved,
         data: this.data,
         draggable: this.draggable,
-        droppable: this.droppable
+        droppable: this.droppable,
+        innerDropHover: this.innerDropHover
       };
     };
     this.get.$inject = ['$injector'];
@@ -1123,7 +1315,7 @@
    */
 
   angular.module('builder.provider', []).provider('$builder', function() {
-    var $http, $injector, $templateCache;
+    var $http, $injector, $templateCache, simplePreview;
     $injector = null;
     $http = null;
     $templateCache = null;
@@ -1138,8 +1330,9 @@
     this.currentForm = 0;
     this.forms = [];
     this.forms['0'] = [];
+    simplePreview = false;
     this.convertComponent = function(name, component) {
-      var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       result = {
         name: name,
         group: (_ref = component.group) != null ? _ref : 'Default',
@@ -1162,7 +1355,8 @@
         template: component.template,
         templateUrl: component.templateUrl,
         popoverTemplate: component.popoverTemplate,
-        popoverTemplateUrl: component.popoverTemplateUrl
+        popoverTemplateUrl: component.popoverTemplateUrl,
+        components: (_ref17 = component.components) != null ? _ref17 : []
       };
       if (!result.template && !result.templateUrl) {
         console.error("The template is empty.");
@@ -1173,7 +1367,7 @@
       return result;
     };
     this.convertFormObject = function(name, formObject) {
-      var component, result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      var component, result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       if (formObject == null) {
         formObject = {};
       }
@@ -1198,7 +1392,8 @@
         header: (_ref11 = formObject.header) != null ? _ref11 : component.header,
         footer: (_ref12 = formObject.footer) != null ? _ref12 : component.footer,
         align: (_ref13 = formObject.align) != null ? _ref13 : component.align,
-        style: (_ref14 = formObject.style) != null ? _ref14 : component.style
+        style: (_ref14 = formObject.style) != null ? _ref14 : component.style,
+        components: (_ref15 = formObject.components) != null ? _ref15 : component.components
       };
       return result;
     };
@@ -1208,6 +1403,15 @@
         formObjects = _this.forms[formIndex];
         for (index = _i = 0, _ref = formObjects.length; _i < _ref; index = _i += 1) {
           formObjects[index].index = index;
+        }
+      };
+    })(this);
+    this.reindexSectionObject = (function(_this) {
+      return function(name, sectionIndex) {
+        var index, sectionObjects, _i, _ref;
+        sectionObjects = _this.forms[name][sectionIndex].components;
+        for (index = _i = 0, _ref = sectionObjects.length; _i < _ref; index = _i += 1) {
+          sectionObjects[index].index = index;
         }
       };
     })(this);
@@ -1367,6 +1571,99 @@
         return _this.reindexFormObject(formIndex);
       };
     })(this);
+
+    /*Sections */
+    this.getSectionObjects = (function(_this) {
+      return function(sectionIndex, formIndex) {
+        if (formIndex == null) {
+          formIndex = _this.currentForm;
+        }
+        console.log('@getSectionObjects', sectionIndex, formIndex, _this.forms[formIndex][sectionIndex].components);
+        if (_this.forms[formIndex][sectionIndex]) {
+          return _this.forms[formIndex][sectionIndex].components;
+        } else {
+          return [];
+        }
+      };
+    })(this);
+    this.insertSectionObject = (function(_this) {
+      return function(formIndex, sectionIndex, index, formObject) {
+        var section;
+        if (formObject == null) {
+          formObject = {};
+        }
+
+        /*
+        		Insert the form object into the form at {index}.
+        		@param  formIndex: The form  formIndex.
+        		@param index: The form object index.
+        		@param form: The form object.
+        			id: The form object id.
+        			component: {string} The component name
+        			editable: {bool} Is the form object editable? (default is yes)
+        			label: {string} The form object label.
+        			description: {string} The form object description.
+        			placeholder: {string} The form object placeholder.
+        			options: {array} The form object options.
+        			required: {bool} Is the form object required? (default is no)
+        			inline: {bool} Is the form object inline? (default is no)
+        			validation: {string} angular-validator. "/regex/" or "[rule1, rule2]".
+        			[index]: {int} The form object index. It will be updated by $builder.
+        		@return: The form object.
+         */
+        section = _this.forms[formIndex][sectionIndex];
+        console.log(formIndex, sectionIndex, '=====');
+        if (section.components == null) {
+          section.components = [];
+        }
+        if (index > section.components.length) {
+          index = section.components.length;
+        } else if (index < 0) {
+          index = 0;
+        }
+        section.components.splice(index, 0, _this.convertFormObject(formIndex, formObject));
+        _this.reindexSectionObject(formIndex, sectionIndex);
+        return section.components[index];
+      };
+    })(this);
+    this.removeSectionObject = (function(_this) {
+      return function(formIndex, sectionIndex, index) {
+        var sectionObjects;
+        if (formIndex == null) {
+          formIndex = _this.currentForm;
+        }
+
+        /*
+        		Remove the form object by the index.
+        		@param formIndex: The form formIndex.
+        		@param index: The form object index.
+         */
+        sectionObjects = _this.forms[formIndex][sectionIndex].components;
+        return sectionObjects.splice(index, 1);
+      };
+    })(this);
+    this.updateSectionObjectIndex = (function(_this) {
+      return function(formIndex, sectionIndex, oldIndex, newIndex) {
+        var formObject, sectionObjects;
+        if (formIndex == null) {
+          formIndex = _this.currentForm;
+        }
+
+        /*
+        		Update the index of the form object.
+        		@param formIndex: The form formIndex.
+        		@param oldIndex: The old index.
+        		@param newIndex: The new index.
+         */
+        if (oldIndex === newIndex) {
+          return;
+        }
+        sectionObjects = _this.forms[formIndex][sectionIndex].components;
+        formObject = sectionObjects.splice(oldIndex, 1)[0];
+        sectionObjects.splice(newIndex, 0, formObject);
+        return _this.reindexSectionObject(formIndex, sectionIndex);
+      };
+    })(this);
     this.$get = [
       '$injector', (function(_this) {
         return function($injector) {
@@ -1388,7 +1685,135 @@
             addFormObject: _this.addFormObject,
             insertFormObject: _this.insertFormObject,
             removeFormObject: _this.removeFormObject,
-            updateFormObjectIndex: _this.updateFormObjectIndex
+            removeSectionObject: _this.removeSectionObject,
+            updateFormObjectIndex: _this.updateFormObjectIndex,
+            updateSectionObjectIndex: _this.updateSectionObjectIndex,
+            getSectionObjects: _this.getSectionObjects,
+            insertSectionObject: _this.insertSectionObject
+          };
+        };
+      })(this)
+    ];
+  });
+
+
+  /*
+      transcription Server Data into FormBuilder Data
+   */
+
+  angular.module('transcription', []).provider('$transcription', function() {
+    var $injector;
+    $injector = null;
+    this.setupProviders = (function(_this) {
+      return function(injector) {
+        return $injector = injector;
+      };
+    })(this);
+    this.vocabulary = {
+      'Text': 'textInput',
+      'TextArea': 'textArea',
+      'DropDown': 'select',
+      'Radio': 'checkbox',
+      'CheckBox': 'radio',
+      'Images': 'image',
+      'Images': 'carousel',
+      'Hint': 'description',
+      'label': 'Title'
+    };
+    this.checkType = (function(_this) {
+      return function(json) {
+        var type;
+        if (typeof json === 'string') {
+          return json = JSON.parse(json);
+        } else if (typeof json === 'object' && json.length !== 0) {
+          return json = json;
+        } else {
+          if (json.length >= 0) {
+            type = 'array';
+          } else {
+            type = typeof json;
+          }
+          throw new Error("Input data format is not supported. \n Expecting Object or JSON String, but receive '" + type + "'");
+        }
+      };
+    })(this);
+    this.translate = (function(_this) {
+      return function(json) {
+        var builder, element, elements, item, items, option, options, page, pageIndex, pages, section, tempItem, tempObj, _i, _j, _len, _len1;
+        json = _this.checkType(json);
+        builder = [];
+        pages = json["Pages"];
+        if (!pages) {
+          builder;
+        }
+        for (pageIndex = _i = 0, _len = pages.length; _i < _len; pageIndex = ++_i) {
+          page = pages[pageIndex];
+          window.dev && console.log('!!!', page);
+          builder[pageIndex] = [];
+          elements = page["Elements"];
+          for (_j = 0, _len1 = elements.length; _j < _len1; _j++) {
+            element = elements[_j];
+            tempObj = {
+              id: element["Name"] || null,
+              label: element["Title"] || null
+            };
+            section = false;
+            items = element["Items"];
+            if (items) {
+              tempObj.component = 'section';
+              tempObj.components = (function() {
+                var _k, _len2, _results;
+                _results = [];
+                for (_k = 0, _len2 = items.length; _k < _len2; _k++) {
+                  item = items[_k];
+                  tempItem = {
+                    component: this.vocabulary[item["InputType"]] || null,
+                    id: item["Name"] || null,
+                    label: item["Title"] || null,
+                    show_label: item["ShowTitle"] || null,
+                    required: item["IsRequired"],
+                    description: item["Description"] || ''
+                  };
+                  options = item["Variants"] || [];
+                  if (options) {
+                    tempItem.options = (function() {
+                      var _l, _len3, _results1;
+                      _results1 = [];
+                      for (_l = 0, _len3 = options.length; _l < _len3; _l++) {
+                        option = options[_l];
+                        if (option["Title"]) {
+                          _results1.push(option["Title"]);
+                        } else {
+                          _results1.push(void 0);
+                        }
+                      }
+                      return _results1;
+                    })();
+                  }
+                  _results.push(tempItem);
+                }
+                return _results;
+              }).call(_this);
+            } else {
+              tempObj.component = _this.vocabulary[element["InputType"]] || null;
+              tempObj.id = element["Name"] || null;
+              tempObj.label = element["Title"] || null;
+              tempObj.show_label = element["ShowTitle"] || null;
+              tempObj.required = element["IsRequired"];
+              tempObj.description = element["Description"] || null;
+            }
+            builder[pageIndex].push(tempObj);
+          }
+        }
+        return builder;
+      };
+    })(this);
+    this.$get = [
+      '$injector', (function(_this) {
+        return function($injector) {
+          _this.setupProviders($injector);
+          return {
+            translate: _this.translate
           };
         };
       })(this)

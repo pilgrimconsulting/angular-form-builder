@@ -7,7 +7,7 @@ Global = this
 !Global.__fbComponents && (Global.__fbComponents = {})
 
 Global.__fbComponents.button = ($builderProvider) ->
-
+	return
 	# ----------------------------------------
 	# Button
 	# ----------------------------------------

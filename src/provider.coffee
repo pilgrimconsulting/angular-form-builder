@@ -43,6 +43,11 @@ angular.module 'builder.provider', []
 	@forms['0'] = []
 
 
+	# ----------------------------------------
+	#	Options
+	# ----------------------------------------
+	simplePreview = false
+
 
 	# ----------------------------------------
 	# private functions
@@ -71,6 +76,7 @@ angular.module 'builder.provider', []
 			templateUrl: component.templateUrl
 			popoverTemplate: component.popoverTemplate
 			popoverTemplateUrl: component.popoverTemplateUrl
+			components: component.components ? []
 		if not result.template and not result.templateUrl
 			console.error "The template is empty."
 		if not result.popoverTemplate and not result.popoverTemplateUrl
@@ -98,12 +104,19 @@ angular.module 'builder.provider', []
 			footer: formObject.footer ? component.footer
 			align: formObject.align ? component.align
 			style: formObject.style ? component.style
+			components: formObject.components ? component.components
 		result
 
 	@reindexFormObject = (formIndex) =>
 		formObjects = @forms[formIndex]
 		for index in [0...formObjects.length] by 1
 			formObjects[index].index = index
+		return
+
+	@reindexSectionObject = (name, sectionIndex) =>
+		sectionObjects = @forms[name][sectionIndex].components
+		for index in [0...sectionObjects.length] by 1
+			sectionObjects[index].index = index
 		return
 
 	@setupProviders = (injector) =>
@@ -169,6 +182,7 @@ angular.module 'builder.provider', []
 		@forms[formIndex] ?= []
 		@insertFormObject formIndex, @forms[formIndex].length, formObject
 
+
 	@insertFormObject = (formIndex, index, formObject={}) =>
 		###
 		Insert the form object into the form at {index}.
@@ -218,6 +232,67 @@ angular.module 'builder.provider', []
 		formObjects.splice newIndex, 0, formObject
 		@reindexFormObject formIndex
 
+
+	###Sections###
+
+	@getSectionObjects = (sectionIndex, formIndex = @currentForm) =>
+		console.log('@getSectionObjects',sectionIndex,formIndex,@forms[formIndex][sectionIndex].components)
+		if @forms[formIndex][sectionIndex]
+			@forms[formIndex][sectionIndex].components
+		else []
+
+	@insertSectionObject = ( formIndex, sectionIndex, index, formObject={}) =>
+		###
+		Insert the form object into the form at {index}.
+		@param  formIndex: The form  formIndex.
+		@param index: The form object index.
+		@param form: The form object.
+			id: The form object id.
+			component: {string} The component name
+			editable: {bool} Is the form object editable? (default is yes)
+			label: {string} The form object label.
+			description: {string} The form object description.
+			placeholder: {string} The form object placeholder.
+			options: {array} The form object options.
+			required: {bool} Is the form object required? (default is no)
+			inline: {bool} Is the form object inline? (default is no)
+			validation: {string} angular-validator. "/regex/" or "[rule1, rule2]".
+			[index]: {int} The form object index. It will be updated by $builder.
+		@return: The form object.
+		###
+		section = @forms[formIndex][sectionIndex]
+		console.log(formIndex, sectionIndex, '=====')
+		section.components ?= []
+		if index > section.components.length then index = section.components.length
+		else if index < 0 then index = 0
+		section.components.splice index, 0, @convertFormObject(formIndex, formObject)
+		@reindexSectionObject formIndex, sectionIndex
+		section.components[index]
+
+	@removeSectionObject = (formIndex = @currentForm, sectionIndex, index) =>
+		###
+		Remove the form object by the index.
+		@param formIndex: The form formIndex.
+		@param index: The form object index.
+		###
+		sectionObjects = @forms[formIndex][sectionIndex].components
+#		console.log(sectionObjects, sectionIndex, index)
+		sectionObjects.splice index, 1
+
+	@updateSectionObjectIndex = (formIndex = @currentForm, sectionIndex, oldIndex, newIndex) =>
+		###
+		Update the index of the form object.
+		@param formIndex: The form formIndex.
+		@param oldIndex: The old index.
+		@param newIndex: The new index.
+		###
+		return if oldIndex is newIndex
+		sectionObjects = @forms[formIndex][sectionIndex].components
+#		console.log(sectionObjects,oldIndex, newIndex)
+		formObject = sectionObjects.splice(oldIndex, 1)[0]
+		sectionObjects.splice newIndex, 0, formObject
+		@reindexSectionObject formIndex, sectionIndex
+
 	# ----------------------------------------
 	# $get
 	# ----------------------------------------
@@ -236,6 +311,10 @@ angular.module 'builder.provider', []
 		addFormObject: @addFormObject
 		insertFormObject: @insertFormObject
 		removeFormObject: @removeFormObject
+		removeSectionObject: @removeSectionObject
 		updateFormObjectIndex: @updateFormObjectIndex
+		updateSectionObjectIndex: @updateSectionObjectIndex
+		getSectionObjects: @getSectionObjects
+		insertSectionObject: @insertSectionObject
 	]
 	return
