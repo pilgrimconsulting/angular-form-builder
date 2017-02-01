@@ -445,9 +445,9 @@
           scope.inputArray = [];
           scope.formNumber = scope.$parent.formNumber;
           scope.componentIndex = scope.$parent.$index;
-          scope.simplePreview = $builder.simplePreview;
+          scope.simpleView = $builder.simplePreview;
           scope.$component = $builder.components[scope.formObject.component];
-          scope.setupScope(scope.formObject, scope.componentName, scope.formNumber, scope.currentPage, scope.simplePreview);
+          scope.setupScope(scope.formObject, scope.componentName, scope.formNumber, scope.currentPage, scope.simpleView);
           scope.$watch('$component.template', function(template) {
             var view;
             if (!template) {
@@ -463,8 +463,7 @@
           scope.$watch(function() {
             return $builder.simplePreview;
           }, function() {
-            console.log('z', $builder.simplePreview);
-            return scope.simplePreview = $builder.simplePreview;
+            return scope.simpleView = $builder.simplePreview;
           });
           $(element).on('click', function() {
             return false;
@@ -616,8 +615,8 @@
         },
         controller: 'fbComponentController',
         link: function(scope, element) {
-          scope.simplePreview = $builder.simplePreview;
-          scope.copyObjectToScope(scope.component, scope.simplePreview);
+          scope.simpleView = $builder.simpleComponentView;
+          scope.copyObjectToScope(scope.component, scope.simpleView);
           $drag.draggable($(element), {
             mode: 'mirror',
             defer: false,
@@ -634,9 +633,10 @@
             return $(element).html(view);
           });
           return scope.$watch(function() {
-            return $builder.simplePreview;
+            return $builder.simpleComponentView;
           }, function() {
-            return scope.simplePreview = $builder.simplePreview;
+            scope.simpleView = $builder.simpleComponentView;
+            return console.log('x', scope.simpleView);
           });
         }
       };
@@ -860,20 +860,27 @@
         }
       };
     }
-  ]).directive('fbSimplePreview', [
+  ]).directive('fbSimpleView', [
     '$injector', function($injector) {
       var $builder;
       $builder = $injector.get('$builder');
       return {
         restrict: 'A',
         scope: {
+          simpleComponentView: '=fbSimpleComponentView',
           simplePreview: '=fbSimplePreview'
         },
+        template: '<div class="col-xs-6">\n	<input type="checkbox" id="simplePreview" ng-model=\'simplePreview\' ng-checked="simplePreview"/>\n	<label for="simplePreview">Simple Preview</label>\n</div>\n<div class="col-xs-6">\n	<input type="checkbox" id="simpleComponentView" ng-model=\'simpleComponentView\'/>\n	<label for="simpleComponentView">Simple Component</label>\n</div>',
         link: function(scope, element) {
-          $builder.simplePreview = scope.simplePreview;
-          console.log('a', scope.simplePreview);
-          return scope.$watch('simplePreview', function() {
-            return $builder.simplePreview = scope.simplePreview;
+          $builder.simplePreview = scope.simplePreview || $builder.simplePreview;
+          $builder.simpleComponentView = scope.simpleComponentView || $builder.simpleComponentView;
+          scope.$watch('simplePreview', function() {
+            $builder.simplePreview = scope.simplePreview;
+            return console.log($builder.simplePreview);
+          });
+          return scope.$watch('simpleComponentView', function() {
+            $builder.simpleComponentView = scope.simpleComponentView;
+            return console.log($builder.simpleComponentView);
           });
         }
       };
@@ -1315,7 +1322,7 @@
    */
 
   angular.module('builder.provider', []).provider('$builder', function() {
-    var $http, $injector, $templateCache, simplePreview;
+    var $http, $injector, $templateCache;
     $injector = null;
     $http = null;
     $templateCache = null;
@@ -1330,7 +1337,8 @@
     this.currentForm = 0;
     this.forms = [];
     this.forms['0'] = [];
-    simplePreview = false;
+    this.simplePreview = false;
+    this.simpleComponentView = true;
     this.convertComponent = function(name, component) {
       var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       result = {

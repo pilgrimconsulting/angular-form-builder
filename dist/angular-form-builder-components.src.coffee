@@ -67,7 +67,7 @@ Global.__fbComponents.divider = ($builderProvider) ->
 		label: 'Text'
 		template:
 			"""
-			<div class="form-group" ng-if='simplePreview'>
+			<div class="form-group" ng-if='simpleView'>
 				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body text-center">
@@ -76,7 +76,7 @@ Global.__fbComponents.divider = ($builderProvider) ->
 					</div>
 				</div>
 			</div>
-			<div class="form-group" ng-if='!simplePreview'>
+			<div class="form-group" ng-if='!simpleView'>
 				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body">
@@ -121,7 +121,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		]
 		template:
 			"""
-			<div class="form-group" ng-if='simplePreview'>
+			<div class="form-group" ng-if='simpleView'>
 				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body text-center">
@@ -130,7 +130,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 					</div>
 				</div>
 			</div>
-			<div class="form-group" ng-if='!simplePreview'>
+			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<input type="text" ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" placeholder="{{placeholder}}"/>
@@ -190,7 +190,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		required: no
 		template:
 			"""
-			<div class="form-group" ng-if='simplePreview'>
+			<div class="form-group" ng-if='simpleView'>
 				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body text-center">
@@ -199,7 +199,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 					</div>
 				</div>
 			</div>
-			<div class="form-group" ng-if='!simplePreview'>
+			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<textarea type="text" ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" rows='6' placeholder="{{placeholder}}"/>
@@ -257,7 +257,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		arrayToText: yes
 		template:
 			"""
-			<div class="form-group" ng-if='simplePreview'>
+			<div class="form-group" ng-if='simpleView'>
 				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body text-center">
@@ -266,7 +266,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 					</div>
 				</div>
 			</div>
-			<div class="form-group" ng-if='!simplePreview'>
+			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<input type='hidden' ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}"/>
@@ -330,7 +330,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		options: ['value one', 'value two']
 		template:
 			"""
-			<div class="form-group" ng-if='simplePreview'>
+			<div class="form-group" ng-if='simpleView'>
 				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body text-center">
@@ -339,7 +339,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 					</div>
 				</div>
 			</div>
-			<div class="form-group" ng-if='!simplePreview'>
+			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<div class='radio' ng-repeat="item in options track by $index" ng-class="{'radio-inline':inline}">
@@ -400,7 +400,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		options: ['value one', 'value two']
 		template:
 			"""
-			<div class="form-group" ng-if='simplePreview'>
+			<div class="form-group" ng-if='simpleView'>
 				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body text-center">
@@ -409,7 +409,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 					</div>
 				</div>
 			</div>
-			<div class="form-group" ng-if='!simplePreview'>
+			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<select ng-options="value for value in options" id="{{formName+index}}" class="form-control"
@@ -460,7 +460,7 @@ Global.__fbComponents.image = ($builderProvider) ->
 		required: no
 		template:
 			"""
-			<div class="form-group" ng-if='simplePreview'>
+			<div class="form-group" ng-if='simpleView'>
 				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body text-center">
@@ -469,7 +469,7 @@ Global.__fbComponents.image = ($builderProvider) ->
 					</div>
 				</div>
 			</div>
-			<div class="form-group" ng-if='!simplePreview'>
+			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label"
 					ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 				<div class='col-sm-8' ng-class="{'col-sm-offset-4': !show_label}">
@@ -509,7 +509,7 @@ Global.__fbComponents.carousel = ($builderProvider) ->
 		show_label: yes
 		required: no
 		template:
-			"""<div class="form-group" ng-if='simplePreview'>
+			"""<div class="form-group" ng-if='simpleView'>
 				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body text-center">
@@ -518,7 +518,7 @@ Global.__fbComponents.carousel = ($builderProvider) ->
 					</div>
 				</div>
 			</div>
-			<div class="form-group" ng-if='!simplePreview'>
+			<div class="form-group" ng-if='!simpleView'>
 				<div class='clearfix text-center margin-bottom-15'>
 					<label for="{{formName+index}}" class="col-sm-12" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 				</div>

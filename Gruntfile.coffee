@@ -49,7 +49,7 @@ module.exports = (grunt) ->
 
 		watch:
 			compass:
-				files: ['example/*.scss', 'src/*.scss']
+				files: ['example/*.scss', 'src/*.scss', 'index.html']
 				tasks: ['compass']
 				options:
 					spawn: no

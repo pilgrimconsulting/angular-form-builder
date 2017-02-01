@@ -449,11 +449,11 @@ angular.module 'builder.directive', [
 		scope.inputArray = [] # just for fix warning
 		scope.formNumber = scope.$parent.formNumber
 		scope.componentIndex = scope.$parent.$index
-		scope.simplePreview = $builder.simplePreview
+		scope.simpleView = $builder.simplePreview
 		# get component
 		scope.$component = $builder.components[scope.formObject.component]
 		# setup scope
-		scope.setupScope scope.formObject, scope.componentName, scope.formNumber, scope.currentPage, scope.simplePreview
+		scope.setupScope scope.formObject, scope.componentName, scope.formNumber, scope.currentPage, scope.simpleView
 
 		# compile formObject
 		scope.$watch '$component.template', (template) ->
@@ -470,8 +470,8 @@ angular.module 'builder.directive', [
 		scope.$watch () ->
 			$builder.simplePreview
 		, () ->
-			console.log('z',$builder.simplePreview)
-			scope.simplePreview = $builder.simplePreview
+#			console.log('z',$builder.simplePreview)
+			scope.simpleView = $builder.simplePreview
 
 		# disable click event
 		$(element).on 'click', -> no
@@ -659,9 +659,9 @@ angular.module 'builder.directive', [
 		component: '=fbComponent'
 	controller: 'fbComponentController'
 	link: (scope, element) ->
-		scope.simplePreview = $builder.simplePreview
-		scope.copyObjectToScope scope.component, scope.simplePreview
-		# scope.setupScope scope.simplePreview
+		scope.simpleView = $builder.simpleComponentView
+		scope.copyObjectToScope scope.component, scope.simpleView
+		# scope.setupScope scope.simpleView
 
 		$drag.draggable $(element),
 			mode: 'mirror'
@@ -674,12 +674,13 @@ angular.module 'builder.directive', [
 			view = $compile(template) scope
 			$(element).html view
 
-		#		scope.setupScope scope.simplePreview
+		#		scope.setupScope scope.simpleView
 
 		scope.$watch () ->
-			$builder.simplePreview
+			$builder.simpleComponentView
 		, () ->
-			scope.simplePreview = $builder.simplePreview
+			scope.simpleView = $builder.simpleComponentView
+			console.log('x',scope.simpleView)
 ]
 
 # ----------------------------------------
@@ -986,19 +987,45 @@ angular.module 'builder.directive', [
 # ----------------------------------------
 # fb-simple-preview
 # ----------------------------------------
-.directive 'fbSimplePreview', ['$injector', ($injector) ->
+.directive 'fbSimpleView', ['$injector', ($injector) ->
 # providers
 	$builder = $injector.get '$builder'
 
 	restrict: 'A'
 	scope:
+		simpleComponentView: '=fbSimpleComponentView'
 		simplePreview: '=fbSimplePreview'
+	template:
+		'''
+		<div class="col-xs-6">
+			<input type="checkbox" id="simplePreview" ng-model='simplePreview' ng-checked="simplePreview"/>
+			<label for="simplePreview">Simple Preview</label>
+		</div>
+		<div class="col-xs-6">
+			<input type="checkbox" id="simpleComponentView" ng-model='simpleComponentView'/>
+			<label for="simpleComponentView">Simple Component</label>
+		</div>
+		'''
 	link: (scope, element) ->
-		$builder.simplePreview = scope.simplePreview
-		console.log('a',scope.simplePreview)
+#		if !scope.simplePreview
+#			$builder.simplePreview = scope.simplePreview
+#		else
+#			scope.simplePreview = $builder.simplePreview
+#
+#		if !scope.simpleComponentView
+#			$builder.simpleComponentView = scope.simpleComponentView
+#		else
+#			scope.simpleComponentView = $builder.simpleComponentView
+#		console.log('a',scope.simpleComponentView)
+		$builder.simplePreview = scope.simplePreview || $builder.simplePreview
+		$builder.simpleComponentView = scope.simpleComponentView || $builder.simpleComponentView
 
 		scope.$watch 'simplePreview', () ->
 			$builder.simplePreview = scope.simplePreview
+			console.log($builder.simplePreview )
+		scope.$watch 'simpleComponentView', () ->
+			$builder.simpleComponentView = scope.simpleComponentView
+			console.log($builder.simpleComponentView )
 
 ]
 angular.module 'builder.drag', []
@@ -1374,7 +1401,8 @@ angular.module 'builder.provider', []
 	# ----------------------------------------
 	#	Options
 	# ----------------------------------------
-	simplePreview = false
+	@simplePreview = false
+	@simpleComponentView = true
 
 
 	# ----------------------------------------

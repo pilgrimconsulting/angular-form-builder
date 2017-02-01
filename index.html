@@ -42,13 +42,14 @@
 	</div>
 </div>
 <div class="row">
-	<div class="col-md-6">
+	<div class="col-xs-12 col-md-6">
 		<div class="panel panel-default">
 
-			<div class="col-sm-12">
-				<input fb-simple-preview="simplePreview" type="checkbox" id="simplePreview" ng-model='simplePreview'/>
-				<label for="simplePreview">Simple Preview</label>
-			</div>
+			<div class="col-sm-12" fb-simple-view
+			     fb-simple-preview="false"
+			     fb-simple-component-view="true"
+			></div>
+
 			<div class="panel-heading text-center" fb-pages>
 				Form Builder
 			</div>
@@ -67,8 +68,15 @@
 		</div>
 	</div>
 
-	<div class="col-md-6">
-		<div fb-components id="buildLists"></div>
+
+	<div fb-control-panel class="col-xs-12 col-md-6 cPanel">
+		<ul class="nav nav-tabs nav-justified">
+			<li role="presentation" class="active"><a href="#">Controls</a></li>
+			<li role="presentation"><a href="#">Components</a></li>
+		</ul>
+		<div class="col-xs-12">
+			<div fb-components id="buildLists"></div>
+		</div>
 	</div>
 </div>
 

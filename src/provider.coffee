@@ -46,7 +46,8 @@ angular.module 'builder.provider', []
 	# ----------------------------------------
 	#	Options
 	# ----------------------------------------
-	simplePreview = false
+	@simplePreview = false
+	@simpleComponentView = true
 
 
 	# ----------------------------------------
