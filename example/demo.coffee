@@ -1,21 +1,271 @@
-angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.bootstrap', 'ngAnimate']
+window.jsonString = {
+	"Id": "12",
+	"Name": null,
+	"Title": "input",
+	"ShowTitle": true,
+	"Description": "FormDescription",
+	"Instructions": "FormInstructions",
+	"ExtraProperiesDef": {
+		"Form": [
+			{
+				"Title": "Company Program Id",
+				"Name": "CompanyProgramId",
+				"Type": "Int64",
+				"ReadOnly": true,
+				"Hidden": true
+			}
+		],
+		"Page": [],
+		"Section": [
+			{
+				"Title": "Branding Package Type",
+				"Name": "BrandingPackageType",
+				"Type": "Int32",
+				"ReadOnly": false,
+				"Hidden": false,
+				"Variants": [
+					{
+						"Item1": "Default",
+						"Item2": "0"
+					},
+					{
+						"Item1": "FullPSN",
+						"Item2": "1"
+					},
+					{
+						"Item1": "NAVOnly",
+						"Item2": "2"
+					}
+				]
+			}
+		],
+		"Item": []
+	},
+	"ExtraProperties": {
+		"CompanyProgramId": {
+			"Name": "CompanyProgramId",
+			"Value": "1"
+		}
+	},
+	"Pages":[
+		{
+			"Id": "7",
+			"Name": null,
+			"Title": "Page0",
+			"ShowTitle": true,
+			"ExtraProperties": {},
+			"Elements":[
+				{
+					"Id": "7",
+					"Name": null,
+					"Title": "Section00",
+					"ShowTitle": true,
+					"IsMultipleSection": false,
+					"ExtraProperties": {
+						"BrandingPackageType": {
+							"Name": "BrandingPackageType",
+							"Value": 1
+						}
+					},
+					"Items": [
+						{
+							"Id": "3",
+							"Name": "input000",
+							"Title": "Input000",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "Text",
+							"IsRequired": false,
+							"VisibilityConditions": ""
+						},
+						{
+							"Id": "4",
+							"Name": "input001",
+							"Title": "Input001",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "DropDown",
+							"IsRequired": false,
+							"VisibilityConditions": "",
+							"IsMultipleSelection": false,
+							"Variants": [
+								{
+									"Id": "5",
+									"Name": "var1",
+									"Title": "Variant 1",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "1"
+								},
+								{
+									"Id": "6",
+									"Name": "var2",
+									"Title": "Variant 2",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "2"
+								}
+							]
+						}
+					]
+				},
+				{
+					"Id": "7",
+					"Name": null,
+					"Title": "Section01",
+					"ShowTitle": true,
+					"IsMultipleSection": false,
+					"ExtraProperties": {
+						"BrandingPackageType": {
+							"Name": "BrandingPackageType",
+							"Value": 1
+						}
+					},
+					"Items": [
+						{
+							"Id": "3",
+							"Name": "input002",
+							"Title": "Input002",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "Text",
+							"IsRequired": false,
+							"VisibilityConditions": ""
+						},
+						{
+							"Id": "4",
+							"Name": "input003",
+							"Title": "Input003",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "DropDown",
+							"IsRequired": false,
+							"VisibilityConditions": "",
+							"IsMultipleSelection": false,
+							"Variants": [
+								{
+									"Id": "5",
+									"Name": "var1",
+									"Title": "Variant 1",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "1"
+								},
+								{
+									"Id": "6",
+									"Name": "var2",
+									"Title": "Variant 2",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "2"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"Id": "7",
+			"Name": null,
+			"Title": "Page0",
+			"ShowTitle": true,
+			"ExtraProperties": {},
+			"Elements":[
+				{
+					"Id": "7",
+					"Name": null,
+					"Title": "Section10",
+					"ShowTitle": true,
+					"IsMultipleSection": false,
+					"ExtraProperties": {
+						"BrandingPackageType": {
+							"Name": "BrandingPackageType",
+							"Value": 1
+						}
+					},
+					"Items": [
+						{
+							"Id": "3",
+							"Name": "input010",
+							"Title": "Input010",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "Text",
+							"IsRequired": false,
+							"VisibilityConditions": ""
+						},
+						{
+							"Id": "4",
+							"Name": "input011",
+							"Title": "Input011",
+							"ShowTitle": true,
+							"ExtraProperties": {},
+							"Description": "InputDesc",
+							"InputType": "DropDown",
+							"IsRequired": false,
+							"VisibilityConditions": "",
+							"IsMultipleSelection": false,
+							"Variants": [
+								{
+									"Id": "5",
+									"Name": "var1",
+									"Title": "Variant 1",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "1"
+								},
+								{
+									"Id": "6",
+									"Name": "var2",
+									"Title": "Variant 2",
+									"ShowTitle": true,
+									"ExtraProperties": {},
+									"Value": "2"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
 
-.run ['$builder', ($builder) ->
-	$builder.registerComponent 'sampleInput',
-		group: 'Additional'
-		label: 'Sample'
-		show_label: yes
-		description: 'From html template'
-		placeholder: 'placeholder'
-		required: no
-		validationOptions: [
-			{label: 'none', rule: '/.*/'}
-			{label: 'number', rule: '[number]'}
-			{label: 'email', rule: '[email]'}
-			{label: 'url', rule: '[url]'}
-		]
-		templateUrl: 'example/template.html'
-		popoverTemplateUrl: 'example/popoverTemplate.html'
+window.dev = true
+
+window.json = [[{"id":"divider","component":"divider","editable":true,"index":0,"label":"Building elevation A","description":"","placeholder":"","options":[],"required":false,"inline":false,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio0","component":"radio","editable":true,"index":1,"label":"What is the condition of the sign can?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio1","component":"radio","editable":true,"index":2,"label":"What is the condition of the sign face?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":3,"label":"Observed while illumination on?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":4,"label":"If yes, were there any problems with illumination?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""}], [{"id":"radio2","component":"radio","editable":true,"index":4,"label":"If yes, were there any problems with illumination?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""}]]
+
+json =  window.json
+
+angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.bootstrap', 'ngAnimate', 'transcription']
+
+.run ['$builder', '$window', '$transcription', ($builder, $window, $transcription) ->
+
+#	$builder.json = $window.jsonString
+
+	$builder.json = $transcription.translate($window.jsonString)
+
+#	$builder.registerComponent 'sampleInput',
+#		group: 'Additional'
+#		label: 'Sample'
+#		show_label: yes
+#		description: 'From html template'
+#		placeholder: 'placeholder'
+#		required: no
+#		validationOptions: [
+#			{label: 'none', rule: '/.*/'}
+#			{label: 'number', rule: '[number]'}
+#			{label: 'email', rule: '[email]'}
+#			{label: 'url', rule: '[url]'}
+#		]
+#		templateUrl: 'example/template.html'
+#		popoverTemplateUrl: 'example/popoverTemplate.html'
 
 	# ----------------------------------------
 	# two text input
@@ -72,12 +322,11 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.b
 
 
 
-
-
 .controller 'DemoController', ['$scope', '$builder', '$validator', ($scope, $builder, $validator) ->
 # ----------------------------------------
 # builder
 # ----------------------------------------
+
 
 #	textbox = $builder.addFormObject 'default',
 #		id: 'textbox'
@@ -88,40 +337,40 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.b
 #		required: yes
 #   editable: no
 
-	$scope.oneAtATime = true
-	$scope.groups = [
-		{
-			title: 'Dynamic Group Header - 1'
-			content: 'Dynamic Group Body - 1'
-		}
-		{
-			title: 'Dynamic Group Header - 2'
-			content: 'Dynamic Group Body - 2'
-		}
-	]
-	$scope.items = [
-		'Item 1'
-		'Item 2'
-		'Item 3'
-	]
+#	$scope.oneAtATime = true
+#	$scope.groups = [
+#		{
+#			title: 'Dynamic Group Header - 1'
+#			content: 'Dynamic Group Body - 1'
+#		}
+#		{
+#			title: 'Dynamic Group Header - 2'
+#			content: 'Dynamic Group Body - 2'
+#		}
+#	]
+#	$scope.items = [
+#		'Item 1'
+#		'Item 2'
+#		'Item 3'
+#	]
 
-	$scope.addItem = ->
-		newItemNo = $scope.items.length + 1
-		$scope.items.push 'Item ' + newItemNo
-		return
+#	$scope.addItem = ->
+#		newItemNo = $scope.items.length + 1
+#		$scope.items.push 'Item ' + newItemNo
+#		return
+#
+#	$scope.status =
+#		isCustomHeaderOpen: false
+#		isFirstOpen: true
+#		isFirstDisabled: false
+#
+#	$scope.pages = []
 
-	$scope.status =
-		isCustomHeaderOpen: false
-		isFirstOpen: true
-		isFirstDisabled: false
 
-	$scope.pages = []
-
-
-	json = [{"id":"divider","component":"divider","editable":true,"index":0,"label":"Building elevation A","description":"","placeholder":"","options":[],"required":false,"inline":false,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio0","component":"radio","editable":true,"index":1,"label":"What is the condition of the sign can?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio1","component":"radio","editable":true,"index":2,"label":"What is the condition of the sign face?","description":"","placeholder":"placeholder","options":["1","2","3","4","5"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":3,"label":"Observed while illumination on?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""},{"id":"radio2","component":"radio","editable":true,"index":4,"label":"If yes, were there any problems with illumination?","description":"","placeholder":"placeholder","options":["Yes","No"],"required":false,"inline":true,"validation":"/.*/","text":"","header":"","footer":"","align":[],"style":""}]
-
-	json.map((component, index)=>
-		$builder.addFormObject 0, component
+	$builder.json.map((page, pageIndex)=>
+		page.map((component) =>
+			$builder.addFormObject pageIndex, component
+		)
 	)
 
 	###divider = $builder.addFormObject 'default',
@@ -300,14 +549,15 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.b
 	#    $builder.addFormObject 'default',
 	#        component: 'sampleInput'
 	# formObjects
-	$scope.form = $builder.forms[$builder.currentForm]
+#	$scope.form = $builder.forms[$builder.currentForm]
+	$scope.jsonString = $builder.forms
 
 	# ----------------------------------------
 	# form
 	# ----------------------------------------
 	# user input value
-	$scope.input = []
-	$scope.defaultValue = {}
+#	$scope.input = []
+#	$scope.defaultValue = {}
 	# formObjectId: default value
 #	$scope.defaultValue[textbox.id] = 'default value'
 #	$scope.defaultValue[checkbox.id] = [yes, yes]
