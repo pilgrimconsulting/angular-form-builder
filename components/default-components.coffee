@@ -24,8 +24,7 @@ Global.__fbComponents.divider = ($builderProvider) ->
 				</div>
 			</div>
 			<div class="form-group" ng-if='!simplePreview'>
-				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
-				<div class="col-sm-8">
+				<div class="col-sm-12">
 					<div class="panel panel-default">
 						<div class="panel-body">
 							{{label}}
@@ -38,8 +37,8 @@ Global.__fbComponents.divider = ($builderProvider) ->
 			"""
 			<form>
 				<div class="form-group">
-					<label class='control-label'>Label</label>
-					<input type='text' ng-model="label" validator="[required]" class='form-control'/>
+					<label class='control-label'>Text</label>
+					<textarea type='text' ng-model="label" validator="[required]" class='form-control'/>
 				</div>
 					<hr/>
 				<div class='form-group'>
