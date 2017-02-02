@@ -529,16 +529,23 @@ Global.__fbComponents.section = ($builderProvider) ->
 		template:
 			"""
 			<div>{{componentIndex}}{{componentName}}|{{currentPage}}|{{formNumber}}
-			    <uib-accordion>
-					<div uib-accordion-group class="panel-default" is-open="isOpen" is-disabled="false" >
-						<uib-accordion-heading>
-							{{label}} <i class="pull-right glyphicon" ng-click="toggleOpen()"
-							ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-right': isOpen}"></i>
-						</uib-accordion-heading>
-						<div fb-section='componentName' component-index='componentIndex' current-page='currentPage' form-number='formNumber'></div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
+							<a role="button" ng-init='isOpen=true' is-open='isOpen' style='cursor: pointer'
+								ng-click="isOpen = !isOpen; $event.stopPropagation();">
+								{{label}}
+								<i class="pull-right glyphicon"
+									ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-up': isOpen}"></i>
+							</a>
+						</h4>
 					</div>
-			    </uib-accordion>
-			<div/>
+					<div id="collapse_{{componentIndex}}" class="panel-collapse collapse " ng-class="{'in': isOpen}"
+							fb-section='componentName' component-index='componentIndex' ng-show='isOpen'
+							current-page='currentPage' form-number='formNumber'></div>
+					</div>
+				</div>
+			</div>
   		    """
 		popoverTemplate:
 			"""

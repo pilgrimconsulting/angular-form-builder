@@ -396,7 +396,7 @@
                 return;
               }
               if (!isHover && draggable.mode === 'drag') {
-                console.lo;
+                console.log('DRAG OUT', draggable.object.formObject);
                 formObject = draggable.object.formObject;
                 if (formObject.editable) {
                   console.log('removeFormObject', attrs.fbBuilder, formObject.index);
@@ -434,7 +434,7 @@
         restrict: 'A',
         controller: 'fbFormObjectEditableController',
         scope: {
-          isOpen: '=isOpen',
+          isOpen: '=?isOpen',
           formObject: '=fbFormObjectEditable',
           sectionIndex: '=sectionIndex',
           componentName: '=fbComponentName',

@@ -138,7 +138,7 @@ angular.module 'builder.directive', [
 					return
 
 				if not isHover and draggable.mode is 'drag'
-					console.lo
+					console.log('DRAG OUT', draggable.object.formObject)
 					# remove the form object by draggin out
 					formObject = draggable.object.formObject
 					if formObject.editable
@@ -172,7 +172,7 @@ angular.module 'builder.directive', [
 	restrict: 'A'
 	controller: 'fbFormObjectEditableController'
 	scope:
-		isOpen: '=isOpen'
+		isOpen: '=?isOpen'
 		formObject: '=fbFormObjectEditable'
 		sectionIndex: '=sectionIndex'
 		componentName: '=fbComponentName'
@@ -186,6 +186,12 @@ angular.module 'builder.directive', [
 		scope.$component = $builder.components[scope.formObject.component]
 		# setup scope
 		scope.setupScope scope.formObject, scope.componentName, scope.formNumber, scope.currentPage, scope.simpleView
+
+		# methods
+#		scope.collapse = (event, isOpen, id, index) =>
+#			event.stopPropagation()
+#			action = if isOpen then 'hide' else 'show'
+#			$("##{id}_#{index}").collapse(action)
 
 		# compile formObject
 		scope.$watch '$component.template', (template) ->
