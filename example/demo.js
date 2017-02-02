@@ -344,7 +344,7 @@
 
   json = window.json;
 
-  angular.module('app', ['builder', 'builder.components', 'validator.rules', 'ui.bootstrap', 'ngAnimate', 'transcription']).run([
+  angular.module('app', ['builder', 'builder.components', 'validator.rules', 'ngAnimate', 'transcription']).run([
     '$builder', '$window', '$transcription', function($builder, $window, $transcription) {
       return $builder.json = $transcription.translate($window.jsonString);
     }

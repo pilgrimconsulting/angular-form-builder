@@ -243,7 +243,7 @@ window.json = [[{"id":"divider","component":"divider","editable":true,"index":0,
 
 json =  window.json
 
-angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ui.bootstrap', 'ngAnimate', 'transcription']
+angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ngAnimate', 'transcription']
 
 .run ['$builder', '$window', '$transcription', ($builder, $window, $transcription) ->
 
