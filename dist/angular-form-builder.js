@@ -282,7 +282,7 @@
           fbBuilder: '=',
           fbObject: '='
         },
-        template: "<div class='form-horizontal' fb-page={{currentPage}}>\n	<div class='fb-form-object-editable '\n		ng-repeat=\"object in formObjects\"\n		fb-form-object-editable=\"object\"\n		fb-component-name='object.component'\n		fb-draggable='allow'\n		fb-indexIn='indexIn'\n		current-page='currentPage'\n		parent-section='false'\n	></div>\n</div>",
+        template: "<div class='form-horizontal' fb-page={{currentPage}}>\n	<div fb-select-checkbox class='fb-select-checkbox'\n		fb-select-level='0' ng-init='checked=true'>\n		<input type='checkbox' id='fb_select_{{fbSelectLevel}}_{{currentPage}}'\n			class=\"fb-select-input\" fb-select-index='currentPage'\n			ng-checked='checked' />\n		<label class='fb-select-checkbox-label'\n			for='fb_select_{{fbSelectLevel}}_{{currentPage}}'></label>\n	</div>\n	<div class='fb-form-object-editable '\n		ng-repeat=\"object in formObjects\"\n		fb-form-object-editable=\"object\"\n		fb-component-name='object.component'\n		fb-draggable='allow'\n		fb-indexIn='indexIn'\n		current-page='currentPage'\n		parent-section='false'\n	></div>\n</div>",
         controller: 'PaginationController',
         link: function(scope, element, attrs) {
           var KeyDown, KeyUp, allowKey, beginMove, keyHold, _base, _name;
@@ -488,13 +488,23 @@
             popover.html = $(popover.html).addClass(popover.id);
             popover.view = $compile(popover.html)(scope);
             $(element).addClass(popover.id);
-            return $(element).popover({
-              html: true,
-              title: scope.$component.label,
-              content: popover.view,
-              container: 'body',
-              placement: $builder.config.popoverPlacement
-            });
+            if ($builder.config.propertiesPlacement === 'sidebar') {
+              $("#fb-property-popover").append($(popover.view).hide().addClass('fb-property-popover-form'));
+              return $(element).on('click', function() {
+                $("#fb-property-popover").show().find('.fb-property-popover-form').hide().end().find('.' + popover.id).show();
+                return scope.$apply(function() {
+                  return scope.popover.shown();
+                });
+              });
+            } else {
+              return $(element).popover({
+                html: true,
+                title: scope.$component.label,
+                content: popover.view,
+                container: '#fb-property-popover',
+                placement: $builder.config.popoverPlacement
+              });
+            }
           });
           scope.popover = {
             save: function($event) {
@@ -505,7 +515,11 @@
               $event.preventDefault();
               $validator.validate(scope).success(function() {
                 popover.isClickedSave = true;
-                return $(element).popover('hide');
+                if ($builder.config.propertiesPlacement === 'sidebar') {
+                  return $(".fb-property-popover-form." + popover.id).hide();
+                } else {
+                  return $(element).popover('hide');
+                }
               });
             },
             remove: function($event) {
@@ -519,7 +533,11 @@
               } else {
                 $builder.removeFormObject(scope.$parent.formNumber, scope.componentIndex);
               }
-              $(element).popover('hide');
+              if ($builder.config.propertiesPlacement === 'sidebar') {
+                $(".fb-property-popover-form." + popover.id).remove();
+              } else {
+                $(element).popover('hide');
+              }
             },
             shown: function() {
 
@@ -527,6 +545,7 @@
               				The shown event of the popover.
                */
               scope.data.backup();
+              console.log(scope.data);
               return popover.isClickedSave = false;
             },
             cancel: function($event) {
@@ -537,7 +556,11 @@
               scope.data.rollback();
               if ($event) {
                 $event.preventDefault();
-                $(element).popover('hide');
+                if ($builder.config.propertiesPlacement === 'sidebar') {
+                  $(".fb-property-popover-form." + popover.id).hide();
+                } else {
+                  $(element).popover('hide');
+                }
               }
             }
           };
@@ -883,6 +906,16 @@
             return console.log($builder.simpleComponentView);
           });
         }
+      };
+    }
+  ]).directive('fbControlPanel', [
+    '$injector', function($injector) {
+      var $builder;
+      $builder = $injector.get('$builder');
+      return {
+        restrict: 'A',
+        template: '<div class="col-xs-12 fb-control-panel">\n	<div class="col-xs-12" fb-property-popover id="fb-property-popover">\n		some properties\n	</div>\n</div>',
+        lenk: function(scope, element) {}
       };
     }
   ]);
@@ -1327,6 +1360,7 @@
     $http = null;
     $templateCache = null;
     this.config = {
+      propertiesPlacement: 'sidebar',
       popoverPlacement: 'right'
     };
     this.components = {};
@@ -1684,6 +1718,7 @@
           }
           return {
             config: _this.config,
+            options: _this.options,
             components: _this.components,
             groups: _this.groups,
             forms: _this.forms,

@@ -249,6 +249,8 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ngAn
 
 #	$builder.json = $window.jsonString
 
+#	$builder.config.propertiesPlacement = 'popover'
+
 	$builder.json = $transcription.translate($window.jsonString)
 
 #	$builder.registerComponent 'sampleInput',

@@ -19,6 +19,7 @@ angular.module 'builder.provider', []
 	$templateCache = null
 
 	@config =
+		propertiesPlacement: 'sidebar' # 'popover' || 'sidebar'
 		popoverPlacement: 'right'
 	# all components
 	@components = {}
@@ -303,6 +304,7 @@ angular.module 'builder.provider', []
 			@loadTemplate component
 
 		config: @config
+		options: @options
 		components: @components
 		groups: @groups
 		forms: @forms

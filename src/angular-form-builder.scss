@@ -79,6 +79,35 @@
 
 .fb-builder {
   min-height: 250px;
+  //padding-top: 30px;
+  .fb-select-checkbox {
+    input[type="checkbox"].fb-select-input{
+      display: none;
+
+      +label.fb-select-checkbox-label {
+        cursor: pointer;
+        position: relative;
+        top: 1px;
+        display: inline-block;
+        font-family: 'Glyphicons Halflings';
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1;
+        color: blue;
+        //-webkit-font-smoothing: antialiased;
+        //-moz-osx-font-smoothing: grayscale;
+      &:before {
+          content: "\e157";
+        }
+      }
+      &:checked + label.fb-select-checkbox-label {
+        color: green;
+        &:before {
+          content: "\e067";
+        }
+      }
+    }
+  }
 }
 
 .popover {

@@ -294,6 +294,14 @@ angular.module 'builder.directive', [
 	template:
 		"""
 		<div class='form-horizontal' fb-page={{currentPage}}>
+			<div fb-select-checkbox class='fb-select-checkbox'
+				fb-select-level='0' ng-init='checked=true'>
+				<input type='checkbox' id='fb_select_{{fbSelectLevel}}_{{currentPage}}'
+					class="fb-select-input" fb-select-index='currentPage'
+					ng-checked='checked' />
+				<label class='fb-select-checkbox-label'
+					for='fb_select_{{fbSelectLevel}}_{{currentPage}}'></label>
+			</div>
 			<div class='fb-form-object-editable '
 				ng-repeat="object in formObjects"
 				fb-form-object-editable="object"
@@ -515,12 +523,20 @@ angular.module 'builder.directive', [
 			# compile popover
 			popover.view = $compile(popover.html) scope
 			$(element).addClass popover.id
-			$(element).popover
-				html: yes
-				title: scope.$component.label
-				content: popover.view
-				container: 'body'
-				placement: $builder.config.popoverPlacement
+			if $builder.config.propertiesPlacement == 'sidebar'
+				$("#fb-property-popover").append $(popover.view).hide().addClass('fb-property-popover-form')
+				$(element).on 'click', () ->
+					$("#fb-property-popover").show()
+					.find('.fb-property-popover-form').hide().end()
+					.find('.'+popover.id).show()
+					scope.$apply -> scope.popover.shown()
+			else
+				$(element).popover
+					html: yes
+					title: scope.$component.label
+					content: popover.view
+					container: '#fb-property-popover'
+					placement: $builder.config.popoverPlacement
 		scope.popover =
 			save: ($event) ->
 				###
@@ -529,7 +545,10 @@ angular.module 'builder.directive', [
 				$event.preventDefault()
 				$validator.validate(scope).success ->
 					popover.isClickedSave = yes
-					$(element).popover 'hide'
+					if  $builder.config.propertiesPlacement == 'sidebar'
+						$(".fb-property-popover-form."+popover.id).hide()
+					else
+						$(element).popover 'hide'
 				return
 			remove: ($event) ->
 				###
@@ -538,17 +557,23 @@ angular.module 'builder.directive', [
 				$event.preventDefault()
 
 				# Delete by $parent - detect is inside Section ?
+#				console.log($event, scope.$parent.fbSection)
 				if scope.$parent.fbSection == 'section'
 					$builder.removeSectionObject scope.$parent.formNumber, scope.componentIndex, scope.$parent.$index
 				else
 					$builder.removeFormObject scope.$parent.formNumber, scope.componentIndex
-				$(element).popover 'hide'
+				if  $builder.config.propertiesPlacement == 'sidebar'
+					$(".fb-property-popover-form."+popover.id).remove()
+				else
+					$(element).popover 'hide'
+
 				return
 			shown: ->
 				###
 				The shown event of the popover.
 				###
 				scope.data.backup()
+				console.log scope.data
 				popover.isClickedSave = no
 			cancel: ($event) ->
 				###
@@ -558,7 +583,10 @@ angular.module 'builder.directive', [
 				if $event
 					# clicked cancel by user
 					$event.preventDefault()
-					$(element).popover 'hide'
+					if  $builder.config.propertiesPlacement == 'sidebar'
+						$(".fb-property-popover-form."+popover.id).hide()
+					else
+						$(element).popover 'hide'
 				return
 		# ----------------------------------------
 		# popover.show
@@ -989,7 +1017,6 @@ angular.module 'builder.directive', [
 				$(element).find('.empty').remove()
 ]
 
-
 # ----------------------------------------
 # fb-simple-preview
 # ----------------------------------------
@@ -1032,6 +1059,28 @@ angular.module 'builder.directive', [
 		scope.$watch 'simpleComponentView', () ->
 			$builder.simpleComponentView = scope.simpleComponentView
 			console.log($builder.simpleComponentView )
+
+]
+
+# ----------------------------------------
+# fb-control-panel
+# ----------------------------------------
+.directive 'fbControlPanel', ['$injector', ($injector) ->
+# providers
+	$builder = $injector.get '$builder'
+
+	restrict: 'A'
+#	scope:
+	template:
+		'''
+		<div class="col-xs-12 fb-control-panel">
+			<div class="col-xs-12" fb-property-popover id="fb-property-popover">
+				some properties
+			</div>
+		</div>
+		'''
+	lenk : (scope, element) ->
+		return
 
 ]
 angular.module 'builder.drag', []
@@ -1380,6 +1429,7 @@ angular.module 'builder.provider', []
 	$templateCache = null
 
 	@config =
+		propertiesPlacement: 'sidebar' # 'popover' || 'sidebar'
 		popoverPlacement: 'right'
 	# all components
 	@components = {}
@@ -1664,6 +1714,7 @@ angular.module 'builder.provider', []
 			@loadTemplate component
 
 		config: @config
+		options: @options
 		components: @components
 		groups: @groups
 		forms: @forms
