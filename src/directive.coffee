@@ -38,7 +38,6 @@ angular.module 'builder.directive', [
 				ng-repeat="object in formObjects"
 				fb-form-object-editable="object"
 				fb-component-name='object.component'
-				fb-draggable='allow'
 				fb-indexIn='indexIn'
 				current-page='currentPage'
 				parent-section='false'
@@ -55,6 +54,7 @@ angular.module 'builder.directive', [
 		scope.formObjects = $builder.forms[scope.formNumber]
 		beginMove = yes
 		scope.currentPage = 0
+		scope.component = 'page'
 #		console.log('---------',scope.formObjects )
 
 		scope.$watchGroup [() ->
@@ -185,7 +185,7 @@ angular.module 'builder.directive', [
 		sectionIndex: '=sectionIndex'
 		componentName: '=fbComponentName'
 		currentPage: '='
-	link: (scope, element) ->
+	link: (scope, element, attrs) ->
 		scope.inputArray = [] # just for fix warning
 		scope.formNumber = scope.$parent.formNumber
 		scope.componentIndex = scope.$parent.$index
@@ -194,6 +194,9 @@ angular.module 'builder.directive', [
 		scope.$component = $builder.components[scope.formObject.component]
 		# setup scope
 		scope.setupScope scope.formObject, scope.componentName, scope.formNumber, scope.currentPage, scope.simpleView
+
+#		scope.log = () ->
+#			console.log 'C'
 
 		# methods
 #		scope.collapse = (event, isOpen, id, index) =>
@@ -208,6 +211,7 @@ angular.module 'builder.directive', [
 #			if scope.componentName == 'section'
 #				$(view).addClass('inside-section')
 			$(element).html view
+#			attrs.$set('ng-click', scope.log() )
 			console.log('Component change')
 
 		scope.$watch '$parent.$index', () ->
@@ -220,7 +224,40 @@ angular.module 'builder.directive', [
 			scope.simpleView = $builder.simplePreview
 
 		# disable click event
-		$(element).on 'click', -> no
+#		$(element).on 'click', -> no
+
+		$(element).on 'click', ->
+			console.log('CLICK', scope.$parent.$parent.$parent.$parent)
+			if scope.component != 'section'
+				if scope.sectionIndex != undefined
+					firstIndex = 1
+					secondIndex = scope.sectionIndex
+				else
+					firstIndex = 0
+			else
+				firstIndex = 1
+				secondIndex = scope.componentIndex
+			$builder.selectFrame firstIndex, secondIndex
+			$(".fb-selected-frame").removeClass("fb-selected-frame")
+			# $(element).children().addClass("fb-selected-frame")
+			$(element).addClass("fb-selected-frame")
+
+		###$(element).on 'click', (e) ->
+			e.preventDefault()
+			if scope.component != 'section'
+				if scope.sectionIndex != undefined
+					firstIndex = 1
+					secondIndex = scope.sectionIndex
+				else
+					firstIndex = 0
+			else
+				firstIndex = 1
+				secondIndex = scope.componentIndex
+#			scope.selected = true
+			$builder.selectFrame firstIndex, secondIndex
+			console.log('CLICK', firstIndex, secondIndex, $builder.selectedPath, $builder.selectFrame())
+			false
+		###
 
 #		console.log($(element).attr('fb-draggable'))
 
@@ -305,7 +342,6 @@ angular.module 'builder.directive', [
 				The shown event of the popover.
 				###
 				scope.data.backup()
-				console.log scope.data
 				popover.isClickedSave = no
 			cancel: ($event) ->
 				###
@@ -637,6 +673,7 @@ angular.module 'builder.directive', [
 				fb-draggable='allow'
 				section-index='sectionIndex'
 				parent-section='true'
+				ng-class='{"fb-selected-frame": selected}'
 			>
 			</div>
 		</div>
@@ -648,6 +685,17 @@ angular.module 'builder.directive', [
 		scope.sectionObjects = $builder.getSectionObjects scope.sectionIndex, scope.formNumber
 		console.log('Init Section: ',scope.sectionIndex,scope.sectionObjects )
 		# $drag.draggable $(element),
+
+#		scope.$watch () ->
+#			console.log 'zzz',$builder.selectedPath
+#			$builder.selectedPath[0]
+#		, (newValue, oldValue) ->
+#			console.log '/',$builder.selectedPath,newValue, oldValue
+#			if $builder.selectedPath[0] != 0 and $builder.selectedPath[1] == scope.sectionIndex
+#				scope.selected = true
+#			else if scope.selected == true
+#				scope.selected = false
+#		, false
 
 #		scope.$watch () ->
 #			$builder.currentForm
@@ -807,7 +855,6 @@ angular.module 'builder.directive', [
 		'''
 		<div class="col-xs-12 fb-control-panel">
 			<div class="col-xs-12" fb-property-popover id="fb-property-popover">
-				some properties
 			</div>
 		</div>
 		'''

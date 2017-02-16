@@ -141,6 +141,9 @@
         if ($event != null) {
           $event.preventDefault();
         }
+        $builder = null;
+        $builder = $injector.get('$builder');
+        console.log($builder.selectFrame(1, 1), $builder.selectedPath);
         return $builder.addFormObject($builder.currentForm || 0, {
           component: component.name
         });
@@ -282,7 +285,7 @@
           fbBuilder: '=',
           fbObject: '='
         },
-        template: "<div class='form-horizontal' fb-page={{currentPage}}>\n	<div fb-select-checkbox class='fb-select-checkbox'\n		fb-select-level='0' ng-init='checked=true'>\n		<input type='checkbox' id='fb_select_{{fbSelectLevel}}_{{currentPage}}'\n			class=\"fb-select-input\" fb-select-index='currentPage'\n			ng-checked='checked' />\n		<label class='fb-select-checkbox-label'\n			for='fb_select_{{fbSelectLevel}}_{{currentPage}}'></label>\n	</div>\n	<div class='fb-form-object-editable '\n		ng-repeat=\"object in formObjects\"\n		fb-form-object-editable=\"object\"\n		fb-component-name='object.component'\n		fb-draggable='allow'\n		fb-indexIn='indexIn'\n		current-page='currentPage'\n		parent-section='false'\n	></div>\n</div>",
+        template: "<div class='form-horizontal' fb-page={{currentPage}}>\n	<div fb-select-checkbox class='fb-select-checkbox'\n		fb-select-level='0' ng-init='checked=true'>\n		<input type='checkbox' id='fb_select_{{fbSelectLevel}}_{{currentPage}}'\n			class=\"fb-select-input\" fb-select-index='currentPage'\n			ng-checked='checked' />\n		<label class='fb-select-checkbox-label'\n			for='fb_select_{{fbSelectLevel}}_{{currentPage}}'></label>\n	</div>\n	<div class='fb-form-object-editable '\n		ng-repeat=\"object in formObjects\"\n		fb-form-object-editable=\"object\"\n		fb-component-name='object.component'\n		fb-indexIn='indexIn'\n		current-page='currentPage'\n		parent-section='false'\n	></div>\n</div>",
         controller: 'PaginationController',
         link: function(scope, element, attrs) {
           var KeyDown, KeyUp, allowKey, beginMove, keyHold, _base, _name;
@@ -293,6 +296,7 @@
           scope.formObjects = $builder.forms[scope.formNumber];
           beginMove = true;
           scope.currentPage = 0;
+          scope.component = 'page';
           scope.$watchGroup([
             function() {
               return $builder.forms[$builder.currentForm];
@@ -440,7 +444,7 @@
           componentName: '=fbComponentName',
           currentPage: '='
         },
-        link: function(scope, element) {
+        link: function(scope, element, attrs) {
           var popover;
           scope.inputArray = [];
           scope.formNumber = scope.$parent.formNumber;
@@ -466,8 +470,40 @@
             return scope.simpleView = $builder.simplePreview;
           });
           $(element).on('click', function() {
-            return false;
+            var firstIndex, secondIndex;
+            console.log('CLICK', scope.$parent.$parent.$parent.$parent);
+            if (scope.component !== 'section') {
+              if (scope.sectionIndex !== void 0) {
+                firstIndex = 1;
+                secondIndex = scope.sectionIndex;
+              } else {
+                firstIndex = 0;
+              }
+            } else {
+              firstIndex = 1;
+              secondIndex = scope.componentIndex;
+            }
+            $builder.selectFrame(firstIndex, secondIndex);
+            $(".fb-selected-frame").removeClass("fb-selected-frame");
+            return $(element).addClass("fb-selected-frame");
           });
+
+          /*$(element).on 'click', (e) ->
+          			e.preventDefault()
+          			if scope.component != 'section'
+          				if scope.sectionIndex != undefined
+          					firstIndex = 1
+          					secondIndex = scope.sectionIndex
+          				else
+          					firstIndex = 0
+          			else
+          				firstIndex = 1
+          				secondIndex = scope.componentIndex
+           *			scope.selected = true
+          			$builder.selectFrame firstIndex, secondIndex
+          			console.log('CLICK', firstIndex, secondIndex, $builder.selectedPath, $builder.selectFrame())
+          			false
+           */
           $drag.draggable($(element), {
             object: {
               formObject: scope.formObject
@@ -545,7 +581,6 @@
               				The shown event of the popover.
                */
               scope.data.backup();
-              console.log(scope.data);
               return popover.isClickedSave = false;
             },
             cancel: function($event) {
@@ -796,7 +831,7 @@
           currentPage: '=',
           formNumber: '='
         },
-        template: "<div class='form-horizontal' >\n	<div style=\"min-height: 100px;\"\n		class='fb-form-object-editable parent-section'\n		ng-repeat=\"object in sectionObjects\"\n		fb-form-object-editable=\"object\"\n		fb-draggable='allow'\n		section-index='sectionIndex'\n		parent-section='true'\n	>\n	</div>\n</div>",
+        template: "<div class='form-horizontal' >\n	<div style=\"min-height: 100px;\"\n		class='fb-form-object-editable parent-section'\n		ng-repeat=\"object in sectionObjects\"\n		fb-form-object-editable=\"object\"\n		fb-draggable='allow'\n		section-index='sectionIndex'\n		parent-section='true'\n		ng-class='{\"fb-selected-frame\": selected}'\n	>\n	</div>\n</div>",
         link: function(scope, element, attrs) {
           if (scope.fbSection !== 'section') {
             return;
@@ -914,7 +949,7 @@
       $builder = $injector.get('$builder');
       return {
         restrict: 'A',
-        template: '<div class="col-xs-12 fb-control-panel">\n	<div class="col-xs-12" fb-property-popover id="fb-property-popover">\n		some properties\n	</div>\n</div>',
+        template: '<div class="col-xs-12 fb-control-panel">\n	<div class="col-xs-12" fb-property-popover id="fb-property-popover">\n	</div>\n</div>',
         lenk: function(scope, element) {}
       };
     }
@@ -927,6 +962,110 @@
     this.data = {
       draggables: {},
       droppables: {}
+    };
+    this.config = {
+      section: true,
+      keyForPage: true,
+      keyForSection: false,
+      keyPage: 18,
+      keySection: 17,
+      dragAllow: true,
+      dragAllowToDefault: true
+    };
+    this.getConfig = Object.assign({}, this.config);
+    this.setConfig = (function(_this) {
+      return function(config) {
+        var keys;
+        keys = {
+          'ALT': 18,
+          'CTRL': 17,
+          'SHIFT': 16,
+          'COMMAND': 91
+        };
+        if (config.section !== void 0) {
+          if (config.section === false && _this.config.section !== false) {
+            _this.dragCheck.removeDragCheck(_this.defaultDragCheck.section);
+          } else if (config.section === true && _this.config.section !== true) {
+            _this.dragCheck.addDragCheck(_this.defaultDragCheck.section);
+          }
+        }
+        if (config.keyForPage !== void 0 && !parseInt(config.keyForPage)) {
+          if (keys[config.keyForPage.toUpperCase()]) {
+            config.keyForPage = keys[config.keyForPage.toUpperCase()];
+          }
+        }
+        if (config.keyForSection !== void 0 && !parseInt(config.keyForSection)) {
+          if (keys[config.keyForPage.toUpperCase()]) {
+            config.keyForPage = keys[config.keyForPage.toUpperCase()];
+          }
+        }
+        return _this.config = Object.assign(_this.config, config);
+      };
+    })(this);
+    this.dragPermissions = [];
+    this.dragCheck = {
+      addDragCheck: (function(_this) {
+        return function(callback) {
+          return _this.dragPermissions.push(callback);
+        };
+      })(this),
+      removeDragCheck: (function(_this) {
+        return function(callbackToRemove) {
+          var tempArray;
+          tempArray = [];
+          _this.dragPermissions.map(function(callback, index) {
+            console.log('@setConfig', callbackToRemove, callback);
+            if (callbackToRemove !== callback) {
+              return tempArray.push(callback);
+            }
+          });
+          return _this.dragPermissions = tempArray;
+        };
+      })(this),
+      clearDragCheck: (function(_this) {
+        return function() {
+          return _this.dragPermissions = [];
+        };
+      })(this),
+      setDragAllow: (function(_this) {
+        return function(cond) {
+          return _this.config.dragAllow = cond;
+        };
+      })(this),
+      setDragAllowToDefault: (function(_this) {
+        return function(cond) {
+          return _this.dragConfig.setDragAllowToDefault = cond;
+        };
+      })(this)
+    };
+    this.checkDragPermission = (function(_this) {
+      return function(element, event) {
+        var check;
+        if (!_this.config.dragAllow) {
+          if (_this.config.dragAllowToDefault) {
+            _this.config.dragAllow = true;
+          }
+          false;
+        }
+        check = true;
+        _this.dragPermissions.map(function(callback, index) {
+          if (!callback(element, event, index)) {
+            return check = false;
+          }
+        });
+        return check;
+      };
+    })(this);
+    this.defaultDragCheck = {
+      section: (function(_this) {
+        return function(element, event, index) {
+          if ($(element).find('.section-open').length) {
+            return false;
+          } else {
+            return true;
+          }
+        };
+      })(this)
     };
     this.mouseMoved = false;
     this.isMouseMoved = (function(_this) {
@@ -979,6 +1118,9 @@
       };
     })(this);
     this.setupEasing = function() {
+      if (this.config.section === true) {
+        this.dragCheck.addDragCheck(this.defaultDragCheck.section);
+      }
       return jQuery.extend(jQuery.easing, {
         easeOutQuad: function(x, t, b, c, d) {
           return -c * (t /= d) * (t - 2) + b;
@@ -988,7 +1130,7 @@
     this.setupProviders = function(injector) {
 
       /*
-      Setup providers.
+      		Setup providers.
        */
       $injector = injector;
       return $rootScope = $injector.get('$rootScope');
@@ -997,9 +1139,9 @@
       return function($elementA, $elementB) {
 
         /*
-        Is element A hover on element B?
-        @param $elementA: jQuery object
-        @param $elementB: jQuery object
+        		Is element A hover on element B?
+        		@param $elementA: jQuery object
+        		@param $elementB: jQuery object
          */
         var isHover, offsetA, offsetB, sizeA, sizeB;
         offsetA = $elementA.offset();
@@ -1100,6 +1242,9 @@
         $element.on('mousedown', function(e) {
           var $clone;
           e.preventDefault();
+          if (!_this.checkDragPermission($element, e)) {
+            return;
+          }
           $clone = $element.clone();
           result.element = $clone[0];
           $clone.addClass("fb-draggable form-horizontal prepare-dragging");
@@ -1171,7 +1316,7 @@
         $element.addClass('fb-draggable');
         $element.on('mousedown', function(e) {
           e.preventDefault();
-          if ($($element).find('.panel-open').length) {
+          if (!_this.checkDragPermission($element, e)) {
             return;
           }
           if ($element.hasClass('dragging')) {
@@ -1239,16 +1384,19 @@
           id: _this.getNewId(),
           element: $element[0],
           move: function(e, draggable) {
+            console.log('move'.draggable);
             return $rootScope.$apply(function() {
               return typeof options.move === "function" ? options.move(e, draggable) : void 0;
             });
           },
           up: function(e, isHover, draggable) {
+            console.log('up'.draggable);
             return $rootScope.$apply(function() {
               return typeof options.up === "function" ? options.up(e, isHover, draggable) : void 0;
             });
           },
           out: function(e, draggable) {
+            console.log('out'.draggable);
             return $rootScope.$apply(function() {
               return typeof options.out === "function" ? options.out(e, draggable) : void 0;
             });
@@ -1265,13 +1413,13 @@
         }
 
         /*
-        Make the element able to drag.
-        @param element: The jQuery element.
-        @param options: Options
-            mode: 'drag' [default], 'mirror'
-            defer: yes/no. defer dragging
-            object: custom information
-            allow: yes/no - allow dragging at the current time
+        		Make the element able to drag.
+        		@param element: The jQuery element.
+        		@param options: Options
+        			mode: 'drag' [default], 'mirror'
+        			defer: yes/no. defer dragging
+        			object: custom information
+        			allow: yes/no - allow dragging at the current time
          */
         result = [];
         if (options.mode === 'mirror') {
@@ -1300,12 +1448,12 @@
         }
 
         /*
-        Make the element coulde be drop.
-        @param $element: The jQuery element.
-        @param options: The droppable options.
-            move: The custom mouse move callback. (e, draggable)->
-            up: The custom mouse up callback. (e, isHover, draggable)->
-            out: The custom mouse out callback. (e, draggable)->
+        		Make the element coulde be drop.
+        		@param $element: The jQuery element.
+        		@param options: The droppable options.
+        			move: The custom mouse move callback. (e, draggable)->
+        			up: The custom mouse up callback. (e, isHover, draggable)->
+        			out: The custom mouse out callback. (e, draggable)->
          */
         result = [];
         for (_i = 0, _len = $element.length; _i < _len; _i++) {
@@ -1325,7 +1473,11 @@
         data: this.data,
         draggable: this.draggable,
         droppable: this.droppable,
-        innerDropHover: this.innerDropHover
+        innerDropHover: this.innerDropHover,
+        config: this.config,
+        getConfig: this.getConfig,
+        setConfig: this.setConfig,
+        dragCheck: this.dragCheck
       };
     };
     this.get.$inject = ['$injector'];
@@ -1360,6 +1512,7 @@
     $http = null;
     $templateCache = null;
     this.config = {
+      section: true,
       propertiesPlacement: 'sidebar',
       popoverPlacement: 'right'
     };
@@ -1706,6 +1859,18 @@
         return _this.reindexSectionObject(formIndex, sectionIndex);
       };
     })(this);
+    this.selectedPath = [0];
+    this.selectFrame = (function(_this) {
+      return function(firstIndex, sectionIndex) {
+        if (firstIndex === 0) {
+          _this.selectedPath = [0];
+        } else {
+          _this.selectedPath = [1, sectionIndex];
+        }
+        console.log('selectFrame', firstIndex, sectionIndex, _this.selectedPath);
+        return _this.selectedPath;
+      };
+    })(this);
     this.$get = [
       '$injector', (function(_this) {
         return function($injector) {
@@ -1732,7 +1897,9 @@
             updateFormObjectIndex: _this.updateFormObjectIndex,
             updateSectionObjectIndex: _this.updateSectionObjectIndex,
             getSectionObjects: _this.getSectionObjects,
-            insertSectionObject: _this.insertSectionObject
+            insertSectionObject: _this.insertSectionObject,
+            selectFrame: _this.selectFrame,
+            selectedPath: _this.selectedPath
           };
         };
       })(this)

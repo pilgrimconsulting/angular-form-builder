@@ -245,11 +245,15 @@ json =  window.json
 
 angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ngAnimate', 'transcription']
 
-.run ['$builder', '$window', '$transcription', ($builder, $window, $transcription) ->
+.run ['$builder', '$drag', '$window', '$transcription', ($builder, $drag, $window, $transcription) ->
 
 #	$builder.json = $window.jsonString
 
 #	$builder.config.propertiesPlacement = 'popover'
+
+	config =
+		section: true
+	$drag.setConfig config
 
 	$builder.json = $transcription.translate($window.jsonString)
 

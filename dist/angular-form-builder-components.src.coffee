@@ -581,22 +581,21 @@ Global.__fbComponents.section = ($builderProvider) ->
 		components: []
 		template:
 			"""
-			<div>{{componentIndex}}{{componentName}}|{{currentPage}}|{{formNumber}}
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
-							<a role="button" ng-init='isOpen=true' is-open='isOpen' style='cursor: pointer'
-								ng-click="isOpen = !isOpen; $event.stopPropagation();">
-								{{label}}
-								<i class="pull-right glyphicon"
-									ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-up': isOpen}"></i>
-							</a>
-						</h4>
-					</div>
-					<div id="collapse_{{componentIndex}}" class="panel-collapse collapse " ng-class="{'in': isOpen}"
-							fb-section='componentName' component-index='componentIndex' ng-show='isOpen'
-							current-page='currentPage' form-number='formNumber'></div>
-					</div>
+			<div class="panel panel-default" ng-class='{"section-open": isOpen, "fb-selected-frame": selected}'>
+			{{componentIndex}}{{componentName}}|{{currentPage}}|{{formNumber}}
+				<div class="panel-heading">
+					<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
+						<a role="button" ng-init='isOpen=true' is-open='isOpen' style='cursor: pointer'
+							ng-click="isOpen = !isOpen; $event.stopPropagation();">
+							{{label}}
+							<i class="pull-right glyphicon"
+								ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-up': isOpen}"></i>
+						</a>
+					</h4>
+				</div>
+				<div id="collapse_{{componentIndex}}" class="panel-collapse collapse " ng-class="{'in': isOpen}"
+						fb-section='componentName' component-index='componentIndex' ng-show='isOpen'
+						current-page='currentPage' form-number='formNumber'></div>
 				</div>
 			</div>
   		    """

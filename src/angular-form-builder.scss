@@ -57,11 +57,7 @@
 }
 
 .fb-section-object-editable.empty {
-  cursor: default;
-  margin: 6px;
-  height: 80px;
-  border: dashed 1px #aaa;
-  background-color: #eee;
+  @extend .fb-form-object-editable.empty;
   z-index: 700;
 }
 
@@ -79,8 +75,16 @@
 
 .fb-builder {
   min-height: 250px;
-  //padding-top: 30px;
+  cursor: pointer;
+  padding: 30px 10px;
+
   .fb-select-checkbox {
+    position: relative;
+    top: -30px;
+    left: -10px;
+    margin-left: 3px;
+    margin-top: 3px;
+
     input[type="checkbox"].fb-select-input{
       display: none;
 
@@ -96,10 +100,12 @@
         color: blue;
         //-webkit-font-smoothing: antialiased;
         //-moz-osx-font-smoothing: grayscale;
-      &:before {
+
+        &:before {
           content: "\e157";
         }
       }
+
       &:checked + label.fb-select-checkbox-label {
         color: green;
         &:before {
@@ -117,4 +123,26 @@
   form {
     width: 240px;
   }
+}
+
+.cPanel {
+  .tab-content{
+    border: 1px solid #ddd;
+    border-top: none;
+    border-bottom: none;
+    &:after{
+      //content: "<br>";
+    }
+  }
+  hr, br, .tab-pane{
+    &:after{
+      clear: both;
+    }
+  }
+}
+
+.fb-selected-frame{
+  -webkit-box-shadow: 0px 0px 5px 1px rgba(0,126,255,1);
+  -moz-box-shadow: 0px 0px 5px 1px rgba(0,126,255,1);
+  box-shadow: 0px 0px 5px 1px rgba(0,126,255,1);
 }

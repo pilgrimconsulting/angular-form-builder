@@ -120,6 +120,9 @@ angular.module 'builder.controller', ['builder.provider']
 
 	$scope.addComponentToEnd = ($event, component) ->
 		$event?.preventDefault()
+		$builder = null
+		$builder = $injector.get '$builder'
+		console.log $builder.selectFrame(1,1), $builder.selectedPath
 #		console.log(component.group, component.name)
 		$builder.addFormObject( $builder.currentForm || 0,
 			component: component.name

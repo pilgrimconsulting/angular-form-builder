@@ -120,6 +120,9 @@ angular.module 'builder.controller', ['builder.provider']
 
 	$scope.addComponentToEnd = ($event, component) ->
 		$event?.preventDefault()
+		$builder = null
+		$builder = $injector.get '$builder'
+		console.log $builder.selectFrame(1,1), $builder.selectedPath
 #		console.log(component.group, component.name)
 		$builder.addFormObject( $builder.currentForm || 0,
 			component: component.name
@@ -306,7 +309,6 @@ angular.module 'builder.directive', [
 				ng-repeat="object in formObjects"
 				fb-form-object-editable="object"
 				fb-component-name='object.component'
-				fb-draggable='allow'
 				fb-indexIn='indexIn'
 				current-page='currentPage'
 				parent-section='false'
@@ -323,6 +325,7 @@ angular.module 'builder.directive', [
 		scope.formObjects = $builder.forms[scope.formNumber]
 		beginMove = yes
 		scope.currentPage = 0
+		scope.component = 'page'
 #		console.log('---------',scope.formObjects )
 
 		scope.$watchGroup [() ->
@@ -453,7 +456,7 @@ angular.module 'builder.directive', [
 		sectionIndex: '=sectionIndex'
 		componentName: '=fbComponentName'
 		currentPage: '='
-	link: (scope, element) ->
+	link: (scope, element, attrs) ->
 		scope.inputArray = [] # just for fix warning
 		scope.formNumber = scope.$parent.formNumber
 		scope.componentIndex = scope.$parent.$index
@@ -462,6 +465,9 @@ angular.module 'builder.directive', [
 		scope.$component = $builder.components[scope.formObject.component]
 		# setup scope
 		scope.setupScope scope.formObject, scope.componentName, scope.formNumber, scope.currentPage, scope.simpleView
+
+#		scope.log = () ->
+#			console.log 'C'
 
 		# methods
 #		scope.collapse = (event, isOpen, id, index) =>
@@ -476,6 +482,7 @@ angular.module 'builder.directive', [
 #			if scope.componentName == 'section'
 #				$(view).addClass('inside-section')
 			$(element).html view
+#			attrs.$set('ng-click', scope.log() )
 			console.log('Component change')
 
 		scope.$watch '$parent.$index', () ->
@@ -488,7 +495,40 @@ angular.module 'builder.directive', [
 			scope.simpleView = $builder.simplePreview
 
 		# disable click event
-		$(element).on 'click', -> no
+#		$(element).on 'click', -> no
+
+		$(element).on 'click', ->
+			console.log('CLICK', scope.$parent.$parent.$parent.$parent)
+			if scope.component != 'section'
+				if scope.sectionIndex != undefined
+					firstIndex = 1
+					secondIndex = scope.sectionIndex
+				else
+					firstIndex = 0
+			else
+				firstIndex = 1
+				secondIndex = scope.componentIndex
+			$builder.selectFrame firstIndex, secondIndex
+			$(".fb-selected-frame").removeClass("fb-selected-frame")
+			# $(element).children().addClass("fb-selected-frame")
+			$(element).addClass("fb-selected-frame")
+
+		###$(element).on 'click', (e) ->
+			e.preventDefault()
+			if scope.component != 'section'
+				if scope.sectionIndex != undefined
+					firstIndex = 1
+					secondIndex = scope.sectionIndex
+				else
+					firstIndex = 0
+			else
+				firstIndex = 1
+				secondIndex = scope.componentIndex
+#			scope.selected = true
+			$builder.selectFrame firstIndex, secondIndex
+			console.log('CLICK', firstIndex, secondIndex, $builder.selectedPath, $builder.selectFrame())
+			false
+		###
 
 #		console.log($(element).attr('fb-draggable'))
 
@@ -573,7 +613,6 @@ angular.module 'builder.directive', [
 				The shown event of the popover.
 				###
 				scope.data.backup()
-				console.log scope.data
 				popover.isClickedSave = no
 			cancel: ($event) ->
 				###
@@ -905,6 +944,7 @@ angular.module 'builder.directive', [
 				fb-draggable='allow'
 				section-index='sectionIndex'
 				parent-section='true'
+				ng-class='{"fb-selected-frame": selected}'
 			>
 			</div>
 		</div>
@@ -916,6 +956,17 @@ angular.module 'builder.directive', [
 		scope.sectionObjects = $builder.getSectionObjects scope.sectionIndex, scope.formNumber
 		console.log('Init Section: ',scope.sectionIndex,scope.sectionObjects )
 		# $drag.draggable $(element),
+
+#		scope.$watch () ->
+#			console.log 'zzz',$builder.selectedPath
+#			$builder.selectedPath[0]
+#		, (newValue, oldValue) ->
+#			console.log '/',$builder.selectedPath,newValue, oldValue
+#			if $builder.selectedPath[0] != 0 and $builder.selectedPath[1] == scope.sectionIndex
+#				scope.selected = true
+#			else if scope.selected == true
+#				scope.selected = false
+#		, false
 
 #		scope.$watch () ->
 #			$builder.currentForm
@@ -1075,7 +1126,6 @@ angular.module 'builder.directive', [
 		'''
 		<div class="col-xs-12 fb-control-panel">
 			<div class="col-xs-12" fb-property-popover id="fb-property-popover">
-				some properties
 			</div>
 		</div>
 		'''
@@ -1086,318 +1136,430 @@ angular.module 'builder.directive', [
 angular.module 'builder.drag', []
 
 .provider '$drag', ->
-    # ----------------------------------------
-    # provider
-    # ----------------------------------------
-    $injector = null
-    $rootScope = null
+	# ----------------------------------------
+	# provider
+	# ----------------------------------------
+	$injector = null
+	$rootScope = null
 
 
-    # ----------------------------------------
-    # properties
-    # ----------------------------------------
-    @data =
-        # all draggable objects
-        draggables: {}
-        # all droppable objects
-        droppables: {}
+	# ----------------------------------------
+	# properties
+	# ----------------------------------------
+	@data =
+		# all draggable objects
+		draggables: {}
+		# all droppable objects
+		droppables: {}
 
 
-    # ----------------------------------------
-    # event hooks
-    # ----------------------------------------
-    @mouseMoved = no
-    @isMouseMoved = => @mouseMoved
-    @hooks =
-        down: {}
-        move: {}
-        up: {}
-    @innerDropHover = false
-    @eventMouseMove = ->
-    @eventMouseUp = ->
-    $ =>
-        $(document).on 'mousedown', (e) =>
-            @mouseMoved = no
-            func(e) for key, func of @hooks.down
-            return
-        $(document).on 'mousemove', (e) =>
-            @mouseMoved = yes
-            func(e) for key, func of @hooks.move
-            return
-        $(document).on 'mouseup', (e) =>
-            func(e) for key, func of @hooks.up
-            return
+	# ----------------------------------------
+	# Config
+	# ----------------------------------------
+	@config =
+		section: true
+		keyForPage: true
+		keyForSection: false
+		keyPage: 18 # ALT or 18
+		keySection: 17 # CTRL or 17
+		# condition to allow dragging or not | default - 'true'
+		dragAllow: true
+		# return 'dragAllow' to TRUE after each check | default - 'true'
+		dragAllowToDefault: true
+
+	# ----------------------------------------
+	# Only Read Config - public access to @config
+	# ----------------------------------------
+	@getConfig = Object.assign {}, @config
+
+	# ----------------------------------------
+	# event hooks
+	# ----------------------------------------
+	@setConfig = (config) =>
+		keys =
+			'ALT': 18
+			'CTRL': 17
+			'SHIFT': 16
+			'COMMAND': 91
+
+		if config.section != undefined
+			if config.section == false and @config.section != false
+				@dragCheck.removeDragCheck @defaultDragCheck.section
+			else if config.section == true and @config.section != true
+				@dragCheck.addDragCheck @defaultDragCheck.section
+		if config.keyForPage != undefined and !parseInt(config.keyForPage)
+			config.keyForPage = keys[config.keyForPage.toUpperCase()] if keys[config.keyForPage.toUpperCase()]
+		if config.keyForSection != undefined and !parseInt(config.keyForSection)
+			config.keyForPage = keys[config.keyForPage.toUpperCase()] if keys[config.keyForPage.toUpperCase()]
+
+		@config = Object.assign @config, config
 
 
-    # ----------------------------------------
-    # private methods
-    # ----------------------------------------
-    @currentId = 0
-    @getNewId = => "#{@currentId++}"
+	# ----------------------------------------
+	# Drag Check array of Callbacks
+	# ----------------------------------------
+	@dragPermissions = []
+
+	# ----------------------------------------
+	# Set Drag Options
+	# ----------------------------------------
+	@dragCheck =
+
+		addDragCheck: (callback) =>
+			@dragPermissions.push callback
+
+		removeDragCheck:  (callbackToRemove) =>
+			tempArray = []
+			@dragPermissions.map (callback, index) =>
+				console.log('@setConfig', callbackToRemove, callback)
+				tempArray.push callback if callbackToRemove != callback
+			@dragPermissions = tempArray
+
+		clearDragCheck: =>
+			@dragPermissions = []
+
+		setDragAllow: (cond) =>
+			@config.dragAllow = cond
+
+		setDragAllowToDefault: (cond) =>
+			@dragConfig.setDragAllowToDefault = cond
 
 
-    @setupEasing = ->
-        jQuery.extend jQuery.easing,
-            easeOutQuad: (x, t, b, c, d) -> -c * (t /= d) * (t - 2) + b
+	@checkDragPermission = (element, event) =>
+		if !@config.dragAllow
+			if @config.dragAllowToDefault
+				@config.dragAllow = true
+			false
+		check = true
+		@dragPermissions.map (callback, index) =>
+			if !callback(element, event, index)
+				check = false
+		check
 
 
-    @setupProviders = (injector) ->
-        ###
-        Setup providers.
-        ###
-        $injector = injector
-        $rootScope = $injector.get '$rootScope'
+	# ----------------------------------------
+	# Default Config Drag Check
+	# ----------------------------------------
+	@defaultDragCheck =
+		# for Section
+		section: (element, event, index) =>
+			if $(element).find('.section-open').length
+				false
+			else
+				true
+		#
 
 
-    @isHover = ($elementA, $elementB) =>
-        ###
-        Is element A hover on element B?
-        @param $elementA: jQuery object
-        @param $elementB: jQuery object
-        ###
-        offsetA = $elementA.offset()
-        offsetB = $elementB.offset()
-        sizeA =
-            width: $elementA.width()
-            height: $elementA.height()
-        sizeB =
-            width: $elementB.width()
-            height: $elementB.height()
-        isHover =
-            x: no
-            y: no
-        # x
-        isHover.x = offsetA.left > offsetB.left and offsetA.left < offsetB.left + sizeB.width
-        isHover.x = isHover.x or offsetA.left + sizeA.width > offsetB.left and offsetA.left + sizeA.width < offsetB.left + sizeB.width
-        return no if not isHover
-        # y
-        isHover.y = offsetA.top > offsetB.top and offsetA.top < offsetB.top + sizeB.height
-        isHover.y = isHover.y or offsetA.top + sizeA.height > offsetB.top and offsetA.top + sizeA.height < offsetB.top + sizeB.height
-        isHover.x and isHover.y
+	# ----------------------------------------
+	# event hooks
+	# ----------------------------------------
+	@mouseMoved = no
+	@isMouseMoved = => @mouseMoved
+	@hooks =
+		down: {}
+		move: {}
+		up: {}
+	@innerDropHover = false
+	@eventMouseMove = ->
+	@eventMouseUp = ->
+	$ =>
+		$(document).on 'mousedown', (e) =>
+			@mouseMoved = no
+			func(e) for key, func of @hooks.down
+			return
+		$(document).on 'mousemove', (e) =>
+			@mouseMoved = yes
+			func(e) for key, func of @hooks.move
+			return
+		$(document).on 'mouseup', (e) =>
+			func(e) for key, func of @hooks.up
+			return
 
 
-    delay = (ms, func) ->
-        setTimeout ->
-            func()
-        , ms
-    @autoScroll =
-        up: no
-        down: no
-        scrolling: no
-        scroll: =>
-            @autoScroll.scrolling = yes
-            if @autoScroll.up
-                $('html, body').dequeue().animate
-                    scrollTop: $(window).scrollTop() - 50
-                , 100, 'easeOutQuad'
-                delay 100, => @autoScroll.scroll()
-            else if @autoScroll.down
-                $('html, body').dequeue().animate
-                    scrollTop: $(window).scrollTop() + 50
-                , 100, 'easeOutQuad'
-                delay 100, => @autoScroll.scroll()
-            else
-                @autoScroll.scrolling = no
-        start: (e) =>
-            if e.clientY < 50
-                # up
-                @autoScroll.up = yes
-                @autoScroll.down = no
-                @autoScroll.scroll() if not @autoScroll.scrolling
-            else if e.clientY > $(window).innerHeight() - 50
-                # down
-                @autoScroll.up = no
-                @autoScroll.down = yes
-                @autoScroll.scroll() if not @autoScroll.scrolling
-            else
-                @autoScroll.up = no
-                @autoScroll.down = no
-        stop: =>
-            @autoScroll.up = no
-            @autoScroll.down = no
+	# ----------------------------------------
+	# private methods
+	# ----------------------------------------
+	@currentId = 0
+	@getNewId = => "#{@currentId++}"
 
 
-    @dragMirrorMode = ($element, defer=yes, object) =>
-        result =
-            id: @getNewId()
-            mode: 'mirror'
-            maternal: $element[0]
-            element: null
-            object: object
+	@setupEasing = ->
+		if @config.section == true
+			@dragCheck.addDragCheck @defaultDragCheck.section
 
-        $element.on 'mousedown', (e) =>
-            e.preventDefault()
-
-            $clone = $element.clone()
-            result.element = $clone[0]
-            $clone.addClass "fb-draggable form-horizontal prepare-dragging"
-            @hooks.move.drag = (e, defer) =>
-                if $clone.hasClass 'prepare-dragging'
-                    $clone.css
-                        width: $element.width()
-                        height: $element.height()
-                    $clone.removeClass 'prepare-dragging'
-                    $clone.addClass 'dragging'
-                    return if defer
-
-                $clone.offset
-                    left: e.pageX - $clone.width() / 2
-                    top: e.pageY - $clone.height() / 2
-
-                @autoScroll.start e
-
-                # execute callback for droppables
-                for id, droppable of @data.droppables
-                    if @isHover $clone, $(droppable.element)
-                        droppable.move e, result
-                    else
-                        droppable.out e, result
-            @hooks.up.drag = (e) =>
-                # execute callback for droppables
-                for id, droppable of @data.droppables
-                    isHover = @isHover $clone, $(droppable.element)
-                    droppable.up e, isHover, result
-                delete @hooks.move.drag
-                delete @hooks.up.drag
-                result.element = null
-                $clone.remove()
-                @autoScroll.stop()
-            $('body').append $clone
-            # setup left & top of the element
-            @hooks.move.drag(e, defer) if not defer
-        result
+		jQuery.extend jQuery.easing,
+			easeOutQuad: (x, t, b, c, d) -> -c * (t /= d) * (t - 2) + b
 
 
-    @dragDragMode = ($element, defer=yes, object) =>
-        result =
-            id: @getNewId()
-            mode: 'drag'
-            maternal: null
-            element: $element[0]
-            object: object
-
-        $element.addClass 'fb-draggable'
-        $element.on 'mousedown', (e) =>
-            e.preventDefault()
-            if $($element).find('.panel-open').length
-              return
+	@setupProviders = (injector) ->
+		###
+		Setup providers.
+		###
+		$injector = injector
+		$rootScope = $injector.get '$rootScope'
 
 
-            return if $element.hasClass 'dragging'
-
-            $element.addClass 'prepare-dragging'
-            @hooks.move.drag = (e, defer) =>
-                if $element.hasClass 'prepare-dragging'
-                    $element.css
-                        width: $element.width()
-                        height: $element.height()
-                    $element.removeClass 'prepare-dragging'
-                    $element.addClass 'dragging'
-                    return if defer
-
-                $element.offset
-                    left: e.pageX - $element.width() / 2
-                    top: e.pageY - $element.height() / 2
-
-                @autoScroll.start e
-
-                # execute callback for droppables
-                for id, droppable of @data.droppables
-                    if @isHover $element, $(droppable.element)
-                        droppable.move e, result
-                    else
-                        droppable.out e, result
-                return
-            @hooks.up.drag = (e) =>
-                # execute callback for droppables
-                for id, droppable of @data.droppables
-                    isHover = @isHover $element, $(droppable.element)
-                    droppable.up e, isHover, result
-
-                delete @hooks.move.drag
-                delete @hooks.up.drag
-                $element.css
-                    width: '', height: ''
-                    left: '', top: ''
-                $element.removeClass 'dragging defer-dragging'
-                @autoScroll.stop()
-            # setup left & top of the element
-            @hooks.move.drag(e, defer) if not defer
-        result
+	@isHover = ($elementA, $elementB) =>
+		###
+		Is element A hover on element B?
+		@param $elementA: jQuery object
+		@param $elementB: jQuery object
+		###
+		offsetA = $elementA.offset()
+		offsetB = $elementB.offset()
+		sizeA =
+			width: $elementA.width()
+			height: $elementA.height()
+		sizeB =
+			width: $elementB.width()
+			height: $elementB.height()
+		isHover =
+			x: no
+			y: no
+		# x
+		isHover.x = offsetA.left > offsetB.left and offsetA.left < offsetB.left + sizeB.width
+		isHover.x = isHover.x or offsetA.left + sizeA.width > offsetB.left and offsetA.left + sizeA.width < offsetB.left + sizeB.width
+		return no if not isHover
+		# y
+		isHover.y = offsetA.top > offsetB.top and offsetA.top < offsetB.top + sizeB.height
+		isHover.y = isHover.y or offsetA.top + sizeA.height > offsetB.top and offsetA.top + sizeA.height < offsetB.top + sizeB.height
+		isHover.x and isHover.y
 
 
-    @dropMode = ($element, options) =>
-        result =
-            id: @getNewId()
-            element: $element[0]
-            move: (e, draggable) ->
-                $rootScope.$apply -> options.move?(e, draggable)
-            up: (e, isHover, draggable) ->
-                $rootScope.$apply -> options.up?(e, isHover, draggable)
-            out: (e, draggable) ->
-                $rootScope.$apply -> options.out?(e, draggable)
-        result
-    # ----------------------------------------
-    # public methods
-    # ----------------------------------------
-    @draggable = ($element, options={}) =>
-        ###
-        Make the element able to drag.
-        @param element: The jQuery element.
-        @param options: Options
-            mode: 'drag' [default], 'mirror'
-            defer: yes/no. defer dragging
-            object: custom information
-            allow: yes/no - allow dragging at the current time
-        ###
-        result = []
-#        if (!options.allow)
-#            return
-        if options.mode is 'mirror'
-            for element in $element
-                draggable = @dragMirrorMode $(element), options.defer, options.object
-                result.push draggable.id
-                @data.draggables[draggable.id] = draggable
-        else
-            for element in $element
-                draggable = @dragDragMode $(element), options.defer, options.object
-                result.push draggable.id
-                @data.draggables[draggable.id] = draggable
-        result
+	delay = (ms, func) ->
+		setTimeout ->
+			func()
+		, ms
+	@autoScroll =
+		up: no
+		down: no
+		scrolling: no
+		scroll: =>
+			@autoScroll.scrolling = yes
+			if @autoScroll.up
+				$('html, body').dequeue().animate
+					scrollTop: $(window).scrollTop() - 50
+				, 100, 'easeOutQuad'
+				delay 100, => @autoScroll.scroll()
+			else if @autoScroll.down
+				$('html, body').dequeue().animate
+					scrollTop: $(window).scrollTop() + 50
+				, 100, 'easeOutQuad'
+				delay 100, => @autoScroll.scroll()
+			else
+				@autoScroll.scrolling = no
+		start: (e) =>
+			if e.clientY < 50
+				# up
+				@autoScroll.up = yes
+				@autoScroll.down = no
+				@autoScroll.scroll() if not @autoScroll.scrolling
+			else if e.clientY > $(window).innerHeight() - 50
+				# down
+				@autoScroll.up = no
+				@autoScroll.down = yes
+				@autoScroll.scroll() if not @autoScroll.scrolling
+			else
+				@autoScroll.up = no
+				@autoScroll.down = no
+		stop: =>
+			@autoScroll.up = no
+			@autoScroll.down = no
 
 
-    @droppable = ($element, options={}) =>
-        ###
-        Make the element coulde be drop.
-        @param $element: The jQuery element.
-        @param options: The droppable options.
-            move: The custom mouse move callback. (e, draggable)->
-            up: The custom mouse up callback. (e, isHover, draggable)->
-            out: The custom mouse out callback. (e, draggable)->
-        ###
-        result = []
-        for element in $element
-            droppable = @dropMode $(element), options
-            result.push droppable
-            @data.droppables[droppable.id] = droppable
-        result
+	@dragMirrorMode = ($element, defer=yes, object) =>
+		result =
+			id: @getNewId()
+			mode: 'mirror'
+			maternal: $element[0]
+			element: null
+			object: object
+
+		$element.on 'mousedown', (e) =>
+			e.preventDefault()
+			if !@checkDragPermission($element, e)
+				return
+
+			$clone = $element.clone()
+			result.element = $clone[0]
+			$clone.addClass "fb-draggable form-horizontal prepare-dragging"
+			@hooks.move.drag = (e, defer) =>
+				if $clone.hasClass 'prepare-dragging'
+					$clone.css
+						width: $element.width()
+						height: $element.height()
+					$clone.removeClass 'prepare-dragging'
+					$clone.addClass 'dragging'
+					return if defer
+
+				$clone.offset
+					left: e.pageX - $clone.width() / 2
+					top: e.pageY - $clone.height() / 2
+
+				@autoScroll.start e
+
+				# execute callback for droppables
+				for id, droppable of @data.droppables
+					if @isHover $clone, $(droppable.element)
+						droppable.move e, result
+					else
+						droppable.out e, result
+			@hooks.up.drag = (e) =>
+				# execute callback for droppables
+				for id, droppable of @data.droppables
+					isHover = @isHover $clone, $(droppable.element)
+					droppable.up e, isHover, result
+				delete @hooks.move.drag
+				delete @hooks.up.drag
+				result.element = null
+				$clone.remove()
+				@autoScroll.stop()
+			$('body').append $clone
+			# setup left & top of the element
+			@hooks.move.drag(e, defer) if not defer
+		result
 
 
-    # ----------------------------------------
-    # $get
-    # ----------------------------------------
-    @get = ($injector) ->
-        @setupEasing()
-        @setupProviders $injector
+	@dragDragMode = ($element, defer=yes, object) =>
+		result =
+			id: @getNewId()
+			mode: 'drag'
+			maternal: null
+			element: $element[0]
+			object: object
 
-        isMouseMoved: @isMouseMoved
-        data: @data
-        draggable: @draggable
-        droppable: @droppable
-        innerDropHover : @innerDropHover
-    @get.$inject = ['$injector']
-    @$get = @get
-    return
+		$element.addClass 'fb-draggable'
+		$element.on 'mousedown', (e) =>
+			e.preventDefault()
+#			console.log('mousedown', $element, e)
+#			if $($element).find('.panel-open').length
+#			if $($element).find('.section-open').length
+#			  return
+			if !@checkDragPermission($element, e)
+				return
+
+			return if $element.hasClass 'dragging'
+
+			$element.addClass 'prepare-dragging'
+			@hooks.move.drag = (e, defer) =>
+				if $element.hasClass 'prepare-dragging'
+					$element.css
+						width: $element.width()
+						height: $element.height()
+					$element.removeClass 'prepare-dragging'
+					$element.addClass 'dragging'
+					return if defer
+
+				$element.offset
+					left: e.pageX - $element.width() / 2
+					top: e.pageY - $element.height() / 2
+
+				@autoScroll.start e
+
+				# execute callback for droppables
+				for id, droppable of @data.droppables
+					if @isHover $element, $(droppable.element)
+						droppable.move e, result
+					else
+						droppable.out e, result
+				return
+			@hooks.up.drag = (e) =>
+				# execute callback for droppables
+				for id, droppable of @data.droppables
+					isHover = @isHover $element, $(droppable.element)
+					droppable.up e, isHover, result
+
+				delete @hooks.move.drag
+				delete @hooks.up.drag
+				$element.css
+					width: '', height: ''
+					left: '', top: ''
+				$element.removeClass 'dragging defer-dragging'
+				@autoScroll.stop()
+			# setup left & top of the element
+			@hooks.move.drag(e, defer) if not defer
+		result
+
+
+	@dropMode = ($element, options) =>
+		result =
+			id: @getNewId()
+			element: $element[0]
+			move: (e, draggable) ->
+				console.log('move'.draggable)
+				$rootScope.$apply -> options.move?(e, draggable)
+			up: (e, isHover, draggable) ->
+				console.log('up'.draggable)
+				$rootScope.$apply -> options.up?(e, isHover, draggable)
+			out: (e, draggable) ->
+				console.log('out'.draggable)
+				$rootScope.$apply -> options.out?(e, draggable)
+		result
+	# ----------------------------------------
+	# public methods
+	# ----------------------------------------
+	@draggable = ($element, options={}) =>
+		###
+		Make the element able to drag.
+		@param element: The jQuery element.
+		@param options: Options
+			mode: 'drag' [default], 'mirror'
+			defer: yes/no. defer dragging
+			object: custom information
+			allow: yes/no - allow dragging at the current time
+		###
+		result = []
+#		if (!options.allow)
+#			return
+		if options.mode is 'mirror'
+			for element in $element
+				draggable = @dragMirrorMode $(element), options.defer, options.object
+				result.push draggable.id
+				@data.draggables[draggable.id] = draggable
+		else
+			for element in $element
+				draggable = @dragDragMode $(element), options.defer, options.object
+				result.push draggable.id
+				@data.draggables[draggable.id] = draggable
+		result
+
+
+	@droppable = ($element, options={}) =>
+		###
+		Make the element coulde be drop.
+		@param $element: The jQuery element.
+		@param options: The droppable options.
+			move: The custom mouse move callback. (e, draggable)->
+			up: The custom mouse up callback. (e, isHover, draggable)->
+			out: The custom mouse out callback. (e, draggable)->
+		###
+		result = []
+		for element in $element
+			droppable = @dropMode $(element), options
+			result.push droppable
+			@data.droppables[droppable.id] = droppable
+		result
+
+
+	# ----------------------------------------
+	# $get
+	# ----------------------------------------
+	@get = ($injector) ->
+		@setupEasing()
+		@setupProviders $injector
+
+		isMouseMoved: @isMouseMoved
+		data: @data
+		draggable: @draggable
+		droppable: @droppable
+		innerDropHover : @innerDropHover
+		config : @config
+		getConfig : @getConfig
+		setConfig : @setConfig
+		dragCheck: @dragCheck
+	@get.$inject = ['$injector']
+	@$get = @get
+	return
 
 angular.module 'builder', ['builder.directive']
 angular.module 'app', ['builder', 'builder.components', 'validator.rules']
@@ -1429,6 +1591,7 @@ angular.module 'builder.provider', []
 	$templateCache = null
 
 	@config =
+		section: true
 		propertiesPlacement: 'sidebar' # 'popover' || 'sidebar'
 		popoverPlacement: 'right'
 	# all components
@@ -1706,6 +1869,22 @@ angular.module 'builder.provider', []
 		@reindexSectionObject formIndex, sectionIndex
 
 	# ----------------------------------------
+	#
+	# ----------------------------------------
+	@selectedPath = [0]
+	@selectFrame = (firstIndex, sectionIndex) =>
+		if firstIndex == 0
+#			@selectedFrame = @forms[@currentForm]
+			@selectedPath = [0]
+		else
+#			@selectedFrame = @forms[@currentForm][sectionIndex]
+#			@forms[@currentForm][sectionIndex].$selected = true
+			@selectedPath = [1, sectionIndex]
+		console.log('selectFrame',firstIndex, sectionIndex, @selectedPath)
+		@selectedPath
+
+
+	# ----------------------------------------
 	# $get
 	# ----------------------------------------
 	@$get = ['$injector', ($injector) =>
@@ -1729,6 +1908,8 @@ angular.module 'builder.provider', []
 		updateSectionObjectIndex: @updateSectionObjectIndex
 		getSectionObjects: @getSectionObjects
 		insertSectionObject: @insertSectionObject
+		selectFrame: @selectFrame
+		selectedPath: @selectedPath
 	]
 	return
 
