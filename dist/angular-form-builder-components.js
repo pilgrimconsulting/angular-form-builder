@@ -164,6 +164,24 @@
 
   angular.module('builder.components', ['builder', 'validator.rules']).config(config);
 
+  Global = this;
+
+  !Global.__fbComponents && (Global.__fbComponents = {});
+
+  Global.__fbComponents.multiple = function($builderProvider) {
+    return $builderProvider.registerComponent('multiple', {
+      group: 'Default',
+      label: 'Multiple Select',
+      show_label: true,
+      description: 'description',
+      placeholder: 'placeholder',
+      required: false,
+      options: ['value one', 'value two'],
+      template: "<div class=\"form-group\" ng-if='simpleView'>\n	<div class=\"col-sm-12\">\n		<div class=\"panel panel-default\">\n			<div class=\"panel-body text-center\">\n				{{componentName ? componentName +' - '+ label : label}}\n			</div>\n		</div>\n	</div>\n</div>\n<div class=\"form-group\" ng-if='!simpleView'>\n	<label for=\"{{formName+index}}\" class=\"col-sm-4 control-label\" ng-class=\"{'fb-required':required}\" ng-hide='!show_label'>{{label}}</label>\n	<div class=\"col-sm-8\" ng-class=\"{'col-sm-offset-4': !show_label}\">\n		<select multiple ng-options=\"value for value in options\" id=\"{{formName+index}}\" class=\"form-control\"\n			ng-model=\"inputText\" ng-init=\"inputText = options[0]\"/>\n		<p class='help-block'>{{description}}</p>\n	</div>\n</div>",
+      popoverTemplate: "<form>\n	<div class=\"checkbox\">\n		<label>\n			<input type='checkbox' ng-model='show_label' />\n			Show label\n		</label>\n	</div>\n	<div class=\"form-group\" >\n		<label class='control-label'>Label</label>\n		<input type='text' ng-model=\"label\" validator=\"{{show_label ? '[required]' : ''}}\" class='form-control'/>\n	</div>\n	<div class=\"form-group\">\n		<label class='control-label'>Description</label>\n		<input type='text' ng-model=\"description\" class='form-control'/>\n	</div>\n	<div class=\"form-group\">\n		<label class='control-label'>Options</label>\n		<textarea class=\"form-control\" rows=\"3\" ng-model=\"optionsText\"/>\n	</div>\n		<hr/>\n	<div class='form-group'>\n		<input type='submit' ng-click=\"popover.save($event)\" class='btn btn-primary' value='Save'/>\n		<input type='button' ng-click=\"popover.cancel($event)\" class='btn btn-default' value='Cancel'/>\n		<input type='button' ng-click=\"popover.remove($event)\" class='btn btn-danger' value='Delete'/>\n	</div>\n</form>"
+    });
+  };
+
 }).call(this);
 
 //# sourceMappingURL=angular-form-builder-components.js.map
