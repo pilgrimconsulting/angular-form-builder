@@ -26,11 +26,18 @@ angular.module 'builder.directive', [
 	template:
 		"""
 		<div class='form-horizontal' fb-page={{currentPage}}>
+			<div fb-select-checkbox class='fb-select-checkbox'
+				fb-select-level='0' ng-init='checked=true'>
+				<input type='checkbox' id='fb_select_{{fbSelectLevel}}_{{currentPage}}'
+					class="fb-select-input" fb-select-index='currentPage'
+					ng-checked='checked' />
+				<label class='fb-select-checkbox-label'
+					for='fb_select_{{fbSelectLevel}}_{{currentPage}}'></label>
+			</div>
 			<div class='fb-form-object-editable '
 				ng-repeat="object in formObjects"
 				fb-form-object-editable="object"
 				fb-component-name='object.component'
-				fb-draggable='allow'
 				fb-indexIn='indexIn'
 				current-page='currentPage'
 				parent-section='false'
@@ -47,6 +54,7 @@ angular.module 'builder.directive', [
 		scope.formObjects = $builder.forms[scope.formNumber]
 		beginMove = yes
 		scope.currentPage = 0
+		scope.component = 'page'
 #		console.log('---------',scope.formObjects )
 
 		scope.$watchGroup [() ->
@@ -177,7 +185,7 @@ angular.module 'builder.directive', [
 		sectionIndex: '=sectionIndex'
 		componentName: '=fbComponentName'
 		currentPage: '='
-	link: (scope, element) ->
+	link: (scope, element, attrs) ->
 		scope.inputArray = [] # just for fix warning
 		scope.formNumber = scope.$parent.formNumber
 		scope.componentIndex = scope.$parent.$index
@@ -186,6 +194,9 @@ angular.module 'builder.directive', [
 		scope.$component = $builder.components[scope.formObject.component]
 		# setup scope
 		scope.setupScope scope.formObject, scope.componentName, scope.formNumber, scope.currentPage, scope.simpleView
+
+#		scope.log = () ->
+#			console.log 'C'
 
 		# methods
 #		scope.collapse = (event, isOpen, id, index) =>
@@ -200,6 +211,7 @@ angular.module 'builder.directive', [
 #			if scope.componentName == 'section'
 #				$(view).addClass('inside-section')
 			$(element).html view
+#			attrs.$set('ng-click', scope.log() )
 			console.log('Component change')
 
 		scope.$watch '$parent.$index', () ->
@@ -212,7 +224,40 @@ angular.module 'builder.directive', [
 			scope.simpleView = $builder.simplePreview
 
 		# disable click event
-		$(element).on 'click', -> no
+#		$(element).on 'click', -> no
+
+		$(element).on 'click', ->
+			console.log('CLICK', scope.$parent.$parent.$parent.$parent)
+			if scope.component != 'section'
+				if scope.sectionIndex != undefined
+					firstIndex = 1
+					secondIndex = scope.sectionIndex
+				else
+					firstIndex = 0
+			else
+				firstIndex = 1
+				secondIndex = scope.componentIndex
+			$builder.selectFrame firstIndex, secondIndex
+			$(".fb-selected-frame").removeClass("fb-selected-frame")
+			# $(element).children().addClass("fb-selected-frame")
+			$(element).addClass("fb-selected-frame")
+
+		###$(element).on 'click', (e) ->
+			e.preventDefault()
+			if scope.component != 'section'
+				if scope.sectionIndex != undefined
+					firstIndex = 1
+					secondIndex = scope.sectionIndex
+				else
+					firstIndex = 0
+			else
+				firstIndex = 1
+				secondIndex = scope.componentIndex
+#			scope.selected = true
+			$builder.selectFrame firstIndex, secondIndex
+			console.log('CLICK', firstIndex, secondIndex, $builder.selectedPath, $builder.selectFrame())
+			false
+		###
 
 #		console.log($(element).attr('fb-draggable'))
 
@@ -247,12 +292,20 @@ angular.module 'builder.directive', [
 			# compile popover
 			popover.view = $compile(popover.html) scope
 			$(element).addClass popover.id
-			$(element).popover
-				html: yes
-				title: scope.$component.label
-				content: popover.view
-				container: 'body'
-				placement: $builder.config.popoverPlacement
+			if $builder.config.propertiesPlacement == 'sidebar'
+				$("#fb-property-popover").append $(popover.view).hide().addClass('fb-property-popover-form')
+				$(element).on 'click', () ->
+					$("#fb-property-popover").show()
+					.find('.fb-property-popover-form').hide().end()
+					.find('.'+popover.id).show()
+					scope.$apply -> scope.popover.shown()
+			else
+				$(element).popover
+					html: yes
+					title: scope.$component.label
+					content: popover.view
+					container: '#fb-property-popover'
+					placement: $builder.config.popoverPlacement
 		scope.popover =
 			save: ($event) ->
 				###
@@ -261,7 +314,10 @@ angular.module 'builder.directive', [
 				$event.preventDefault()
 				$validator.validate(scope).success ->
 					popover.isClickedSave = yes
-					$(element).popover 'hide'
+					if  $builder.config.propertiesPlacement == 'sidebar'
+						$(".fb-property-popover-form."+popover.id).hide()
+					else
+						$(element).popover 'hide'
 				return
 			remove: ($event) ->
 				###
@@ -270,11 +326,16 @@ angular.module 'builder.directive', [
 				$event.preventDefault()
 
 				# Delete by $parent - detect is inside Section ?
+#				console.log($event, scope.$parent.fbSection)
 				if scope.$parent.fbSection == 'section'
 					$builder.removeSectionObject scope.$parent.formNumber, scope.componentIndex, scope.$parent.$index
 				else
 					$builder.removeFormObject scope.$parent.formNumber, scope.componentIndex
-				$(element).popover 'hide'
+				if  $builder.config.propertiesPlacement == 'sidebar'
+					$(".fb-property-popover-form."+popover.id).remove()
+				else
+					$(element).popover 'hide'
+
 				return
 			shown: ->
 				###
@@ -290,7 +351,10 @@ angular.module 'builder.directive', [
 				if $event
 					# clicked cancel by user
 					$event.preventDefault()
-					$(element).popover 'hide'
+					if  $builder.config.propertiesPlacement == 'sidebar'
+						$(".fb-property-popover-form."+popover.id).hide()
+					else
+						$(element).popover 'hide'
 				return
 		# ----------------------------------------
 		# popover.show
@@ -609,6 +673,7 @@ angular.module 'builder.directive', [
 				fb-draggable='allow'
 				section-index='sectionIndex'
 				parent-section='true'
+				ng-class='{"fb-selected-frame": selected}'
 			>
 			</div>
 		</div>
@@ -620,6 +685,17 @@ angular.module 'builder.directive', [
 		scope.sectionObjects = $builder.getSectionObjects scope.sectionIndex, scope.formNumber
 		console.log('Init Section: ',scope.sectionIndex,scope.sectionObjects )
 		# $drag.draggable $(element),
+
+#		scope.$watch () ->
+#			console.log 'zzz',$builder.selectedPath
+#			$builder.selectedPath[0]
+#		, (newValue, oldValue) ->
+#			console.log '/',$builder.selectedPath,newValue, oldValue
+#			if $builder.selectedPath[0] != 0 and $builder.selectedPath[1] == scope.sectionIndex
+#				scope.selected = true
+#			else if scope.selected == true
+#				scope.selected = false
+#		, false
 
 #		scope.$watch () ->
 #			$builder.currentForm
@@ -721,7 +797,6 @@ angular.module 'builder.directive', [
 				$(element).find('.empty').remove()
 ]
 
-
 # ----------------------------------------
 # fb-simple-preview
 # ----------------------------------------
@@ -764,5 +839,26 @@ angular.module 'builder.directive', [
 		scope.$watch 'simpleComponentView', () ->
 			$builder.simpleComponentView = scope.simpleComponentView
 			console.log($builder.simpleComponentView )
+
+]
+
+# ----------------------------------------
+# fb-control-panel
+# ----------------------------------------
+.directive 'fbControlPanel', ['$injector', ($injector) ->
+# providers
+	$builder = $injector.get '$builder'
+
+	restrict: 'A'
+#	scope:
+	template:
+		'''
+		<div class="col-xs-12 fb-control-panel">
+			<div class="col-xs-12" fb-property-popover id="fb-property-popover">
+			</div>
+		</div>
+		'''
+	lenk : (scope, element) ->
+		return
 
 ]

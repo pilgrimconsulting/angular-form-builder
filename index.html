@@ -42,13 +42,9 @@
 	</div>
 </div>
 <div class="row">
+
 	<div class="col-xs-12 col-md-6">
 		<div class="panel panel-default">
-
-			<div class="col-sm-12" fb-simple-view
-			     fb-simple-preview="false"
-			     fb-simple-component-view="true"
-			></div>
 
 			<div class="panel-heading text-center" fb-pages>
 				Form Builder
@@ -69,13 +65,42 @@
 	</div>
 
 
-	<div fb-control-panel class="col-xs-12 col-md-6 cPanel">
-		<ul class="nav nav-tabs nav-justified">
-			<li role="presentation" class="active"><a href="#">Controls</a></li>
-			<li role="presentation"><a href="#">Components</a></li>
+	<div class="col-xs-12 col-md-6 cPanel">
+		<ul class="nav nav-tabs nav-justified" role="tablist">
+			<li role="presentation" class="">
+				<a href="#fb-control-panel" aria-controls="fb-control-panel" role="tab" data-toggle="tab">Controls</a>
+			</li>
+			<li role="presentation" class="">
+				<a href="#fb-form-properties" aria-controls="fb-form-properties" role="tab" data-toggle="tab">Form</a>
+			</li>
+			<li role="presentation" class="active">
+				<a href="#fb-component-list" aria-controls="fb-component-list" role="tab" data-toggle="tab">Components</a>
+			</li>
 		</ul>
-		<div class="col-xs-12">
-			<div fb-components id="buildLists"></div>
+
+
+		<div class="tab-content">
+			<br/>
+
+			<div class="col-sm-12 fb-simple-view" fb-simple-view
+			     fb-simple-preview="false"
+			     fb-simple-component-view="true"
+			></div>
+
+			<br/><hr>
+
+			<div role="tabpanel" class="col-xs-12 tab-pane" id="fb-control-panel">
+				<div fb-control-panel ></div>
+			</div>
+
+			<div role="tabpanel" class="col-xs-12 tab-pane" id="fb-form-properties">
+				<div fb-form-properties ></div>
+			</div>
+
+			<div role="tabpanel" class="col-xs-12 tab-pane active" id="fb-component-list">
+				<div fb-components id="buildLists"></div>
+			</div>
+
 		</div>
 	</div>
 </div>

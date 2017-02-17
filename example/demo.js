@@ -345,7 +345,12 @@
   json = window.json;
 
   angular.module('app', ['builder', 'builder.components', 'validator.rules', 'ngAnimate', 'transcription']).run([
-    '$builder', '$window', '$transcription', function($builder, $window, $transcription) {
+    '$builder', '$drag', '$window', '$transcription', function($builder, $drag, $window, $transcription) {
+      var config;
+      config = {
+        section: true
+      };
+      $drag.setConfig(config);
       return $builder.json = $transcription.translate($window.jsonString);
     }
   ]).controller('DemoController', [

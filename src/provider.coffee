@@ -19,6 +19,8 @@ angular.module 'builder.provider', []
 	$templateCache = null
 
 	@config =
+		section: true
+		propertiesPlacement: 'sidebar' # 'popover' || 'sidebar'
 		popoverPlacement: 'right'
 	# all components
 	@components = {}
@@ -295,6 +297,22 @@ angular.module 'builder.provider', []
 		@reindexSectionObject formIndex, sectionIndex
 
 	# ----------------------------------------
+	#
+	# ----------------------------------------
+	@selectedPath = [0]
+	@selectFrame = (firstIndex, sectionIndex) =>
+		if firstIndex == 0
+#			@selectedFrame = @forms[@currentForm]
+			@selectedPath = [0]
+		else
+#			@selectedFrame = @forms[@currentForm][sectionIndex]
+#			@forms[@currentForm][sectionIndex].$selected = true
+			@selectedPath = [1, sectionIndex]
+		console.log('selectFrame',firstIndex, sectionIndex, @selectedPath)
+		@selectedPath
+
+
+	# ----------------------------------------
 	# $get
 	# ----------------------------------------
 	@$get = ['$injector', ($injector) =>
@@ -303,6 +321,7 @@ angular.module 'builder.provider', []
 			@loadTemplate component
 
 		config: @config
+		options: @options
 		components: @components
 		groups: @groups
 		forms: @forms
@@ -317,5 +336,7 @@ angular.module 'builder.provider', []
 		updateSectionObjectIndex: @updateSectionObjectIndex
 		getSectionObjects: @getSectionObjects
 		insertSectionObject: @insertSectionObject
+		selectFrame: @selectFrame
+		selectedPath: @selectedPath
 	]
 	return
