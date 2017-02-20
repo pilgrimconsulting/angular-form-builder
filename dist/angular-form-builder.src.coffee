@@ -786,6 +786,8 @@ angular.module 'builder.directive', [
 			scope.form = $builder.forms[scope.formNumber]
 			scope.jsonString = $builder.forms
 
+			console.log(window.jsonString);
+
 		# get the form for controller
 		$builder.forms[scope.formNumber] ?= []
 		scope.form = $builder.forms[scope.formNumber]
@@ -1130,6 +1132,26 @@ angular.module 'builder.directive', [
 		</div>
 		'''
 	lenk : (scope, element) ->
+		return
+
+]
+
+# ----------------------------------------
+# fb-form-properties
+# ----------------------------------------
+.directive 'fbFormProperties', ['$injector', ($injector) ->
+# providers
+	$builder = $injector.get '$builder'
+
+	restrict: 'A'
+#	scope:
+	template: '''
+		<div class="col-xs-12 fb-control-panel">
+			<p> 1 {{ $builder.forms[0] }}</p>
+		</div>
+		'''
+	lenk : (scope, element) ->
+
 		return
 
 ]
@@ -1486,13 +1508,13 @@ angular.module 'builder.drag', []
 			id: @getNewId()
 			element: $element[0]
 			move: (e, draggable) ->
-				console.log('move'.draggable)
+#				console.log('move'.draggable)
 				$rootScope.$apply -> options.move?(e, draggable)
 			up: (e, isHover, draggable) ->
-				console.log('up'.draggable)
+#				console.log('up'.draggable)
 				$rootScope.$apply -> options.up?(e, isHover, draggable)
 			out: (e, draggable) ->
-				console.log('out'.draggable)
+#				console.log('out'.draggable)
 				$rootScope.$apply -> options.out?(e, draggable)
 		result
 	# ----------------------------------------
@@ -1912,7 +1934,6 @@ angular.module 'builder.provider', []
 		selectedPath: @selectedPath
 	]
 	return
-
 ###
     transcription Server Data into FormBuilder Data
 ###

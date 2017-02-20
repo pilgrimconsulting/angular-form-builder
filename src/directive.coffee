@@ -515,6 +515,8 @@ angular.module 'builder.directive', [
 			scope.form = $builder.forms[scope.formNumber]
 			scope.jsonString = $builder.forms
 
+			console.log(window.jsonString);
+
 		# get the form for controller
 		$builder.forms[scope.formNumber] ?= []
 		scope.form = $builder.forms[scope.formNumber]
@@ -859,6 +861,26 @@ angular.module 'builder.directive', [
 		</div>
 		'''
 	lenk : (scope, element) ->
+		return
+
+]
+
+# ----------------------------------------
+# fb-form-properties
+# ----------------------------------------
+.directive 'fbFormProperties', ['$injector', ($injector) ->
+# providers
+	$builder = $injector.get '$builder'
+
+	restrict: 'A'
+#	scope:
+	template: '''
+		<div class="col-xs-12 fb-control-panel">
+			<p> 1 {{ $builder.forms[0] }}</p>
+		</div>
+		'''
+	lenk : (scope, element) ->
+
 		return
 
 ]

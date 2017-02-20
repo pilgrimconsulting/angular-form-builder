@@ -351,13 +351,13 @@ angular.module 'builder.drag', []
 			id: @getNewId()
 			element: $element[0]
 			move: (e, draggable) ->
-				console.log('move'.draggable)
+#				console.log('move'.draggable)
 				$rootScope.$apply -> options.move?(e, draggable)
 			up: (e, isHover, draggable) ->
-				console.log('up'.draggable)
+#				console.log('up'.draggable)
 				$rootScope.$apply -> options.up?(e, isHover, draggable)
 			out: (e, draggable) ->
-				console.log('out'.draggable)
+#				console.log('out'.draggable)
 				$rootScope.$apply -> options.out?(e, draggable)
 		result
 	# ----------------------------------------
