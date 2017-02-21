@@ -28,12 +28,16 @@ module.exports = (grunt) ->
 					cssDir: 'dist'
 					outputStyle: 'compressed'
 
+		concat:
+			source:
+				files:
+					'dist/angular-form-builder.js': ['src/*.js']
+
+
+
 		coffee:
 			options:
 				sourceMap: true
-			source:
-				files:
-					'dist/angular-form-builder.js': ['src/*.coffee']
 			components:
 				files:
 					'dist/angular-form-builder-components.js': ['components/*.coffee']
@@ -49,7 +53,7 @@ module.exports = (grunt) ->
 
 		watch:
 			compass:
-				files: ['example/*.scss', 'src/*.scss', 'index.html']
+				files: ['src/*.js', 'example/*.scss', 'src/*.scss', 'index.html']
 				tasks: ['compass']
 				options:
 					spawn: no
@@ -63,7 +67,7 @@ module.exports = (grunt) ->
 #    // you can pass in any other options you'd like to the https server, as listed here: http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener
 
 			coffee:
-				files: ['src/*.coffee', 'components/*.coffee', 'example/*.coffee']
+				files: ['components/*.coffee', 'example/*.coffee']
 				tasks: ['coffee']
 				options:
 					sourceMap: true
@@ -105,6 +109,7 @@ module.exports = (grunt) ->
 	# -----------------------------------
 	grunt.registerTask 'dev', [
 		'compass'
+		'concat'
 		'coffee'
 		'connect'
 		'watch'
@@ -112,6 +117,7 @@ module.exports = (grunt) ->
 	]
 	grunt.registerTask 'build', [
 		'compass'
+		'concat'
 		'coffee'
 		'uglify'
 	]
@@ -126,5 +132,6 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-contrib-connect'
+	grunt.loadNpmTasks 'grunt-contrib-concat'
 	grunt.loadNpmTasks 'grunt-karma'
 	grunt.loadNpmTasks 'grunt-contrib-uglify'

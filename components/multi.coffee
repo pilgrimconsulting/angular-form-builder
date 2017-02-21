@@ -33,7 +33,7 @@ Global.__fbComponents.multiple = ($builderProvider) ->
 			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
-					<select multiple ng-options="value for value in options" id="{{formName+index}}" class="form-control"
+					<select ng-options="value for value in options" id="{{formName+index}}" class="form-control"
 						ng-model="inputText" ng-init="inputText = options[0]"/>
 					<p class='help-block'>{{description}}</p>
 				</div>

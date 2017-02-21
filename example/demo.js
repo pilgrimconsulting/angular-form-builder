@@ -4,10 +4,10 @@
   window.jsonString = {
     "Id": "12",
     "Name": null,
-    "Title": "Form title",
+    "Title": "input",
     "ShowTitle": true,
-    "Description": "Any form description",
-    "Instructions": "Any form instructions",
+    "Description": "FormDescription",
+    "Instructions": "FormInstructions",
     "ExtraProperiesDef": {
       "Form": [
         {
@@ -351,15 +351,10 @@
         section: true
       };
       $drag.setConfig(config);
-
-      $builder.getFormData = $transcription.getFormData($window.jsonString);
-      $builder.json = $transcription.translate($window.jsonString);
-
-      return;
+      return $builder.json = $transcription.translate($window.jsonString);
     }
   ]).controller('DemoController', [
     '$scope', '$builder', '$validator', function($scope, $builder, $validator) {
-
       $builder.json.map((function(_this) {
         return function(page, pageIndex) {
           return page.map(function(component) {

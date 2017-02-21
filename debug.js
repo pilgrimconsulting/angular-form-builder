@@ -1121,7 +1121,7 @@
                     '</div>' +
                     '<div class="form-group">' +
                     '<label class="control-label">Instructions</label>' +
-                    '<input type="text" ng-model="formData.instructions" class="form-control"/>' +
+                    '<textarea type="text" rows="6" ng-model="formData.instructions" class="form-control"/>' +
                     '</div>' +
                     '<hr/>' +
                     '<div class="form-group">' +
@@ -1131,10 +1131,9 @@
                     '</div>' +
                     '</form>' +
                     '</div>',
-                    controller: function($scope) {
-                        $scope.formData = angular.copy($builder.getFormData);
-                    },
                     link: function(scope, element) {
+                        scope.formData = angular.copy($builder.getFormData);
+
                         scope.resetForm = function() {
                             scope.formData = angular.copy($builder.getFormData);
                         };
