@@ -20,6 +20,9 @@ angular.module('builder.provider', [])
         this.simplePreview = false;
         this.simpleComponentView = true;
         this.convertComponent = function (name, component) {
+
+            //console.log('convertComponent');
+
             var result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
             result = {
                 name: name,
@@ -55,6 +58,8 @@ angular.module('builder.provider', [])
             return result;
         };
         this.convertFormObject = function (name, formObject) {
+            //console.log('convertFormObject');
+
             var component, result, _ref, _ref1, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
             if (formObject == null) {
                 formObject = {};
@@ -87,6 +92,8 @@ angular.module('builder.provider', [])
         };
         this.reindexFormObject = (function (_this) {
             return function (formIndex) {
+                //console.log('reindexFormObject');
+
                 var formObjects, index, _i, _ref;
                 formObjects = _this.forms[formIndex];
                 for (index = _i = 0, _ref = formObjects.length; _i < _ref; index = _i += 1) {
@@ -96,6 +103,8 @@ angular.module('builder.provider', [])
         })(this);
         this.reindexSectionObject = (function (_this) {
             return function (name, sectionIndex) {
+                //console.log('reindexSectionObject');
+
                 var index, sectionObjects, _i, _ref;
                 sectionObjects = _this.forms[name][sectionIndex].components;
                 for (index = _i = 0, _ref = sectionObjects.length; _i < _ref; index = _i += 1) {
@@ -105,13 +114,14 @@ angular.module('builder.provider', [])
         })(this);
         this.setupProviders = (function (_this) {
             return function (injector) {
+                //console.log('setupProviders');
+
                 $injector = injector;
                 $http = $injector.get('$http');
                 return $templateCache = $injector.get('$templateCache');
             };
         })(this);
         this.loadTemplate = function (component) {
-
             /*
              Load template for components.
              @param component: {object} The component of $builder.
@@ -133,6 +143,8 @@ angular.module('builder.provider', [])
         };
         this.registerComponent = (function (_this) {
             return function (name, component) {
+                //console.log('registerComponent');
+
                 var newComponent, _ref;
                 if (component == null) {
                     component = {};
@@ -172,8 +184,12 @@ angular.module('builder.provider', [])
                 }
             };
         })(this);
+
+        //TODO: add form element to the end of form array
         this.addFormObject = (function (_this) {
             return function (formIndex, formObject) {
+                console.log('addFormObject');
+
                 var _base;
                 if (formObject == null) {
                     formObject = {};
@@ -188,8 +204,13 @@ angular.module('builder.provider', [])
                 return _this.insertFormObject(formIndex, _this.forms[formIndex].length, formObject);
             };
         })(this);
+
+        //TODO: add new element, reformat and reindex forms array
         this.insertFormObject = (function (_this) {
+
             return function (formIndex, index, formObject) {
+                //console.log('insertFormObject');
+
                 var _base;
                 if (formObject == null) {
                     formObject = {};
@@ -221,8 +242,12 @@ angular.module('builder.provider', [])
                 } else if (index < 0) {
                     index = 0;
                 }
+                //console.log('before', _this.forms);
+
                 _this.forms[formIndex].splice(index, 0, _this.convertFormObject(formIndex, formObject));
                 _this.reindexFormObject(formIndex);
+
+                //console.log('after', _this.forms);
                 return _this.forms[formIndex][index];
             };
         })(this);
@@ -242,6 +267,7 @@ angular.module('builder.provider', [])
         })(this);
         this.updateFormObjectIndex = (function (_this) {
             return function (formIndex, oldIndex, newIndex) {
+                //console.log('updateFormObjectIndex');
 
                 /*
                  Update the index of the form object.
@@ -275,6 +301,8 @@ angular.module('builder.provider', [])
         })(this);
         this.insertSectionObject = (function (_this) {
             return function (formIndex, sectionIndex, index, formObject) {
+                console.log('insertSectionObject');
+
                 var section;
                 if (formObject == null) {
                     formObject = {};
@@ -300,7 +328,6 @@ angular.module('builder.provider', [])
                  @return: The form object.
                  */
                 section = _this.forms[formIndex][sectionIndex];
-                console.log(formIndex, sectionIndex, '=====');
                 if (section.components == null) {
                     section.components = [];
                 }
@@ -332,6 +359,8 @@ angular.module('builder.provider', [])
         })(this);
         this.updateSectionObjectIndex = (function (_this) {
             return function (formIndex, sectionIndex, oldIndex, newIndex) {
+                //console.log('updateSectionObjectIndex');
+
                 var formObject, sectionObjects;
                 if (formIndex == null) {
                     formIndex = _this.currentForm;
@@ -355,12 +384,13 @@ angular.module('builder.provider', [])
         this.selectedPath = [0];
         this.selectFrame = (function (_this) {
             return function (firstIndex, sectionIndex) {
+                //console.log('selectFrame');
+
                 if (firstIndex === 0) {
                     _this.selectedPath = [0];
                 } else {
                     _this.selectedPath = [1, sectionIndex];
                 }
-                console.log('selectFrame', firstIndex, sectionIndex, _this.selectedPath);
                 return _this.selectedPath;
             };
         })(this);

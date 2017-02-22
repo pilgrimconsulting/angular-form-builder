@@ -528,7 +528,7 @@ Global.__fbComponents.section = ($builderProvider) ->
 		components: []
 		template:
 			"""
-			<div class="panel panel-default" ng-class='{"section-open": isOpen, "fb-selected-frame": selected}'>
+			<div class="panel panel-default" ng-class='{"fb-selected-frame": selected}'>
 			{{componentIndex}}{{componentName}}|{{currentPage}}|{{formNumber}}
 				<div class="panel-heading">
 					<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
