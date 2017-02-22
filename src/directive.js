@@ -89,6 +89,9 @@ angular.module
                     document.onkeyup = KeyUp;
                     return $drag.droppable($(element), {  //TODO: DRAGGABLE ACTIONS
                         move: function (e) {
+
+                            console.log('move');
+
                             var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
                             if (beginMove) {
                                 $("div.fb-form-object-editable").popover('hide');
@@ -798,10 +801,8 @@ angular.module
                 '</div>' +
                 '</form>' +
                 '</div>',
-                link: function (scope, element) {
+                link: function (scope) {
                     scope.formData = angular.copy($builder.formData);
-
-                    console.log($builder.formData);
 
                     scope.resetForm = function () {
                         scope.formData = angular.copy($builder.formData);
