@@ -39,6 +39,21 @@ angular.module('transcription', [])
                 }
             };
         })(this);
+
+        this.getFormData = (function (_this) {
+            return function(json) {
+                var json = _this.checkType(json);
+                var formData = {
+                    title: json["Title"],
+                    showTitle: json["ShowTitle"],
+                    description: json["Description"],
+                    instructions: json["Instructions"]
+                };
+
+                return formData;
+            }
+        })(this);
+
         this.translate = (function (_this) {
             return function (json) {
                 var builder, element, elements, item, items, option, options, page, pageIndex, pages, section, tempItem, tempObj, _i, _j, _len, _len1;
@@ -50,7 +65,6 @@ angular.module('transcription', [])
                 }
                 for (pageIndex = _i = 0, _len = pages.length; _i < _len; pageIndex = ++_i) {
                     page = pages[pageIndex];
-                    window.dev && console.log('!!!', page);
                     builder[pageIndex] = [];
                     elements = page["Elements"];
                     for (_j = 0, _len1 = elements.length; _j < _len1; _j++) {
@@ -110,14 +124,16 @@ angular.module('transcription', [])
                 return builder;
             };
         })(this);
+
         this.$get = [
             '$injector', (function (_this) {
                 return function ($injector) {
                     _this.setupProviders($injector);
                     return {
-                        translate: _this.translate
+                        translate: _this.translate,
+                        getFormData: _this.getFormData
                     };
                 };
             })(this)
         ];
-    }).call(this);
+    })

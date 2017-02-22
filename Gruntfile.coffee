@@ -33,8 +33,6 @@ module.exports = (grunt) ->
 				files:
 					'dist/angular-form-builder.js': ['src/*.js']
 
-
-
 		coffee:
 			options:
 				sourceMap: true
@@ -53,7 +51,7 @@ module.exports = (grunt) ->
 
 		watch:
 			compass:
-				files: ['src/*.js', 'example/*.scss', 'src/*.scss', 'index.html']
+				files: ['example/*.scss', 'src/*.scss', 'index.html']
 				tasks: ['compass']
 				options:
 					spawn: no
@@ -65,6 +63,14 @@ module.exports = (grunt) ->
 #                        key: grunt.file.read('path/to/ssl.key'),
 #                        cert: grunt.file.read('path/to/ssl.crt')
 #    // you can pass in any other options you'd like to the https server, as listed here: http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener
+
+			concat:
+				files: ['src/*.js']
+				tasks: ['concat']
+				options:
+					sourceMap: true
+					spawn: no
+					livereload: LIVERELOAD_PORT
 
 			coffee:
 				files: ['components/*.coffee', 'example/*.coffee']

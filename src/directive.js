@@ -595,7 +595,7 @@ angular.module
                 "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: !next}\" ng-click=\"goF()\">>" +
                 "</button>\n		" +
                 "<div class=\"btn-group\">\n			" +
-                "<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" >\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right disabled\"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
+                "<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" >\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right \"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
                 controller: 'PaginationController',
                 link: function (scope, element, attrs) {
                     return scope.$watch(function () {      //TODO: recount pages when new pade was added
@@ -644,6 +644,9 @@ angular.module
                     scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
                     return $drag.droppable($(element), {
                         move: function (e) {
+
+                            console.log('move');
+
                             var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
                             if (beginMove) {
                                 $("div.fb-form-object-editable").popover('hide');
@@ -679,6 +682,8 @@ angular.module
                             }
                         },
                         out: function () {
+                            console.log('out');
+
                             var beginMove;
                             if (beginMove) {
                                 $("div.fb-form-object-editable").popover('hide');
@@ -687,6 +692,8 @@ angular.module
                             return $(element).find('.empty').remove();
                         },
                         up: function (e, isHover, draggable) {
+                            console.log('up');
+
                             var beginMove, elementIndex, formObject, newIndex, oldIndex;
                             beginMove = true;
                             if (!$drag.isMouseMoved()) {
@@ -792,14 +799,16 @@ angular.module
                 '</form>' +
                 '</div>',
                 link: function (scope, element) {
-                    scope.formData = angular.copy($builder.getFormData);
+                    scope.formData = angular.copy($builder.formData);
+
+                    console.log($builder.formData);
 
                     scope.resetForm = function () {
-                        scope.formData = angular.copy($builder.getFormData);
+                        scope.formData = angular.copy($builder.formData);
                     };
 
                     scope.saveForm = function () {
-                        $builder.getFormData = scope.formData;
+                        $builder.formData = scope.formData;
                     }
                 }
             };
