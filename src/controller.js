@@ -20,7 +20,6 @@ copyObjectToScope = function (object, scope) {
     }
 };
 
-
 angular.module('builder.controller', ['builder.provider'])
     .controller('fbFormObjectEditableController', [
         '$scope', '$injector', function ($scope, $injector) {
@@ -142,9 +141,6 @@ angular.module('builder.controller', ['builder.provider'])
 
 //TODO: зміна вкладки компоненту Default/Image/Special
             $scope.selectGroup = function ($event, group) {
-
-//console.log('selectGroup');
-
                 var component, name, _ref, _results;
                 if ($event != null) {
                     $event.preventDefault();
@@ -183,7 +179,7 @@ angular.module('builder.controller', ['builder.provider'])
     ])
 
 
-//TODO: при зміні вкладки компоненту Default/Image/Special відбувається:
+//TODO: при зміні вкладки компоненту Default/Image/Special заповнення правої частини даними:
     .controller('fbComponentController', [
         '$scope', function ($scope) {
             return $scope.copyObjectToScope = function (object) {

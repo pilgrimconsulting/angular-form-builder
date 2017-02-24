@@ -6,7 +6,7 @@ angular.module
     'validator'
 ])
     .directive('fbBuilder', [
-        '$injector', function ($injector) {
+        '$injector', '$rootScope', function ($injector, $rootScope) {
             var $builder, $drag;
             $builder = $injector.get('$builder');
             $drag = $injector.get('$drag');
@@ -89,10 +89,14 @@ angular.module
                     document.onkeyup = KeyUp;
                     return $drag.droppable($(element), {  //TODO: DRAGGABLE ACTIONS
                         move: function (e) {
-
-                            console.log('move');
-
                             var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
+                            var emptyElements = $(element).find('.fb-form-object-editable.empty');
+
+                            if (!emptyElements.length && !$rootScope.test) {
+                                $(element).find('.form-horizontal:first').append($("<div class='fb-form-object-editable empty'></div>"));
+                                return;
+                            }
+
                             if (beginMove) {
                                 $("div.fb-form-object-editable").popover('hide');
                                 beginMove = false;
@@ -139,10 +143,8 @@ angular.module
                         up: function (e, isHover, draggable) {
                             var formObject, newIndex, oldIndex;
                             beginMove = true;
-                            if (keyHold !== allowKey) {
-                                return;
-                            }
-                            if (!$drag.isMouseMoved()) {
+
+                            if (!$drag.isMouseMoved() || $rootScope.moveSection) {
                                 $(element).find('.empty').remove();
                                 return;
                             }
@@ -200,7 +202,6 @@ angular.module
                     scope.simpleView = $builder.simplePreview;
                     scope.$component = $builder.components[scope.formObject.component];
 
-                    //TODO: use setupScope(copyObjectToScope) from fbFormObjectEditableController controller
                     scope.setupScope(scope.formObject);
 
                     //TODO: set new data to form components
@@ -440,6 +441,7 @@ angular.module
                 controller: 'fbComponentController',
                 link: function (scope, element) {
                     scope.simpleView = $builder.simpleComponentView;
+
                     scope.copyObjectToScope(scope.component, scope.simpleView);
                     $drag.draggable($(element), {
                         mode: 'mirror',
@@ -455,7 +457,10 @@ angular.module
                         if (!template) {
                             return;
                         }
+
                         view = $compile(template)(scope);
+                        view.length === 2 && $(view).addClass('section-right');
+
                         return $(element).html(view);
                     });
                     return scope.$watch(function () {
@@ -469,7 +474,7 @@ angular.module
         }
     ])
 
-
+    //TODO: BOTTOM FORM CONTAINER
     .directive('fbForm', [
         '$injector', function ($injector) {
             return {
@@ -510,7 +515,7 @@ angular.module
         }
     ])
 
-    // TODO: triggered every time we change page and this page have any section
+    // TODO: BOTTOM FORM ELEMENT triggered every time we change page and this page have any section
     .directive('fbFormObject', [
         '$injector', function ($injector) {
             var $builder, $compile, $parse;
@@ -521,6 +526,7 @@ angular.module
                 restrict: 'A',
                 controller: 'fbFormObjectController',
                 link: function (scope, element, attrs) {
+
                     scope.formObject = $parse(attrs.fbFormObject)(scope);
                     scope.$component = $builder.components[scope.formObject.component];
 
@@ -530,8 +536,6 @@ angular.module
                     if (scope.$component.arrayToText) {
                         scope.inputArray = [];
                         scope.$watch('inputArray', function (newValue, oldValue) {
-                            //console.log('inputArray', scope.inputArray);
-
                             var checked, index, _ref;
                             if (newValue === oldValue) {
                                 return;
@@ -585,6 +589,7 @@ angular.module
     ])
 
 
+    //TODO: TOP panel with pages managing
     .directive('fbPages', [
         '$injector', function ($injector) {
             var $builder;
@@ -616,7 +621,7 @@ angular.module
 
     //TODO: move components actions
     .directive('fbSection', [
-        '$injector', '$compile', function ($injector, $compile) {
+        '$injector', '$compile', '$rootScope', function ($injector, $compile, $rootScope) {
             var $builder, $drag;
             $builder = $injector.get('$builder');
             $drag = $injector.get('$drag');
@@ -647,10 +652,10 @@ angular.module
                     scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
                     return $drag.droppable($(element), {
                         move: function (e) {
-
-                            console.log('move');
-
                             var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
+
+                            $rootScope.moveSection = true;
+
                             if (beginMove) {
                                 $("div.fb-form-object-editable").popover('hide');
                                 beginMove = false;
@@ -662,6 +667,7 @@ angular.module
                                 }
                                 return;
                             }
+
                             positions = [];
                             positions.push(-1000);
                             for (index = _i = 0, _ref = $formObjects.length; _i < _ref; index = _i += 1) {
@@ -675,8 +681,9 @@ angular.module
                                 if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
                                     $(element).find('.empty').remove();
                                     $empty = $("<div class='parent-section fb-form-object-editable empty'></div>");
-                                    if (index - 1 < $formObjects.length) {
+                                    if (index - 1 < $formObjects.length) {                                              //TODO: empty handler!!!
                                         $empty.insertBefore($($formObjects[index - 1]));
+
                                     } else {
                                         $empty.insertAfter($($formObjects[index - 2]));
                                     }
@@ -685,7 +692,7 @@ angular.module
                             }
                         },
                         out: function () {
-                            console.log('out');
+                            $rootScope.moveSection = false;
 
                             var beginMove;
                             if (beginMove) {
@@ -695,12 +702,13 @@ angular.module
                             return $(element).find('.empty').remove();
                         },
                         up: function (e, isHover, draggable) {
-                            console.log('up');
-
                             var beginMove, elementIndex, formObject, newIndex, oldIndex;
                             beginMove = true;
+
+                            var emptyArea = $(element).find('.empty');
+
                             if (!$drag.isMouseMoved()) {
-                                $(element).find('.empty').remove();
+                                emptyArea.remove();
                                 return;
                             }
                             if (!isHover && draggable.mode === 'drag') {
@@ -722,6 +730,7 @@ angular.module
                                     $builder.updateSectionObjectIndex(scope.formNumber, scope.sectionIndex, oldIndex, newIndex);
                                 }
                             }
+
                             return $(element).find('.empty').remove();
                         }
                     });

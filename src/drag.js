@@ -102,8 +102,10 @@ angular.module('builder.drag', [])
     this.defaultDragCheck = {
         section: (function (_this) {
             return function (element, event, index) {
-                if ($(element).find('.section-open').length) {
-                    return false;
+                var el = $(element).find('.section-open');
+
+                if (el.length) {
+                    return el.hasClass('section-right');
                 } else {
                     return true;
                 }

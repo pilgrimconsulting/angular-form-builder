@@ -60,6 +60,7 @@ angular.module('builder.provider', [])
                 formObject = {};
             }
             component = this.components[formObject.component];
+
             if (component == null) {
                 throw "The component " + formObject.component + " was not registered.";
             }
@@ -276,10 +277,10 @@ angular.module('builder.provider', [])
         this.insertSectionObject = (function (_this) {
             return function (formIndex, sectionIndex, index, formObject) {
                 var section;
-                if (formObject == null) {
+                if (formObject == null || formObject.component == 'section') {
                     formObject = {};
+                    return;
                 }
-
 
                 /*
                  Insert the form object into the form at {index}.
@@ -300,7 +301,6 @@ angular.module('builder.provider', [])
                  @return: The form object.
                  */
                 section = _this.forms[formIndex][sectionIndex];
-                console.log(formIndex, sectionIndex, '=====');
                 if (section.components == null) {
                     section.components = [];
                 }
@@ -360,7 +360,6 @@ angular.module('builder.provider', [])
                 } else {
                     _this.selectedPath = [1, sectionIndex];
                 }
-                console.log('selectFrame', firstIndex, sectionIndex, _this.selectedPath);
                 return _this.selectedPath;
             };
         })(this);

@@ -351,11 +351,7 @@
         section: true
       };
       $drag.setConfig(config);
-
-      $builder.formData = $transcription.getFormData($window.jsonString);
-      $builder.json = $transcription.translate($window.jsonString);
-
-      return;
+      return $builder.json = $transcription.translate($window.jsonString);
     }
   ]).controller('DemoController', [
     '$scope', '$builder', '$validator', function($scope, $builder, $validator) {
