@@ -88,11 +88,14 @@ angular.module
                     document.onkeydown = KeyDown;
                     document.onkeyup = KeyUp;
                     return $drag.droppable($(element), {  //TODO: DRAGGABLE ACTIONS
-                        move: function (e) {
+                        move: function (e, isHover) {
                             var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
                             var emptyElements = $(element).find('.fb-form-object-editable.empty');
 
-                            if (!emptyElements.length && !$rootScope.test) {
+                            console.log('isHover', $(isHover.element).hasClass('parent-section'));
+                            //console.log('isHover', isHover.element);
+
+                            if (!emptyElements.length && !$rootScope.moveSection) {
                                 $(element).find('.form-horizontal:first').append($("<div class='fb-form-object-editable empty'></div>"));
                                 return;
                             }
@@ -105,12 +108,6 @@ angular.module
                                 return;
                             }
                             $formObjects = $(element).find('.fb-form-object-editable:not(.empty,.dragging)');
-                            if ($formObjects.length === 0) {
-                                if ($(element).find('.fb-form-object-editable.empty').length === 0) {
-                                    $(element).find('>div:first').append($("<div class='fb-form-object-editable empty'></div>"));
-                                }
-                                return;
-                            }
                             positions = [];
                             positions.push(-1000);
                             for (index = _i = 0, _ref = $formObjects.length; _i < _ref; index = _i += 1) {
@@ -148,13 +145,17 @@ angular.module
                                 $(element).find('.empty').remove();
                                 return;
                             }
-                            if (!isHover && draggable.mode === 'drag') {
+                            if (!isHover) {
                                 formObject = draggable.object.formObject;
-                                if (formObject.editable) {
-                                    $builder.removeFormObject(attrs.fbBuilder, formObject.index);
+
+                                //console.log(formObject);
+
+                                if (formObject && formObject.editable && !$rootScope.moveSectionTest) {
+                                    $builder.removeFormObject(scope.formNumber, formObject.index);
                                 }
                             } else if (isHover) {
                                 if (draggable.mode === 'mirror') {
+
                                     $builder.insertFormObject(scope.formNumber, $(element).find('.empty').index('.fb-form-object-editable'), {
                                         component: draggable.object.componentName
                                     });
@@ -200,7 +201,7 @@ angular.module
                     scope.formNumber = scope.$parent.formNumber;
                     scope.componentIndex = scope.$parent.$index;
                     scope.simpleView = $builder.simplePreview;
-                    scope.$component = $builder.components[scope.formObject.component];
+                    scope.$component = scope.formObject.component ? $builder.components[scope.formObject.component] : null;
 
                     scope.setupScope(scope.formObject);
 
@@ -655,6 +656,7 @@ angular.module
                             var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
 
                             $rootScope.moveSection = true;
+                            $rootScope.moveSectionTest = true;
 
                             if (beginMove) {
                                 $("div.fb-form-object-editable").popover('hide');
@@ -679,6 +681,7 @@ angular.module
                             positions.push(positions[positions.length - 1] + 1000);
                             for (index = _j = 1, _ref1 = positions.length; _j < _ref1; index = _j += 1) {
                                 if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
+
                                     $(element).find('.empty').remove();
                                     $empty = $("<div class='parent-section fb-form-object-editable empty'></div>");
                                     if (index - 1 < $formObjects.length) {                                              //TODO: empty handler!!!
@@ -705,6 +708,8 @@ angular.module
                             var beginMove, elementIndex, formObject, newIndex, oldIndex;
                             beginMove = true;
 
+                            $rootScope.moveSectionTest = false;
+
                             var emptyArea = $(element).find('.empty');
 
                             if (!$drag.isMouseMoved()) {
@@ -713,9 +718,18 @@ angular.module
                             }
                             if (!isHover && draggable.mode === 'drag') {
                                 formObject = draggable.object.formObject;
+
+                                //ev.stopPropagation();
+                                //console.log('TEST', 'El id: ', $(element).find('.empty').index(), 'Sec id: ', scope.sectionIndex);
+                                //console.log('test', $(element).childNodes);
+
+                                //if(!$rootScope.moveSection) $builder.removeSectionObject($builder.currentForm, scope.sectionIndex, 0);
                             } else if (isHover) {
                                 if (draggable.mode === 'mirror') {
                                     elementIndex = $(element).find('.empty').index();
+
+                                    //console.log(elementIndex);
+
                                     $builder.insertSectionObject($builder.currentForm, scope.sectionIndex, elementIndex, {
                                         component: draggable.object.componentName
                                     });

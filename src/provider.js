@@ -229,7 +229,6 @@ angular.module('builder.provider', [])
         })(this);
         this.removeFormObject = (function (_this) {
             return function (formIndex, index) {
-
                 /*
                  Remove the form object by the index.
                  @param formIndex: The form formIndex.
@@ -238,6 +237,10 @@ angular.module('builder.provider', [])
                 var formObjects;
                 formObjects = _this.forms[formIndex];
                 formObjects.splice(index, 1);
+
+                console.log('removeFormObject', formIndex, index, _this.forms);
+
+
                 return _this.reindexFormObject(formIndex);
             };
         })(this);
