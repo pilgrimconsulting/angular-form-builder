@@ -92,10 +92,7 @@ angular.module
                             var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
                             var emptyElements = $(element).find('.fb-form-object-editable.empty');
 
-                            console.log('isHover', $(isHover.element).hasClass('parent-section'));
-                            //console.log('isHover', isHover.element);
-
-                            if (!emptyElements.length && !$rootScope.moveSection) {
+                            if (!emptyElements.length) {
                                 $(element).find('.form-horizontal:first').append($("<div class='fb-form-object-editable empty'></div>"));
                                 return;
                             }
@@ -646,17 +643,21 @@ angular.module
                 "</div>\n" +
                 "</div>",
                 link: function (scope, element, attrs) {
+                    var hasParentSection, selectedFormItem;
                     if (scope.fbSection !== 'section') {
                         return;
                     }
                     $(element).addClass('fb-section');
                     scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
                     return $drag.droppable($(element), {
-                        move: function (e) {
+                        move: function (e, isHover) {
                             var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
 
                             $rootScope.moveSection = true;
                             $rootScope.moveSectionTest = true;
+
+                            hasParentSection = $(isHover.element).hasClass('parent-section');
+                            selectedFormItem = $(isHover);
 
                             if (beginMove) {
                                 $("div.fb-form-object-editable").popover('hide');
@@ -717,19 +718,18 @@ angular.module
                                 return;
                             }
                             if (!isHover && draggable.mode === 'drag') {
-                                formObject = draggable.object.formObject;
+                                if(selectedFormItem && hasParentSection) {
+                                    var currentSectionComponents    = $builder.forms[$builder.currentForm][scope.sectionIndex].components,
+                                        itemIndex                   = currentSectionComponents.indexOf(selectedFormItem[0].object.formObject);
 
-                                //ev.stopPropagation();
-                                //console.log('TEST', 'El id: ', $(element).find('.empty').index(), 'Sec id: ', scope.sectionIndex);
-                                //console.log('test', $(element).childNodes);
+                                    $builder.removeSectionObject($builder.currentForm, scope.sectionIndex, itemIndex);
+                                }
 
-                                //if(!$rootScope.moveSection) $builder.removeSectionObject($builder.currentForm, scope.sectionIndex, 0);
+                                hasParentSection = false;
+
                             } else if (isHover) {
                                 if (draggable.mode === 'mirror') {
                                     elementIndex = $(element).find('.empty').index();
-
-                                    //console.log(elementIndex);
-
                                     $builder.insertSectionObject($builder.currentForm, scope.sectionIndex, elementIndex, {
                                         component: draggable.object.componentName
                                     });
