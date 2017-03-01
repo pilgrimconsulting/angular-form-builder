@@ -17,8 +17,5 @@ bower_components
 # dist + exxample
 dist/*
 
-# map
-example/demo.js.map
-
 #Test
 /test/*

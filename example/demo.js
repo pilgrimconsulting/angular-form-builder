@@ -351,6 +351,7 @@
         section: true
       };
       $drag.setConfig(config);
+      $builder.formData = $transcription.getFormData($window.jsonString);
       return $builder.json = $transcription.translate($window.jsonString);
     }
   ]).controller('DemoController', [

@@ -255,7 +255,9 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules', 'ngAn
 		section: true
 	$drag.setConfig config
 
-	$builder.json = $transcription.translate($window.jsonString)
+	$builder.formData  		= $transcription.getFormData($window.jsonString)
+	$builder.json         = $transcription.translate($window.jsonString)
+
 
 #	$builder.registerComponent 'sampleInput',
 #		group: 'Additional'

@@ -149,8 +149,9 @@ angular.module
                                     $builder.removeFormObject(scope.formNumber, formObject.index);
                                 }
                             } else if (isHover) {
-                                if (draggable.mode === 'mirror') {
+                                console.log($rootScope.moveSection, $rootScope.FO);
 
+                                if (draggable.mode === 'mirror') {
                                     $builder.insertFormObject(scope.formNumber, $(element).find('.empty').index('.fb-form-object-editable'), {
                                         component: draggable.object.componentName
                                     });
@@ -662,7 +663,6 @@ angular.module
                                 beginMove = false;
                             }
                             $formObjects = $(element).find('.parent-section.fb-form-object-editable:not(.empty,.dragging)');
-
                             $rootScope.FO = !!$formObjects;
 
                             if ($formObjects.length === 0) {
@@ -698,7 +698,7 @@ angular.module
                                 }
                             }
                         },
-                        out: function () {
+                        out: function (e, is) {
                             $rootScope.moveSection = false;
                             $rootScope.FO = false;
 
