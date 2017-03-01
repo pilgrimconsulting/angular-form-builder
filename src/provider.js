@@ -100,7 +100,7 @@ angular.module('builder.provider', [])
                 var index, sectionObjects, _i, _ref;
                 sectionObjects = _this.forms[name][sectionIndex].components;
                 for (index = _i = 0, _ref = sectionObjects.length; _i < _ref; index = _i += 1) {
-                    sectionObjects[index].index = index;
+                    if(sectionObjects[index]) sectionObjects[index].index = index;
                 }
             };
         })(this);
