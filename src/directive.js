@@ -92,7 +92,7 @@ angular.module
                             var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
                             var emptyElements = $(element).find('.fb-form-object-editable.empty');
 
-                            if (!emptyElements.length && !$rootScope.FO) {
+                            if (!emptyElements.length) {
                                 $(element).find('.form-horizontal:first').append($("<div class='fb-form-object-editable empty'></div>"));
                                 return;
                             }
@@ -101,9 +101,7 @@ angular.module
                                 $("div.fb-form-object-editable").popover('hide');
                                 beginMove = false;
                             }
-                            if (keyHold !== allowKey) {
-                                return;
-                            }
+
                             $formObjects = $(element).find('.fb-form-object-editable:not(.empty,.dragging)');
                             positions = [];
                             positions.push(-1000);
@@ -117,6 +115,9 @@ angular.module
                             for (index = _j = 1, _ref1 = positions.length; _j < _ref1; index = _j += 1) {
                                 if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
                                     $(element).find('.empty').remove();
+
+                                    console.log('test');
+
                                     $empty = $("<div class='fb-form-object-editable empty'></div>");
                                     if (index - 1 < $formObjects.length) {
                                         $empty.insertBefore($($formObjects[index - 1]));
