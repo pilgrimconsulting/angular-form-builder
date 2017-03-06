@@ -59,11 +59,13 @@ angular.module('builder.provider', [])
             if (formObject == null) {
                 formObject = {};
             }
-            component = this.components[formObject.component];
 
-            if (component == null) {
+            component = angular.copy(this.components[formObject.component]);
+
+            if (!component) {
                 throw "The component " + formObject.component + " was not registered.";
             }
+
             result = {
                 id: formObject.id,
                 component: formObject.component,
@@ -84,6 +86,7 @@ angular.module('builder.provider', [])
                 style: (_ref14 = formObject.style) != null ? _ref14 : component.style,
                 components: (_ref15 = formObject.components) != null ? _ref15 : component.components
             };
+
             return result;
         };
         this.reindexFormObject = (function (_this) {
@@ -238,9 +241,6 @@ angular.module('builder.provider', [])
                 formObjects = _this.forms[formIndex];
                 formObjects.splice(index, 1);
 
-                console.log('removeFormObject', formIndex, index, _this.forms);
-
-
                 return _this.reindexFormObject(formIndex);
             };
         })(this);
@@ -312,8 +312,10 @@ angular.module('builder.provider', [])
                 } else if (index < 0) {
                     index = 0;
                 }
+
                 section.components.splice(index, 0, _this.convertFormObject(formIndex, formObject));
                 _this.reindexSectionObject(formIndex, sectionIndex);
+
                 return section.components[index];
             };
         })(this);

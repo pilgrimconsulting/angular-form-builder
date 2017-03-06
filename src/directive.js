@@ -27,7 +27,7 @@ angular.module
                 "</div>",
                 controller: 'PaginationController',
                 link: function (scope, element, attrs) {
-                    var KeyDown, KeyUp, allowKey, beginMove, keyHold, _base, _name;
+                    var KeyDown, KeyUp, allowKey, beginMove, keyHold, _base, _name, hoveredSection;
                     scope.formNumber = attrs.fbPage || $builder.currentForm;
                     if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
                         _base[_name] = [];
@@ -91,6 +91,7 @@ angular.module
                         move: function (e, isHover) {
                             var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
                             var emptyElements = $(element).find('.fb-form-object-editable');
+                            hoveredSection = $rootScope.hoverFormData.find(function(e) { return e.hover === true; });
 
                             if (!emptyElements.length) {
                                 $(element).find('.form-horizontal:first').append($("<div class='fb-form-object-editable empty'></div>"));
@@ -102,7 +103,7 @@ angular.module
                                 beginMove = false;
                             }
 
-                            if(!$rootScope.moveSection) {
+                            if(!hoveredSection) {
                                 $formObjects = $(element).find('.fb-form-object-editable:not(.empty,.dragging)');
                                 positions = [];
                                 positions.push(-1000);
@@ -141,14 +142,14 @@ angular.module
                             var formObject, newIndex, oldIndex;
                             beginMove = true;
 
-                            if (!$drag.isMouseMoved() || $rootScope.moveSection) {
+                            if (!$drag.isMouseMoved() || hoveredSection) {
                                 $(element).find('.empty').remove();
                                 return;
                             }
                             if (!isHover) {
                                 formObject = draggable.object.formObject;
                                 
-                                if (formObject && formObject.editable && !$rootScope.moveSectionItem) {
+                                if (formObject && formObject.editable) {
                                     $builder.removeFormObject(scope.formNumber, formObject.index);
                                 }
                             } else if (isHover) {
@@ -649,12 +650,19 @@ angular.module
                     }
                     $(element).addClass('fb-section');
                     scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
+
+                    $rootScope.hoverFormData = [];
+
+                    $builder.forms[scope.currentPage].map(function(e, i) {
+                        $rootScope.hoverFormData[i] = e;
+                        $rootScope.hoverFormData[i].hover = false;
+                    });
+
                     return $drag.droppable($(element), {
                         move: function (e, isHover) {
                             var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
 
-                            $rootScope.moveSection = true;
-                            $rootScope.moveSectionItem = true;
+                            if($rootScope.hoverFormData[scope.sectionIndex]) $rootScope.hoverFormData[scope.sectionIndex].hover = true;
 
                             hasParentSection = $(isHover.element).hasClass('parent-section');
                             selectedFormItem = $(isHover);
@@ -664,11 +672,8 @@ angular.module
                                 beginMove = false;
                             }
                             $formObjects = $(element).find('.parent-section.fb-form-object-editable:not(.empty,.dragging)');
-                            $rootScope.FO = !!$formObjects;
 
                             if ($formObjects.length === 0) {
-
-
                                 if ($(element).find('.parent-section.fb-form-object-editable.empty').length === 0) {
                                     $(element).find('>div:first').append($("<div class='parent-section fb-form-object-editable empty'></div>"));
                                 }
@@ -700,8 +705,7 @@ angular.module
                             }
                         },
                         out: function (e, is) {
-                            $rootScope.moveSection = false;
-                            $rootScope.FO = false;
+                            if($rootScope.hoverFormData[scope.sectionIndex]) $rootScope.hoverFormData[scope.sectionIndex].hover = false;
 
                             $("div.fb-form-object-editable").popover('hide');
                         },
@@ -742,8 +746,6 @@ angular.module
                                     $builder.updateSectionObjectIndex(scope.formNumber, scope.sectionIndex, oldIndex, newIndex);
                                 }
                             }
-
-                            $rootScope.moveSectionItem = false;
 
                             return $(element).find('.empty').remove();
                         }
