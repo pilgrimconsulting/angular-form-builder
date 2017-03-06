@@ -596,13 +596,25 @@ angular.module
             return {
                 restrict: 'A',
                 template: "<div class=\"fb-builderPagination\">\n	" +
-                "<div class=\"pull-left\">\n		" +
-                "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><" +
-                "</button>\n		" +
-                "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: !next}\" ng-click=\"goF()\">>" +
-                "</button>\n		" +
-                "<div class=\"btn-group\">\n			" +
-                "<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\" >\n				<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" >\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	<div class=\"pull-right\">\n		<button type=\"button\" class=\"btn btn-danger btn-small _pull-right \"\n				ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">-</button>\n		<!-- Split button -->\n		<div class=\"btn-group\">\n			<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			<button type=\"button\" class=\"btn btn-success dropdown-toggle\" data-toggle=\"dropdown\"\n					aria-haspopup=\"true\" aria-expanded=\"false\">\n				<span class=\"caret\"></span>\n				<span class=\"sr-only\">Toggle Dropdown</span>\n			</button>\n			<ul class=\"dropdown-menu\">\n				<li><a href=\"\" ng-click=\"addPage(pageCount)\">Page</a></li>\n				<li role=\"separator\" class=\"divider\"></li>\n				<li><a href=\"\">Section</a></li>\n				<li><a href=\"\">Component</a></li>\n			</ul>\n		</div>\n	</div>\n\n	<div class=\"clearfix\"></div>\n</div>",
+                    "<div class=\"pull-left\">\n		" +
+                        "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		" +
+                        "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: !next}\" ng-click=\"goF()\">></button>\n		" +
+                        "<div class=\"btn-group\">\n			" +
+                            "<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				" +
+                                "<span class=\"caret\"></span>\n				" +
+                                "<span class=\"sr-only\">Toggle Dropdown</span>\n			" +
+                            "</button>\n			" +
+                            "<ul class=\"dropdown-menu\" >\n				" +
+                            "<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			" +
+                            "</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" >\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	" +
+                            "<div class=\"pull-right\">\n <button type=\"button\" class=\"btn btn-danger btn-small _pull-right \"\n ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">Delete</button>\n		<!-- Split button -->\n		" +
+                            "<div class=\"btn-group\">\n			" +
+                                    "<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			" +
+                            "</div>\n	" +
+                        "</div>\n\n	" +
+                    "<div class=\"clearfix\">" +
+                    "</div>\n" +
+                "</div>",
                 controller: 'PaginationController',
                 link: function (scope, element, attrs) {
                     return scope.$watch(function () {      //TODO: recount pages when new pade was added
