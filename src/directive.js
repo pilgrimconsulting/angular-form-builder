@@ -658,7 +658,7 @@ angular.module
                 "ng-class='{\"fb-selected-frame\": selected}'\n	>\n " +
                 "</div>\n" +
                 "</div>",
-                link: function (scope, element, attrs) {
+                link: function (scope, element) {
                     var hasParentSection, selectedFormItem;
                     if (scope.fbSection !== 'section') {
                         return;
@@ -670,7 +670,7 @@ angular.module
 
                     return $drag.droppable($(element), {
                         move: function (e, isHover) {
-                            var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
+                            var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
 
                             $builder.forms[scope.currentPage].map(function(e, i) {
                                 $rootScope.hoverFormData[i] = e;
@@ -681,16 +681,6 @@ angular.module
 
                             hasParentSection = $(isHover.element).hasClass('parent-section');
                             selectedFormItem = isHover;
-
-                            if (isHover.mode === 'drag' && isHover.object.formObject.editable) {
-                                $(element).find('.empty').remove();
-                                return;
-                            }
-
-                            if (beginMove) {
-                                $("div.fb-form-object-editable").popover('hide');
-                                beginMove = false;
-                            }
 
                             $formObjects = $(element).find('.parent-section.fb-form-object-editable:not(.empty,.dragging)');
                             if ($formObjects.length === 0) {
@@ -730,12 +720,10 @@ angular.module
                             $("div.fb-form-object-editable").popover('hide');
                         },
                         up: function (e, isHover, draggable) {
-                            var beginMove, elementIndex, formObject, newIndex, oldIndex;
-                            beginMove = true;
-
+                            var elementIndex, newIndex, oldIndex;
                             var emptyArea = $(element).find('.empty');
 
-                            if (!$drag.isMouseMoved() || selectedFormItem && selectedFormItem.mode === 'drag' && selectedFormItem.object.formObject.editable && isHover) {
+                            if (!$drag.isMouseMoved()) {
                                 emptyArea.remove();
                                 return;
                             }
