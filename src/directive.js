@@ -142,7 +142,7 @@ angular.module
                             var formObject, newIndex, oldIndex;
                             beginMove = true;
 
-                            if (!$drag.isMouseMoved() || hoveredSection) {
+                            if (!$drag.isMouseMoved() || !!hoveredSection) {
                                 $(element).find('.empty').remove();
                                 return;
                             }
@@ -167,6 +167,9 @@ angular.module
                                     $builder.updateFormObjectIndex(scope.formNumber, oldIndex, newIndex);
                                 }
                             }
+
+                            //console.log($builder.forms[scope.currentPage]);
+
                             return $(element).find('.empty').remove();
                         }
                     });
@@ -199,7 +202,7 @@ angular.module
                     scope.formNumber = scope.$parent.formNumber;
                     scope.componentIndex = scope.$parent.$index;
                     scope.simpleView = $builder.simplePreview;
-                    scope.$component = scope.formObject.component ? $builder.components[scope.formObject.component] : null;
+                    scope.$component = scope.formObject ? $builder.components[scope.formObject.component] : null;
 
                     scope.setupScope(scope.formObject);
 
@@ -665,26 +668,31 @@ angular.module
 
                     $rootScope.hoverFormData = [];
 
-                    $builder.forms[scope.currentPage].map(function(e, i) {
-                        $rootScope.hoverFormData[i] = e;
-                        $rootScope.hoverFormData[i].hover = false;
-                    });
-
                     return $drag.droppable($(element), {
                         move: function (e, isHover) {
                             var $empty, $formObject, $formObjects, beginMove, height, index, offset, positions, _i, _j, _ref, _ref1;
 
+                            $builder.forms[scope.currentPage].map(function(e, i) {
+                                $rootScope.hoverFormData[i] = e;
+                                $rootScope.hoverFormData[i].hover = false;
+                            });
+
                             if($rootScope.hoverFormData[scope.sectionIndex]) $rootScope.hoverFormData[scope.sectionIndex].hover = true;
 
                             hasParentSection = $(isHover.element).hasClass('parent-section');
-                            selectedFormItem = $(isHover);
+                            selectedFormItem = isHover;
+
+                            if (isHover.mode === 'drag' && isHover.object.formObject) {
+                                $(element).find('.empty').remove();
+                                return;
+                            }
 
                             if (beginMove) {
                                 $("div.fb-form-object-editable").popover('hide');
                                 beginMove = false;
                             }
-                            $formObjects = $(element).find('.parent-section.fb-form-object-editable:not(.empty,.dragging)');
 
+                            $formObjects = $(element).find('.parent-section.fb-form-object-editable:not(.empty,.dragging)');
                             if ($formObjects.length === 0) {
                                 if ($(element).find('.parent-section.fb-form-object-editable.empty').length === 0) {
                                     $(element).find('>div:first').append($("<div class='parent-section fb-form-object-editable empty'></div>"));
@@ -727,14 +735,15 @@ angular.module
 
                             var emptyArea = $(element).find('.empty');
 
-                            if (!$drag.isMouseMoved()) {
+                            if (!$drag.isMouseMoved() || selectedFormItem && selectedFormItem.mode === 'drag' && selectedFormItem.object.formObject) {
                                 emptyArea.remove();
                                 return;
                             }
+
                             if (!isHover && draggable.mode === 'drag') {
                                 if(selectedFormItem && hasParentSection) {
                                     var currentSectionComponents    = $builder.forms[$builder.currentForm][scope.sectionIndex].components,
-                                        itemIndex                   = currentSectionComponents.indexOf(selectedFormItem[0].object.formObject);
+                                        itemIndex                   = currentSectionComponents.indexOf(selectedFormItem.object.formObject);
 
                                     $builder.removeSectionObject($builder.currentForm, scope.sectionIndex, itemIndex);
                                 }
