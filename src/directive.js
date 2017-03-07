@@ -661,7 +661,7 @@ angular.module
                 "</div>\n" +
                 "</div>",
                 link: function (scope, element) {
-                    var hasParentSection, selectedFormItem;
+                    var hasParentSection, selectedFormItem, newIndex;
                     if (scope.fbSection !== 'section') {
                         return;
                     }
@@ -673,8 +673,6 @@ angular.module
                     return $drag.droppable($(element), {
                         move: function (e, isHover) {
                             var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
-
-                            //console.log( $(element) ); //[0].find('.empty').index()
 
                             $builder.forms[scope.currentPage].map(function(e, i) {
                                 $rootScope.hoverFormData[i] = e;
@@ -703,6 +701,7 @@ angular.module
                                 positions.push(offset.top + height / 2);
                             }
                             positions.push(positions[positions.length - 1] + 1000);
+
                             for (index = _j = 1, _ref1 = positions.length; _j < _ref1; index = _j += 1) {
                                 if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
 
@@ -710,12 +709,11 @@ angular.module
                                     $empty = $("<div class='parent-section fb-form-object-editable empty'></div>");
                                     if (index - 1 < $formObjects.length) {                                              //TODO: empty handler!!!
                                         $empty.insertBefore($($formObjects[index - 1]));
+                                        newIndex = $($formObjects[index - 1]).index()-1;
 
-                                        //console.log(index - 1);
                                     } else {
                                         $empty.insertAfter($($formObjects[index - 2]));
-
-                                        //console.log(index - 2);
+                                        newIndex = $($formObjects[index - 2]).index()+1;
                                     }
                                     break;
                                 }
@@ -727,11 +725,8 @@ angular.module
                             $("div.fb-form-object-editable").popover('hide');
                         },
                         up: function (e, isHover, draggable) {
-                            var emptyArea   = $(element).find('.empty'),
-                                newIndex    = emptyArea.index();
-
                             if (!$drag.isMouseMoved()) {
-                                emptyArea.remove();
+                                $(element).find('.empty').remove();
                                 return;
                             }
 
@@ -753,16 +748,12 @@ angular.module
                                     scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
                                 } else if (draggable.mode === 'drag' && itemIndex>=0) {
                                     var oldIndex = draggable.object.formObject.index;
-                                    //newIndex = $(element).find('.empty').index();
-                                    //
-
-                                    //var a = $(element).find('.form-horizontal')[0];
-                                    //console.log( $(a).find('.empty').index() ); //[0].find('.empty').index()
-
 
                                     //if (oldIndex < newIndex) {
                                     //    newIndex--;
                                     //}
+                                    //console.log('newIndex: ', newIndex);
+
                                     $builder.updateSectionObjectIndex(scope.formNumber, scope.sectionIndex, oldIndex, newIndex);
                                 }
                             }
