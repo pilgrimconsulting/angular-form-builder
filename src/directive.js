@@ -682,7 +682,7 @@ angular.module
                             hasParentSection = $(isHover.element).hasClass('parent-section');
                             selectedFormItem = isHover;
 
-                            if (isHover.mode === 'drag' && isHover.object.formObject) {
+                            if (isHover.mode === 'drag' && isHover.object.formObject.editable) {
                                 $(element).find('.empty').remove();
                                 return;
                             }
@@ -735,7 +735,7 @@ angular.module
 
                             var emptyArea = $(element).find('.empty');
 
-                            if (!$drag.isMouseMoved() || selectedFormItem && selectedFormItem.mode === 'drag' && selectedFormItem.object.formObject) {
+                            if (!$drag.isMouseMoved() || selectedFormItem && selectedFormItem.mode === 'drag' && selectedFormItem.object.formObject.editable && isHover) {
                                 emptyArea.remove();
                                 return;
                             }
