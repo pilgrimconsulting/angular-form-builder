@@ -142,6 +142,8 @@ angular.module
                             var formObject, newIndex, oldIndex;
                             beginMove = true;
 
+                            $rootScope.isHoverContainer = isHover;
+
                             if (!$drag.isMouseMoved() || !!hoveredSection) {
                                 $(element).find('.empty').remove();
                                 return;
@@ -672,6 +674,8 @@ angular.module
                         move: function (e, isHover) {
                             var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
 
+                            //console.log( $(element) ); //[0].find('.empty').index()
+
                             $builder.forms[scope.currentPage].map(function(e, i) {
                                 $rootScope.hoverFormData[i] = e;
                                 $rootScope.hoverFormData[i].hover = false;
@@ -707,8 +711,11 @@ angular.module
                                     if (index - 1 < $formObjects.length) {                                              //TODO: empty handler!!!
                                         $empty.insertBefore($($formObjects[index - 1]));
 
+                                        //console.log(index - 1);
                                     } else {
                                         $empty.insertAfter($($formObjects[index - 2]));
+
+                                        //console.log(index - 2);
                                     }
                                     break;
                                 }
@@ -720,38 +727,42 @@ angular.module
                             $("div.fb-form-object-editable").popover('hide');
                         },
                         up: function (e, isHover, draggable) {
-                            var elementIndex, newIndex, oldIndex;
-                            var emptyArea = $(element).find('.empty');
+                            var emptyArea   = $(element).find('.empty'),
+                                newIndex    = emptyArea.index();
 
                             if (!$drag.isMouseMoved()) {
                                 emptyArea.remove();
                                 return;
                             }
 
+                            var currentSectionComponents = $builder.forms[$builder.currentForm][scope.sectionIndex] ? $builder.forms[$builder.currentForm][scope.sectionIndex].components : null,
+                                itemIndex                = selectedFormItem && currentSectionComponents ? currentSectionComponents.indexOf(selectedFormItem.object.formObject) : -1;
+
                             if (!isHover && draggable.mode === 'drag') {
                                 if(selectedFormItem && hasParentSection) {
-                                    var currentSectionComponents    = $builder.forms[$builder.currentForm][scope.sectionIndex].components,
-                                        itemIndex                   = currentSectionComponents.indexOf(selectedFormItem.object.formObject);
-
-                                    $builder.removeSectionObject($builder.currentForm, scope.sectionIndex, itemIndex);
+                                    if(!$rootScope.isHoverContainer) $builder.removeSectionObject($builder.currentForm, scope.sectionIndex, itemIndex);
                                 }
 
                                 hasParentSection = false;
 
                             } else if (isHover) {
                                 if (draggable.mode === 'mirror') {
-                                    elementIndex = $(element).find('.empty').index();
-                                    $builder.insertSectionObject($builder.currentForm, scope.sectionIndex, elementIndex, {
+                                    $builder.insertSectionObject($builder.currentForm, scope.sectionIndex, newIndex, {
                                         component: draggable.object.componentName
                                     });
                                     scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
-                                }
-                                if (draggable.mode === 'drag') {
-                                    oldIndex = draggable.object.formObject.index;
-                                    newIndex = $(element).find('.empty').index();
-                                    if (oldIndex < newIndex) {
-                                        newIndex--;
-                                    }
+                                } else if (draggable.mode === 'drag' && itemIndex>=0) {
+                                    var oldIndex = draggable.object.formObject.index;
+                                    //newIndex = $(element).find('.empty').index();
+                                    //
+
+                                    //var a = $(element).find('.form-horizontal')[0];
+                                    //console.log( $(a).find('.empty').index() ); //[0].find('.empty').index()
+
+
+                                    //if (oldIndex < newIndex) {
+                                    //    newIndex--;
+                                    //}
                                     $builder.updateSectionObjectIndex(scope.formNumber, scope.sectionIndex, oldIndex, newIndex);
                                 }
                             }
