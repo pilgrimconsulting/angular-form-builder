@@ -27,7 +27,7 @@ angular.module
                 "</div>",
                 controller: 'PaginationController',
                 link: function (scope, element, attrs) {
-                    var KeyDown, KeyUp, allowKey, beginMove, keyHold, _base, _name, hoveredSection;
+                    var KeyDown, KeyUp, allowKey, beginMove, keyHold, _base, _name, hoveredSection, newIndex;
                     scope.formNumber = attrs.fbPage || $builder.currentForm;
                     if ((_base = $builder.forms)[_name = scope.formNumber] == null) {
                         _base[_name] = [];
@@ -104,7 +104,7 @@ angular.module
                             }
 
                             if(!hoveredSection) {
-                                $formObjects = $(element).find('.fb-form-object-editable:not(.empty,.dragging)');
+                                $formObjects = $(element).find('.fb-form-object-editable:not(.empty,.dragging,.parent-section)');
                                 positions = [];
                                 positions.push(-1000);
                                 for (index = _i = 0, _ref = $formObjects.length; _i < _ref; index = _i += 1) {
@@ -124,6 +124,9 @@ angular.module
                                         } else {
                                             $empty.insertAfter($($formObjects[index - 2]));
                                         }
+
+                                        newIndex = index - 1;
+
                                         break;
                                     }
                                 }
@@ -139,7 +142,7 @@ angular.module
                             return $(element).find('.empty').remove();
                         },
                         up: function (e, isHover, draggable) {
-                            var formObject, newIndex, oldIndex;
+                            var formObject, oldIndex;
                             beginMove = true;
 
                             $rootScope.isHoverContainer = isHover;
@@ -150,7 +153,7 @@ angular.module
                             }
                             if (!isHover) {
                                 formObject = draggable.object.formObject;
-                                
+
                                 if (formObject && formObject.editable) {
                                     $builder.removeFormObject(scope.formNumber, formObject.index);
                                 }
@@ -162,15 +165,10 @@ angular.module
                                 }
                                 if (draggable.mode === 'drag') {
                                     oldIndex = draggable.object.formObject.index;
-                                    newIndex = $(element).find('.empty').index('.fb-form-object-editable');
-                                    if (oldIndex < newIndex) {
-                                        newIndex--;
-                                    }
+
                                     $builder.updateFormObjectIndex(scope.formNumber, oldIndex, newIndex);
                                 }
                             }
-
-                            //console.log($builder.forms[scope.currentPage]);
 
                             return $(element).find('.empty').remove();
                         }
@@ -748,11 +746,6 @@ angular.module
                                     scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
                                 } else if (draggable.mode === 'drag' && itemIndex>=0) {
                                     var oldIndex = draggable.object.formObject.index;
-
-                                    //if (oldIndex < newIndex) {
-                                    //    newIndex--;
-                                    //}
-                                    //console.log('newIndex: ', newIndex);
 
                                     $builder.updateSectionObjectIndex(scope.formNumber, scope.sectionIndex, oldIndex, newIndex);
                                 }
