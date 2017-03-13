@@ -11,6 +11,7 @@ angular.module('transcription', [])
                 return $injector = injector;
             };
         })(this);
+
         this.vocabulary = {
             'Text': 'textInput',
             'TextArea': 'textArea',
@@ -22,6 +23,19 @@ angular.module('transcription', [])
             'Hint': 'description',
             'label': 'Title'
         };
+
+        this.vocabularyBackwards = {
+            'textInput':    'Text',
+            'textArea':     'TextArea',
+            'select':       'DropDown',
+            'checkbox':     'Radio',
+            'radio':        'CheckBox',
+            'image':        'Images',
+            'carousel':     'Images',
+            'description':  'Hint',
+            'Title':        'label'
+        };
+
         this.checkType = (function (_this) {
             return function (json) {
                 var type;
@@ -61,7 +75,7 @@ angular.module('transcription', [])
                 builder = [];
                 pages = json["Pages"];
                 if (!pages) {
-                    builder;
+                    return builder;
                 }
                 for (pageIndex = _i = 0, _len = pages.length; _i < _len; pageIndex = ++_i) {
                     page = pages[pageIndex];
@@ -84,7 +98,7 @@ angular.module('transcription', [])
                                     item = items[_k];
                                     tempItem = {
                                         component: this.vocabulary[item["InputType"]] || null,
-                                        id: item["Name"] || null,
+                                        id: item["Id"] || null,
                                         label: item["Title"] || null,
                                         show_label: item["ShowTitle"] || null,
                                         required: item["IsRequired"],
@@ -125,15 +139,111 @@ angular.module('transcription', [])
             };
         })(this);
 
+
+        this.translateBackwards = (function (_this) {
+            function setOptions(options) {
+                var variants = [];
+
+                options.map(function(value, id) {
+                    variants[id] = {
+                        "Item1": value,
+                        "Item2": id
+                    }
+                });
+
+                return variants;
+            }
+
+            return function (jsonData, formData) {
+                var item, items, options, formPage, jsonPage, pageIndex, formElement, section, tempItem, tempObj, _i, _j, _len, _len1;
+
+                jsonData["Pages"] = [];
+
+                if (!formData.length) {
+                    return jsonData;
+                }
+
+                for (pageIndex = _i = 0, _len = formData.length; _i < _len; pageIndex = ++_i) {
+                    formPage = formData[pageIndex];
+                    jsonPage = {
+                        "Id": pageIndex.toString(),
+                        "Name": null,
+                        "Title": "Page"+pageIndex,
+                        "ShowTitle": true,
+                        "ExtraProperties": {},
+                        "Elements": []
+                    };
+
+                    for (_j = 0, _len1 = formPage.length; _j < _len1; _j++) {
+                        formElement = formPage[_j];
+                        tempObj = {
+                            "Id": formElement.index,
+                            "Name": null,
+                            "Title": formElement.label || null,
+                            "ShowTitle": formElement.show_label
+                        };
+
+                        if (formElement.component === "section") {
+                            items = formElement.components;
+
+                            tempObj["Items"] = (function () {
+                                var _k, _len2, _results;
+                                _results = [];
+                                for (_k = 0, _len2 = items.length; _k < _len2; _k++) {
+                                    item = items[_k];
+                                    tempItem = {
+                                        "InputType": this.vocabularyBackwards[item.component] || null,
+                                        "Id": item.id || null,
+                                        "Title": item.label || null,
+                                        "IsRequired": item.required,
+                                        "Description": item.description || ''
+                                    };
+
+                                    options = item.options || [];
+                                    if (options.length)  tempItem["Variants"] = setOptions(options);
+
+                                    _results.push(tempItem);
+                                }
+                                return _results;
+                            }).call(_this);
+
+                            //console.log('sections', tempObj);
+                        } else {
+                            options = formElement.options || [];
+                            if (options.length)  tempObj["Variants"] = setOptions(options);
+
+                            tempObj["InputType"] = _this.vocabulary[formElement.component] || null;
+                            tempObj["Name"] = formElement.id;
+                            tempObj["Title"] = formElement.label || null;
+                            tempObj["ShowTitle"] = formElement.show_label || null;
+                            tempObj["IsRequired"] = formElement.required;
+                            tempObj["Description"] = formElement.description || null;
+
+                            //console.log('custom', tempObj)
+                        }
+
+                        jsonPage["Elements"].push(tempObj);
+                    }
+
+                    jsonData["Pages"].push(jsonPage)
+                }
+
+                //console.log('sections', formData, 'json', jsonData);
+
+                return jsonData;
+            };
+        })(this);
+
         this.$get = [
             '$injector', (function (_this) {
                 return function ($injector) {
                     _this.setupProviders($injector);
                     return {
+                        getFormData: _this.getFormData,
                         translate: _this.translate,
-                        getFormData: _this.getFormData
+                        translateBackwards: _this.translateBackwards
                     };
                 };
             })(this)
         ];
-    })
+    });
