@@ -495,7 +495,10 @@ angular.module
 
                     // TODO: when user select form (left side)
                     scope.$watch(function () {
-                        return $builder.currentForm;  // TODO: currentForm - id of form in an array
+                        scope.form = $builder.forms[$builder.currentForm];
+                        scope.jsonString = $builder.forms;
+
+                        return $builder.currentForm;
                     }, function (current, prev) {
                         var _base, _name;
                         scope.formNumber = current;
