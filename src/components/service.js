@@ -5,18 +5,11 @@ angular.module('formService', [])
     [ '$http', 'appSettings', function ($http, appSettings) {
         this.getForm = (function () {
             return function(parentId, id) {
-
-                console.log('TEST: ', parentId, id);
-
                 return $http({
                     method: 'GET',
-                    url:  appSettings.apiUrl + '?parentId=' + parentId + '&id=' + id,
-
+                    url:  appSettings.apiUrl + '?parentId=' + parentId + '&id=' + id
                 })
                     .then(function (response) {
-
-                        console.log(response);
-
                         return response;
                     }, function (errResponse) {
                         return errResponse;

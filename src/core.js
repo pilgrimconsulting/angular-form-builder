@@ -1939,37 +1939,46 @@
             "apiUrl": "http://louise.sunbay-ukraine.com:4000/Mpa/FormDesigner/Get"
         })
         .run([
-            '$builder', '$drag', '$window', '$transcription', function($builder, $drag, $window, $transcription) {
+            '$builder', '$drag', '$window', '$transcription', '$routeParams', '$formService', '$rootScope',
+            function($builder, $drag, $window, $transcription, $routeParams, $formService, $rootScope) {
                 var config;
-                config = {
-                    section: true
-                };
+                config = { section: false };
                 $drag.setConfig(config);
-                $builder.formData = $transcription.getFormData($window.jsonString.result);
-                return $builder.json = $transcription.translate($window.jsonString.result);
+
+                var parentId    = $routeParams.parentId || 1,
+                    id          = $routeParams.id || 4;
+
+                $formService.getForm(parentId, id)
+                    .then(function(res) {
+                        var formData = res.data.result;
+
+                        $builder.formData = $transcription.getFormData(formData);
+                        $builder.json = $transcription.translate(formData);
+                        $rootScope.pages = $builder.json;
+
+                        $builder.json.map((function(_this) {
+                            return function(page, pageIndex) {
+                                return page.map(function(component) {
+                                    return $builder.addFormObject(pageIndex, component);
+                                });
+                            };
+                        })(this));
+                    }, function(err) {
+                        console.log(err);
+                    })
             }
         ])
         .controller('DemoController', [
-            '$scope', '$builder', '$validator', '$location', '$routeParams', '$formService', function($scope, $builder, $validator, $location, $routeParams, $formService) {
-
-                $builder.json.map((function(_this) {
-                    return function(page, pageIndex) {
-                        return page.map(function(component) {
-                            return $builder.addFormObject(pageIndex, component);
-                        });
-                    };
-                })(this));
+            '$scope', '$builder', '$validator', '$location', '$routeParams', '$formService', '$transcription', '$window',
+            function($scope, $builder, $validator, $location, $routeParams, $formService, $transcription, $window) {
 
                 $scope.jsonString = $builder.forms;
-                return $scope.submit = function() {
-                    var parentId  = $routeParams.parentId || 1,
-                        id        = $routeParams.id || 4;
 
+                $scope.submit = function() {
                     return $validator.validate($scope, 'default').success(function() {
+                        $transcription.translateBackwards($window.jsonString.result, $builder.forms);
 
-                        $formService.getForm(parentId, id);
-
-                        //return console.log('success');
+                        return console.log('success');
                     }).error(function() {
                         return console.log('error');
                     });

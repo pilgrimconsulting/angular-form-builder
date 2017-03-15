@@ -263,7 +263,7 @@ angular.module('builder.controller', ['builder.provider'])
                 $scope.pages = forms;
                 $scope.currentPage = $builder.currentForm;
                 $scope.prev = $builder.currentForm > 0 ? true : false;
-                return $scope.next = $scope.pageCount > ($builder.currentForm + 1) ? true : false;
+                $scope.next = $scope.pageCount > ($builder.currentForm + 1) ? true : false;
             };
             $scope.addPage = function (pageCount) {
                 $builder.forms[$scope.pageCount] = [];

@@ -136,8 +136,6 @@ angular.module('transcription', [])
                     }
                 }
 
-                console.log(builder);
-
                 return builder;
             };
         })(this);
@@ -169,69 +167,65 @@ angular.module('transcription', [])
                 for (pageIndex = _i = 0, _len = formData.length; _i < _len; pageIndex = ++_i) {
                     formPage = formData[pageIndex];
                     jsonPage = {
-                        "Id": pageIndex.toString(),
-                        "Name": null,
-                        "Title": "Page"+pageIndex,
-                        "ShowTitle": true,
-                        "ExtraProperties": {},
-                        "Elements": []
+                        "id": pageIndex.toString(),
+                        "name": null,
+                        "title": "Page"+pageIndex,
+                        "showTitle": true,
+                        "extraProperties": {},
+                        "elements": []
                     };
 
                     for (_j = 0, _len1 = formPage.length; _j < _len1; _j++) {
                         formElement = formPage[_j];
                         tempObj = {
-                            "Id": formElement.index,
-                            "Name": null,
-                            "Title": formElement.label || null,
-                            "ShowTitle": formElement.show_label
+                            "id": formElement.index,
+                            "name": null,
+                            "title": formElement.label || null,
+                            "showTitle": formElement.show_label
                         };
 
                         if (formElement.component === "section") {
                             items = formElement.components;
 
-                            tempObj["Items"] = (function () {
+                            tempObj["items"] = (function () {
                                 var _k, _len2, _results;
                                 _results = [];
                                 for (_k = 0, _len2 = items.length; _k < _len2; _k++) {
                                     item = items[_k];
                                     tempItem = {
-                                        "InputType": this.vocabularyBackwards[item.component] || null,
-                                        "Id": item.id || null,
-                                        "Title": item.label || null,
-                                        "IsRequired": item.required,
-                                        "Description": item.description || ''
+                                        "inputType": this.vocabularyBackwards[item.component] || null,
+                                        "id": item.id || null,
+                                        "title": item.label || null,
+                                        "isRequired": item.required,
+                                        "description": item.description || ''
                                     };
 
                                     options = item.options || [];
-                                    if (options.length)  tempItem["Variants"] = setOptions(options);
+                                    if (options.length)  tempItem["variants"] = setOptions(options);
 
                                     _results.push(tempItem);
                                 }
                                 return _results;
                             }).call(_this);
-
-                            //console.log('sections', tempObj);
                         } else {
                             options = formElement.options || [];
-                            if (options.length)  tempObj["Variants"] = setOptions(options);
+                            if (options.length)  tempObj["variants"] = setOptions(options);
 
-                            tempObj["InputType"] = _this.vocabulary[formElement.component] || null;
-                            tempObj["Name"] = formElement.id;
-                            tempObj["Title"] = formElement.label || null;
-                            tempObj["ShowTitle"] = formElement.show_label || null;
-                            tempObj["IsRequired"] = formElement.required;
-                            tempObj["Description"] = formElement.description || null;
-
-                            //console.log('custom', tempObj)
+                            tempObj["inputType"] = _this.vocabulary[formElement.component] || null;
+                            tempObj["name"] = formElement.id;
+                            tempObj["title"] = formElement.label || null;
+                            tempObj["showTitle"] = formElement.show_label || null;
+                            tempObj["isRequired"] = formElement.required;
+                            tempObj["description"] = formElement.description || null;
                         }
 
-                        jsonPage["Elements"].push(tempObj);
+                        jsonPage["elements"].push(tempObj);
                     }
 
-                    jsonData["Pages"].push(jsonPage)
+                    jsonData["pages"].push(jsonPage)
                 }
 
-                //console.log('sections', formData, 'json', jsonData);
+                console.log('sections', formData, 'json', jsonData);
 
                 return jsonData;
             };

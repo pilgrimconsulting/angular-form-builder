@@ -604,7 +604,7 @@ angular.module
                 template: "<div class=\"fb-builderPagination\">\n	" +
                     "<div class=\"pull-left\">\n		" +
                         "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		" +
-                        "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: !next}\" ng-click=\"goF()\">></button>\n		" +
+                        "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: currentPage+1 >= pages.length}\" ng-click=\"goF()\">></button>\n		" +
                         "<div class=\"btn-group\">\n			" +
                             "<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				" +
                                 "<span class=\"caret\"></span>\n				" +
@@ -628,8 +628,9 @@ angular.module
                     }, function () {
                         scope.pageCount = $builder.forms.length;
                         scope.pages = $builder.forms;
+                        scope.currentPage = $builder.currentForm;
 
-                        return scope.currentPage = $builder.currentForm;
+                        //console.log('scope.currentPage', scope.currentPage, $builder.currentForm);
                     });
                 }
             };
