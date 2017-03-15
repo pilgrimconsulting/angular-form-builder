@@ -21,7 +21,7 @@ angular.module('transcription', [])
             'Images': 'image',
             'Images': 'carousel',
             'Hint': 'description',
-            'label': 'Title'
+            'ReadOnlyText': 'text'
         };
 
         this.vocabularyBackwards = {
@@ -33,16 +33,16 @@ angular.module('transcription', [])
             'image':        'Images',
             'carousel':     'Images',
             'description':  'Hint',
-            'Title':        'label'
+            'text':         'ReadOnlyText'
         };
 
         this.checkType = (function (_this) {
             return function (json) {
                 var type;
                 if (typeof json === 'string') {
-                    return json = JSON.parse(json);
-                } else if (typeof json === 'object' && json.length !== 0) {
-                    return json = json;
+                    return JSON.parse(json);
+                } else if (typeof json === 'object') {
+                    return json;
                 } else {
                     if (json.length >= 0) {
                         type = 'array';
@@ -58,10 +58,10 @@ angular.module('transcription', [])
             return function(json) {
                 var json = _this.checkType(json);
                 var formData = {
-                    title: json["Title"],
-                    showTitle: json["ShowTitle"],
-                    description: json["Description"],
-                    instructions: json["Instructions"]
+                    title: json["title"],
+                    showTitle: json["showTitle"],
+                    description: json["description"],
+                    instructions: json["instructions"]
                 };
 
                 return formData;
@@ -73,22 +73,22 @@ angular.module('transcription', [])
                 var builder, element, elements, item, items, option, options, page, pageIndex, pages, section, tempItem, tempObj, _i, _j, _len, _len1;
                 json = _this.checkType(json);
                 builder = [];
-                pages = json["Pages"];
+                pages = json["pages"];
                 if (!pages) {
                     return builder;
                 }
                 for (pageIndex = _i = 0, _len = pages.length; _i < _len; pageIndex = ++_i) {
                     page = pages[pageIndex];
                     builder[pageIndex] = [];
-                    elements = page["Elements"];
+                    elements = page["elements"];
                     for (_j = 0, _len1 = elements.length; _j < _len1; _j++) {
                         element = elements[_j];
                         tempObj = {
-                            id: element["Name"] || null,
-                            label: element["Title"] || null
+                            id: element["name"] || null,
+                            label: element["title"] || null
                         };
                         section = false;
-                        items = element["Items"];
+                        items = element["items"];
                         if (items) {
                             tempObj.component = 'section';
                             tempObj.components = (function () {
@@ -97,22 +97,22 @@ angular.module('transcription', [])
                                 for (_k = 0, _len2 = items.length; _k < _len2; _k++) {
                                     item = items[_k];
                                     tempItem = {
-                                        component: this.vocabulary[item["InputType"]] || null,
-                                        id: item["Id"] || null,
-                                        label: item["Title"] || null,
-                                        show_label: item["ShowTitle"] || null,
-                                        required: item["IsRequired"],
-                                        description: item["Description"] || ''
+                                        component: this.vocabulary[item["inputType"]] || null,
+                                        id: item["id"] || null,
+                                        label: item["title"] || null,
+                                        show_label: item["showTitle"] || null,
+                                        required: item["isRequired"],
+                                        description: item["description"] || ''
                                     };
-                                    options = item["Variants"] || [];
+                                    options = item["variants"] || [];
                                     if (options) {
                                         tempItem.options = (function () {
                                             var _l, _len3, _results1;
                                             _results1 = [];
                                             for (_l = 0, _len3 = options.length; _l < _len3; _l++) {
                                                 option = options[_l];
-                                                if (option["Title"]) {
-                                                    _results1.push(option["Title"]);
+                                                if (option["title"]) {
+                                                    _results1.push(option["title"]);
                                                 } else {
                                                     _results1.push(void 0);
                                                 }
@@ -125,16 +125,19 @@ angular.module('transcription', [])
                                 return _results;
                             }).call(_this);
                         } else {
-                            tempObj.component = _this.vocabulary[element["InputType"]] || null;
-                            tempObj.id = element["Name"] || null;
-                            tempObj.label = element["Title"] || null;
-                            tempObj.show_label = element["ShowTitle"] || null;
-                            tempObj.required = element["IsRequired"];
-                            tempObj.description = element["Description"] || null;
+                            tempObj.component = _this.vocabulary[element["inputType"]] || null;
+                            tempObj.id = element["name"] || null;
+                            tempObj.label = element["title"] || null;
+                            tempObj.show_label = element["showTitle"] || null;
+                            tempObj.required = element["isRequired"];
+                            tempObj.description = element["description"] || null;
                         }
                         builder[pageIndex].push(tempObj);
                     }
                 }
+
+                console.log(builder);
+
                 return builder;
             };
         })(this);
@@ -157,7 +160,7 @@ angular.module('transcription', [])
             return function (jsonData, formData) {
                 var item, items, options, formPage, jsonPage, pageIndex, formElement, section, tempItem, tempObj, _i, _j, _len, _len1;
 
-                jsonData["Pages"] = [];
+                jsonData["pages"] = [];
 
                 if (!formData.length) {
                     return jsonData;

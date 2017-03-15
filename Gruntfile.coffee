@@ -31,17 +31,19 @@ module.exports = (grunt) ->
 		concat:
 			source:
 				files:
-					'dist/angular-form-builder.js': ['src/*.js']
+					'dist/angular-form-builder.js': ['src/components/*.js']
+					'dist/core.js': ['src/core.js']
+
 
 		coffee:
 			options:
 				sourceMap: true
 			components:
 				files:
-					'dist/angular-form-builder-components.js': ['components/*.coffee']
-			demo:
-				files:
-					'example/demo.js': 'example/demo.coffee'
+					'dist/angular-form-builder-components.js': ['src/partials/*.coffee']
+#			demo:
+#				files:
+#					'example/demo.js': 'example/demo.coffee'
 
 		uglify:
 			build:
@@ -51,7 +53,7 @@ module.exports = (grunt) ->
 
 		watch:
 			compass:
-				files: ['example/*.scss', 'src/*.scss', 'index.html']
+				files: ['src/*.scss', 'index.html']
 				tasks: ['compass']
 				options:
 					spawn: no
@@ -65,7 +67,7 @@ module.exports = (grunt) ->
 #    // you can pass in any other options you'd like to the https server, as listed here: http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener
 
 			concat:
-				files: ['src/*.js']
+				files: ['src/components/*.js', 'src/core.js']
 				tasks: ['concat']
 				options:
 					sourceMap: true
@@ -73,7 +75,7 @@ module.exports = (grunt) ->
 					livereload: LIVERELOAD_PORT
 
 			coffee:
-				files: ['components/*.coffee', 'example/*.coffee']
+				files: ['src/partials/*.coffee']
 				tasks: ['coffee']
 				options:
 					sourceMap: true

@@ -272,22 +272,26 @@ angular.module('builder.controller', ['builder.provider'])
             $scope.deletePage = function (pageNumber) {
                 var current, forms, page, pageObj;
                 forms = $builder.forms;
-                current = forms[pageNumber + 1] ? pageNumber + 1 : pageNumber - 1;
-                if (typeof forms.length === 'number') {
-                    forms.splice(pageNumber, 1);
-                } else {
-                    delete forms[pageNumber];
-                    for (page in forms) {
-                        pageObj = forms[page];
-                        if (page > pageNumber) {
-                            forms[page - 1] = forms[page];
+
+                if(forms.length>1) {
+                    current = forms[pageNumber + 1] ? pageNumber + 1 : pageNumber - 1;
+                    if (typeof forms.length === 'number') {
+                        forms.splice(pageNumber, 1);
+                    } else {
+                        delete forms[pageNumber];
+                        for (page in forms) {
+                            pageObj = forms[page];
+                            if (page > pageNumber) {
+                                forms[page - 1] = forms[page];
+                            }
                         }
+                        delete forms[$scope.pageCount - 1];
                     }
-                    delete forms[$scope.pageCount - 1];
+                    $builder.currentForm = current > pageNumber ? pageNumber : current;
+                    $scope.currentPage = false;
+                    return $scope.currentPage = pageNumber;
                 }
-                $builder.currentForm = current > pageNumber ? pageNumber : current;
-                $scope.currentPage = false;
-                return $scope.currentPage = pageNumber;
+
             };
             $scope.goPage = function (page) {
                 if ($builder.forms[page]) {
