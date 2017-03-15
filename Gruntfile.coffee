@@ -24,7 +24,7 @@ module.exports = (grunt) ->
 					outputStyle: 'compressed'
 			src:
 				options:
-					sassDir: 'src'
+					sassDir: 'src/assets/style'
 					cssDir: 'dist'
 					outputStyle: 'compressed'
 
