@@ -1956,6 +1956,8 @@
                         $builder.json = $transcription.translate(formData);
                         $rootScope.pages = $builder.json;
 
+                        console.log('FORM: ', $builder.json);
+
                         $builder.json.map((function(_this) {
                             return function(page, pageIndex) {
                                 return page.map(function(component) {

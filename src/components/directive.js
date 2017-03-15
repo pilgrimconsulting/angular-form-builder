@@ -17,13 +17,8 @@ angular.module
                     fbObject: '='
                 },
                 template: "<div class='form-horizontal' fb-page={{currentPage}}>\n	" +
-                "<div fb-select-checkbox class='fb-select-checkbox'\n fb-select-level='0' ng-init='checked=true'>\n		" +
-                "<input type='checkbox' id='fb_select_{{fbSelectLevel}}_{{currentPage}}'\n class=\"fb-select-input\" fb-select-index='currentPage'\n ng-checked='checked' />\n " +
-                "<label class='fb-select-checkbox-label'\n for='fb_select_{{fbSelectLevel}}_{{currentPage}}'>" +
-                "</label>\n	" +
-                "</div>\n	" +
-                "<div class='fb-form-object-editable '\n ng-repeat=\"object in formObjects\"\n fb-form-object-editable=\"object\"\n fb-component-name='object.component'\n fb-indexIn='indexIn'\n current-page='currentPage'\n parent-section='false'\n >" +
-                "</div>\n" +
+                    "<div class='fb-form-object-editable '\n ng-repeat=\"object in formObjects\"\n fb-form-object-editable=\"object\"\n fb-component-name='object.component'\n fb-indexIn='indexIn'\n current-page='currentPage'\n parent-section='false'\n >" +
+                    "</div>\n" +
                 "</div>",
                 controller: 'PaginationController',
                 link: function (scope, element, attrs) {
