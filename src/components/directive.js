@@ -28,6 +28,7 @@ angular.module
                         _base[_name] = [];
                     }
                     scope.formObjects = $builder.forms[scope.formNumber];
+
                     //TODO: CURRENT form
 
                     beginMove = true;
@@ -601,13 +602,12 @@ angular.module
                         "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: !currentPage}\" ng-click=\"goB()\"><</button>\n		" +
                         "<button type=\"button\" class=\"btn btn-primary btn-small _pull-right\"\n ng-class=\"{disabled: currentPage+1 >= pages.length}\" ng-click=\"goF()\">></button>\n		" +
                         "<div class=\"btn-group\">\n			" +
-                            "<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\"\n aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				" +
-                                "<span class=\"caret\"></span>\n				" +
-                                "<span class=\"sr-only\">Toggle Dropdown</span>\n			" +
+                            "<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-hover=\"dropdown\" data-toggle=\"dropdown\" data-close-others=\"true\" aria-expanded=\"false\" aria-haspopup=\"true\">Page\n				" +
+                                "<span class=\"caret\"></span>\n" +
                             "</button>\n			" +
                             "<ul class=\"dropdown-menu\" >\n				" +
-                            "<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n			" +
-                            "</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" >\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}\n	</span>\n\n	" +
+                            "<li ng-repeat=\"(key, value) in pages\"><a ng-click=\"goPage(+key)\">{{+key+1}}</a></li>\n" +
+                            "</ul>\n		</div>\n	</div>\n	<span class=\"panel-title\" >\n		Page <b>\#<span ng-model=\"page\">{{currentPage+1}}</span></b> / {{pageCount}}</span>\n	" +
                             "<div class=\"pull-right\">\n <button type=\"button\" class=\"btn btn-danger btn-small _pull-right \"\n ng-class=\"{disabled: pageCount == 1}\" ng-click=\"deletePage(currentPage)\">Delete</button>\n		<!-- Split button -->\n		" +
                             "<div class=\"btn-group\">\n			" +
                                     "<button type=\"button\" class=\"btn btn-success\" ng-click=\"addPage(pageCount)\">Add</button>\n			" +

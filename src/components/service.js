@@ -5,12 +5,12 @@ angular.module('formService', [])
     [ '$http', 'appSettings', function ($http, appSettings) {
         this.getForm = (function () {
             return function(parentId, id) {
-                var parentIdParam   = parentId ? '?parentId=' + parentId : '',
+                var parentIdParam   = '?parentId=' + (parentId ? parentId : 1),
                     idParam         = id ? '&id=' + id : '';
 
                 return $http({
                     method: 'GET',
-                    url:  appSettings.apiUrl + parentIdParam + idParam
+                    url:  appSettings.apiUrl + '/Get' + parentIdParam + idParam
                 })
                     .then(function (response) {
                         return response;
@@ -24,17 +24,22 @@ angular.module('formService', [])
         })(this);
 
         this.saveForm = (function () {
-            return function(data, parentId, id) {
+            return function(data) {
 
-                console.log('TEST: ', parentId, id);
+                console.log('TEST: ', data);
 
                 return $http({
                     method: 'POST',
-                    url:  appSettings.apiUrl + 'Save'
+                    url:  appSettings.apiUrl + '/Save',
+                    data: data
                 })
                     .then(function (response) {
+                        console.log('Res: ', response);
+
                         return response;
                     }, function (errResponse) {
+                        console.log('Res: ', errResponse);
+
                         return errResponse;
                     })
                     .finally(function () {

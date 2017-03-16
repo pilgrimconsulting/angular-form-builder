@@ -12,7 +12,7 @@ var path = null;
     angular.module('app', ['builder', 'builder.components', 'validator.rules', 'ngAnimate', 'transcription', 'formService', 'ngRoute'])
 
         .constant("appSettings", {
-            "apiUrl": "http://louise.sunbay-ukraine.com:4000/Mpa/FormDesigner/Get"
+            "apiUrl": "http://louise.sunbay-ukraine.com:4000/Mpa/FormDesigner"
         })
         .run([
             '$builder', '$drag', '$window', '$transcription', '$routeParams', '$formService', '$rootScope',
@@ -26,23 +26,24 @@ var path = null;
 
                 $formService.getForm(parentId, id)
                     .then(function(res) {
-                        var formData = res.data.result;
+                        console.log('RESPONSE: ', res);
 
+                        var formData = res.data ? res.data.result : {};
+
+                        $builder.receivedForm = formData;
                         $builder.formData = $transcription.getFormData(formData);
                         $builder.json = $transcription.translate(formData);
                         $rootScope.pages = $builder.json;
 
-                        console.log('FORM: ', $builder.json);
-
                         $builder.json.map((function(_this) {
                             return function(page, pageIndex) {
-                                return page.map(function(component) {
+                                return page["elements"].map(function(component) {
                                     return $builder.addFormObject(pageIndex, component);
                                 });
                             };
                         })(this));
                     }, function(err) {
-                        console.log(err);
+                        console.log('ERROR: ', err);
                     })
             }
         ])
@@ -54,8 +55,8 @@ var path = null;
 
                 $scope.submit = function() {
                     return $validator.validate($scope, 'default').success(function() {
-                        //TODO: There will be save form functionality.
-                        //$transcription.translateBackwards($window.jsonString.result, $builder.forms);
+                        var form = $transcription.translateBackwards($builder.receivedForm, $builder.forms);
+                        $formService.saveForm(form);
 
                         return console.log('success');
                     }).error(function() {

@@ -289,8 +289,8 @@ Global.__fbComponents.default = ($builderProvider) ->
 			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
-					<div class='radio' ng-repeat="item in options track by $index" ng-class="{'radio-inline':inline}">
-						<label><input name='{{formName+index}}' ng-model="$parent.inputText" validator-group="{{formName}}" value='{{item}}' type='radio'/>
+					<div ng-repeat="item in options track by $index" ng-class="{'radio-inline':inline}">
+						<label class="radio-label-text"><input name='{{formName+index}}' ng-model="$parent.inputText" validator-group="{{formName}}" value='{{item}}' type='radio'/>
 							{{item}}
 						</label>
 					</div>

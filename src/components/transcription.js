@@ -70,7 +70,7 @@ angular.module('transcription', [])
 
         this.translate = (function (_this) {
             return function (json) {
-                var builder, element, elements, item, items, option, options, page, pageIndex, pages, section, tempItem, tempObj, _i, _j, _len, _len1;
+                var builder, element, elements, item, items, option, options, page, pageIndex, pages, section, tempItem, tempObj, _i, _j, _len, _len1, id;
                 json = _this.checkType(json);
                 builder = [];
                 pages = json["pages"];
@@ -79,7 +79,17 @@ angular.module('transcription', [])
                 }
                 for (pageIndex = _i = 0, _len = pages.length; _i < _len; pageIndex = ++_i) {
                     page = pages[pageIndex];
-                    builder[pageIndex] = [];
+                    builder[pageIndex] = {
+                        id: page.id,
+                        title: page.title,
+                        name: page.name,
+                        showTitle: page.showTitle,
+                        elements: []
+                    };
+                    id = pages[pageIndex].id;
+
+                    //console.log(page, id);
+
                     elements = page["elements"];
                     for (_j = 0, _len1 = elements.length; _j < _len1; _j++) {
                         element = elements[_j];
@@ -126,13 +136,13 @@ angular.module('transcription', [])
                             }).call(_this);
                         } else {
                             tempObj.component = _this.vocabulary[element["inputType"]] || null;
-                            tempObj.id = element["name"] || null;
+                            tempObj.id = element["id"] || null;
                             tempObj.label = element["title"] || null;
                             tempObj.show_label = element["showTitle"] || null;
                             tempObj.required = element["isRequired"];
                             tempObj.description = element["description"] || null;
                         }
-                        builder[pageIndex].push(tempObj);
+                        builder[pageIndex]["elements"].push(tempObj);
                     }
                 }
 
@@ -169,7 +179,7 @@ angular.module('transcription', [])
                     jsonPage = {
                         "id": pageIndex.toString(),
                         "name": null,
-                        "title": "Page"+pageIndex,
+                        "title": "Page_"+pageIndex,
                         "showTitle": true,
                         "extraProperties": {},
                         "elements": []
@@ -224,8 +234,6 @@ angular.module('transcription', [])
 
                     jsonData["pages"].push(jsonPage)
                 }
-
-                console.log('sections', formData, 'json', jsonData);
 
                 return jsonData;
             };
