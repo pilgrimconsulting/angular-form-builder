@@ -18,7 +18,7 @@ var path = null;
             '$builder', '$drag', '$window', '$transcription', '$routeParams', '$formService', '$rootScope',
             function($builder, $drag, $window, $transcription, $routeParams, $formService, $rootScope) {
                 var config;
-                config = { section: false };
+                config = { section: true };
                 $drag.setConfig(config);
 
                 var parentId    = $routeParams.parentId || 1,

@@ -463,7 +463,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		template:
 			"""
 			<div class="form-group">
-				<hr class="underline" color="green" size="2">
+				<hr class="underline" color="#5cb85c" size="2">
 			</div>
 			"""
 		popoverTemplate:
@@ -609,7 +609,8 @@ Global.__fbComponents.section = ($builderProvider) ->
 		required: no
 		components: []
 		repeatable: no
-		collapsable: no
+		collapsable: true
+		repited: no
 		template:
 			"""
 			<div class="panel panel-default" ng-class='{"section-open": isOpen, "fb-selected-frame": selected}'>
@@ -630,10 +631,9 @@ Global.__fbComponents.section = ($builderProvider) ->
 						fb-section='componentName' component-index='componentIndex' ng-show='collapsable ? isOpen : true'
 						current-page='currentPage' form-number='formNumber'></div>
 				</div>
-
 				<div ng-show="repeatable" class='form-group section-actions-container'>
-					<input type='submit' ng-click="" class='btn btn-primary' value='Repeat'/>
-					<input type='button' ng-click="" class='btn btn-danger' value='Delete'/>
+					<input type='button' ng-click="repeatSection(currentPage, componentIndex)" class='btn btn-primary' value='Repeat'/>
+					<input ng-show="repited" type='button' ng-click="removeSection(currentPage, componentIndex)" class='btn btn-danger' value='Delete'/>
 				</div>
 			</div>
   		"""
@@ -646,21 +646,18 @@ Global.__fbComponents.section = ($builderProvider) ->
 						Show label
 					</label>
 				</div>
-
 				<div class="checkbox">
 					<label>
 						<input type='checkbox' ng-model='repeatable' />
 						Repeatable
 					</label>
 				</div>
-
 				<div class="checkbox">
 					<label>
 						<input type='checkbox' ng-model='collapsable' />
 						Collapsable
 					</label>
 				</div>
-
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>

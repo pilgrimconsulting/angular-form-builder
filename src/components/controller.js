@@ -25,6 +25,14 @@ angular.module('builder.controller', ['builder.provider'])
             var $builder;
             $builder = $injector.get('$builder');
 
+            $scope.repeatSection = function(currentPage, componentIndex) {
+                console.log(currentPage, componentIndex, $builder.forms);
+            };
+
+            $scope.removeSection = function(currentPage, componentIndex) {
+                console.log(currentPage, componentIndex, $builder.forms);
+            };
+
             $scope.setupScope = function (formObject) {
                 /*
                  1. Copy origin formObject (ng-repeat="object in formObjects") to scope.
@@ -37,7 +45,6 @@ angular.module('builder.controller', ['builder.provider'])
                 var component;
                 copyObjectToScope(formObject, $scope);
                 $scope.optionsText = formObject.options.join('\n');
-
 
 //TODO: зміна любого елемента форми
                 $scope.$watch('[label, show_label, repeatable, collapsable, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function () {
