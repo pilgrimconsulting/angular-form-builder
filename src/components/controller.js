@@ -7,7 +7,6 @@ var copyObjectToScope,
         };
 
 copyObjectToScope = function (object, scope) {
-
     /*
      Copy object (ng-repeat="object in objects") to scope without `hashKey`.
      */
@@ -55,8 +54,7 @@ angular.module('builder.controller', ['builder.provider'])
                     formObject.footer = $scope.footer;
                     formObject.align = $scope.align;
                     formObject.style = $scope.style;
-
-                    return formObject.components = $scope.components;
+                    formObject.components = $scope.components;
                 }, true);
 
 
@@ -155,6 +153,7 @@ angular.module('builder.controller', ['builder.provider'])
                         _results.push($scope.components.push(component));
                     }
                 }
+
                 return _results;
             };
 
@@ -170,6 +169,7 @@ angular.module('builder.controller', ['builder.provider'])
                 });
             };
             $scope.groups = $builder.groups;
+
             $scope.activeGroup = $scope.groups[0];
             $scope.allComponents = $builder.components;
             return $scope.$watch('allComponents', function () {
@@ -241,7 +241,7 @@ angular.module('builder.controller', ['builder.provider'])
 
 //TODO: весь функціонал додавання/видалення і т. д. сторінок
     .controller('PaginationController', [
-        '$scope', '$injector', function ($scope, $injector) {
+        '$rootScope', '$scope', '$injector', function ($rootScope, $scope, $injector) {
             var $builder;
             $builder = $injector.get('$builder');
             $scope.prev = false;
@@ -312,6 +312,7 @@ angular.module('builder.controller', ['builder.provider'])
                 pageNumber = $builder.currentForm - 1;
                 return $scope.goPage(pageNumber);
             };
+            $rootScope.hoverFormData = [];
             return $scope.updatePage();
         }
     ]);

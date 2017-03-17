@@ -415,7 +415,23 @@ angular.module
 
             return {
                 restrict: 'A',
-                template: "<ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n	<li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n		<a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n	</li>\n</ul>\n<div class='form-horizontal col-sm-12 elementList'>\n	<div ng-repeat=\"component in components\">\n		<div class=\"form-group element-wrapper\">\n			<div class=\"col-sm-1\">\n				<button type='button' class='btn btn-success btn-sm'\n						ng-click='addComponentToEnd($event, component)'>+</button>\n			</div>\n			<div class=\"col-sm-11\">\n				<div class='fb-component' fb-component=\"component\" ng-component=\"{{component.name}}\" ng-if='!_$builder.simplePreview'></div>\n				<!--div class=\"col-sm-12 fb-component\" ng-if='$builder.simplePreview'>\n					<div class=\"panel panel-default\">\n						<div class=\"panel-body text-center\">\n							{{component.name}}\n						</div>\n					</div>\n				</div-->\n			</div>\n	</div>\n</div>",
+                template: "<ul ng-if=\"groups.length > 1\" class=\"nav nav-tabs nav-justified\">\n	" +
+                    "<li ng-repeat=\"group in groups\" ng-class=\"{active:activeGroup==group}\">\n		" +
+                        "<a href='#' ng-click=\"selectGroup($event, group)\">{{group}}</a>\n	" +
+                    "</li>\n" +
+                "</ul>\n" +
+                "<div class='form-horizontal col-sm-12 elementList'>\n	" +
+                    "<div ng-repeat=\"component in components\">\n		" +
+                        "<div class=\"form-group element-wrapper\">\n			" +
+                            "<div class=\"col-sm-1\">\n				" +
+                                "<button type='button' class='btn btn-success btn-sm' ng-click='addComponentToEnd($event, component)'>+</button>\n			" +
+                        "</div>\n" +
+                        "<div class=\"col-sm-11\">\n				" +
+                            "<div class='fb-component' fb-component=\"component\" ng-component=\"{{component.name}}\" ng-if='!_$builder.simplePreview'>" +
+                            "</div>" +
+                        "</div>\n	" +
+                    "</div>\n" +
+                "</div>",
                 controller: 'fbComponentsController',
                 scope: false,
                 link: function (scope) {
@@ -664,8 +680,6 @@ angular.module
                     }
                     $(element).addClass('fb-section');
                     scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
-
-                    $rootScope.hoverFormData = [];
 
                     return $drag.droppable($(element), {
                         move: function (e, isHover) {

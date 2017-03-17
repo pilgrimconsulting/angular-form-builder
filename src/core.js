@@ -48,17 +48,21 @@ var path = null;
             }
         ])
         .controller('DemoController', [
-            '$scope', '$builder', '$validator', '$location', '$routeParams', '$formService', '$transcription', '$window',
-            function($scope, $builder, $validator, $location, $routeParams, $formService, $transcription, $window) {
+            '$scope', '$builder', '$validator', '$location', '$routeParams', '$formService', '$transcription',
+            function($scope, $builder, $validator, $location, $routeParams, $formService, $transcription) {
 
                 $scope.jsonString = $builder.forms;
 
                 $scope.submit = function() {
                     return $validator.validate($scope, 'default').success(function() {
-                        var form = $transcription.translateBackwards($builder.receivedForm, $builder.forms);
-                        $formService.saveForm(form);
 
-                        return console.log('success');
+                        if($builder.receivedForm) {
+                            var form = $transcription.translateBackwards($builder.receivedForm, $builder.forms);
+                            $formService.saveForm(form);
+
+                        } else {
+                            alert('Server Error')
+                        }
                     }).error(function() {
                         return console.log('error');
                     });

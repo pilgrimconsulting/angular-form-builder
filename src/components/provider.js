@@ -46,6 +46,7 @@ angular.module('builder.provider', [])
                 popoverTemplateUrl: component.popoverTemplateUrl,
                 components: (_ref17 = component.components) != null ? _ref17 : []
             };
+
             if (!result.template && !result.templateUrl) {
                 console.error("The template is empty.");
             }
@@ -162,6 +163,7 @@ angular.module('builder.provider', [])
                  popoverTemplate: {string} html template
                  popoverTemplateUrl: {string} The url of the popover template.
                  */
+
                 if (_this.components[name] == null) {
                     newComponent = _this.convertComponent(name, component);
                     _this.components[name] = newComponent;
