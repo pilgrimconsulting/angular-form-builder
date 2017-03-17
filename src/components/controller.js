@@ -26,7 +26,24 @@ angular.module('builder.controller', ['builder.provider'])
             $builder = $injector.get('$builder');
 
             $scope.repeatSection = function(currentPage, componentIndex) {
-                console.log(currentPage, componentIndex, $builder.forms);
+                var originalElement = $builder.forms[currentPage][componentIndex],
+                    newElementId    = componentIndex + 1,
+                    component       = {component: "section"};
+
+                $builder.insertFormObject(currentPage, newElementId, component);
+
+                var copiedElement = $builder.forms[currentPage][newElementId];
+                copiedElement.repited = true;
+                copiedElement.repeatable = originalElement.repeatable;
+                copiedElement.collapsable = originalElement.collapsable;
+                copiedElement.show_label = originalElement.show_label;
+                copiedElement.components = [];
+
+                originalElement.components.map(function(item, index) {
+                    $builder.insertSectionObject(currentPage, newElementId, index, {
+                        component: item.component
+                    });
+                });
             };
 
             $scope.removeSection = function(currentPage, componentIndex) {
@@ -46,8 +63,7 @@ angular.module('builder.controller', ['builder.provider'])
                 copyObjectToScope(formObject, $scope);
                 $scope.optionsText = formObject.options.join('\n');
 
-//TODO: зміна любого елемента форми
-                $scope.$watch('[label, show_label, repeatable, collapsable, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function () {
+                $scope.$watch('[label, show_label, repeatable, repited, collapsable, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function () {
                     formObject.label = $scope.label;
                     formObject.show_label = $scope.show_label;
                     formObject.description = $scope.description;
@@ -64,10 +80,9 @@ angular.module('builder.controller', ['builder.provider'])
                     formObject.components = $scope.components;
                     formObject.repeatable = $scope.repeatable;
                     formObject.collapsable = $scope.collapsable;
+                    formObject.repited = $scope.repited;
                 }, true);
 
-
-//TODO: зміна оптіонів в селекті
                 $scope.$watch('optionsText', function (text) {
                     var x;
                     $scope.options = (function () {
@@ -135,18 +150,15 @@ angular.module('builder.controller', ['builder.provider'])
                     $scope.align = this.model.align;
                     $scope.style = this.model.style;
                     return $scope.components = this.model.components;
-                }
-            };
+                }            };
         }
     ])
-
 
     .controller('fbComponentsController', [
         '$scope', '$injector', function ($scope, $injector) {
             var $builder;
             $builder = $injector.get('$builder');
 
-//TODO: зміна вкладки компоненту Default/Image/Special
             $scope.selectGroup = function ($event, group) {
                 var component, name, _ref, _results;
                 if ($event != null) {
@@ -166,7 +178,6 @@ angular.module('builder.controller', ['builder.provider'])
                 return _results;
             };
 
-//TODO: зелена кнопка даодати компонент
             $scope.addComponentToEnd = function ($event, component) {
                 if ($event != null) {
                     $event.preventDefault();
@@ -187,8 +198,6 @@ angular.module('builder.controller', ['builder.provider'])
         }
     ])
 
-
-//TODO: при зміні вкладки компоненту Default/Image/Special заповнення правої частини даними:
     .controller('fbComponentController', [
         '$scope', function ($scope) {
             return $scope.copyObjectToScope = function (object) {
@@ -197,8 +206,6 @@ angular.module('builder.controller', ['builder.provider'])
         }
     ])
 
-
-//TODO: при друкуванні в любому полі
     .controller('fbFormController', [
         '$scope', '$injector', function ($scope, $injector) {
             var $builder, $timeout;
@@ -219,8 +226,6 @@ angular.module('builder.controller', ['builder.provider'])
         }
     ])
 
-
-//TODO: при друкуванні в любому полі ^^^
     .controller('fbFormObjectController', [
         '$scope', '$injector', function ($scope, $injector) {
             var $builder;
@@ -247,8 +252,6 @@ angular.module('builder.controller', ['builder.provider'])
         }
     ])
 
-
-//TODO: весь функціонал додавання/видалення і т. д. сторінок
     .controller('PaginationController', [
         '$rootScope', '$scope', '$injector', function ($rootScope, $scope, $injector) {
             var $builder;
@@ -311,12 +314,12 @@ angular.module('builder.controller', ['builder.provider'])
                     return false;
                 }
             };
-            $scope.goF = function () {   //TODO: page foreward
+            $scope.goF = function () {
                 var pageNumber;
                 pageNumber = $builder.currentForm + 1;
                 return $scope.goPage(pageNumber);
             };
-            $scope.goB = function () {   //TODO: page back
+            $scope.goB = function () {
                 var pageNumber;
                 pageNumber = $builder.currentForm - 1;
                 return $scope.goPage(pageNumber);

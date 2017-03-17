@@ -425,7 +425,7 @@ angular.module
                         "<div class=\"form-group element-wrapper\">\n			" +
                             "<div class=\"col-sm-1\">\n				" +
                                 "<button type='button' class='btn btn-success btn-sm' ng-click='addComponentToEnd($event, component)'>+</button>\n			" +
-                        "</div>\n" +
+                            "</div>\n" +
                         "<div class=\"col-sm-11\">\n				" +
                             "<div class='fb-component' fb-component=\"component\" ng-component=\"{{component.name}}\" ng-if='!_$builder.simplePreview'>" +
                             "</div>" +

@@ -608,7 +608,7 @@ Global.__fbComponents.section = ($builderProvider) ->
 		show_label: yes
 		required: no
 		components: []
-		repeatable: no
+		repeatable: true
 		collapsable: true
 		repited: no
 		template:
@@ -618,7 +618,7 @@ Global.__fbComponents.section = ($builderProvider) ->
 				<div class="panel-heading">
 					<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
 						<a role="button" ng-init='isOpen=true' is-open='true' style='cursor: pointer'
-							ng-click="isOpen = collapsable ? !isOpen : true; $event.stopPropagation();">
+							ng-click="isOpen = !isOpen; $event.stopPropagation();">
 							{{show_label ? label : null}}
 							<i class="pull-right glyphicon"
 								ng-show="collapsable"
@@ -630,13 +630,20 @@ Global.__fbComponents.section = ($builderProvider) ->
 				<div id="collapse_{{componentIndex}}" class="panel-collapse collapse " ng-class="{'in': collapsable ? isOpen : true}"
 						fb-section='componentName' component-index='componentIndex' ng-show='collapsable ? isOpen : true'
 						current-page='currentPage' form-number='formNumber'></div>
-				</div>
-				<div ng-show="repeatable" class='form-group section-actions-container'>
-					<input type='button' ng-click="repeatSection(currentPage, componentIndex)" class='btn btn-primary' value='Repeat'/>
-					<input ng-show="repited" type='button' ng-click="removeSection(currentPage, componentIndex)" class='btn btn-danger' value='Delete'/>
+					<div ng-show="repeatable" class='form-group section-actions-container'>
+						<input type='button' ng-click="repeatSection(currentPage, componentIndex)" class='btn btn-primary' value='Repeat'/>
+						<input ng-show="repited" type='button' ng-click="removeSection(currentPage, componentIndex)" class='btn btn-danger' value='Delete'/>
+					</div>
 				</div>
 			</div>
   		"""
+
+#				<div id="collapse_{{componentIndex}}" class="panel-collapse collapse " ng-class="{'in': isOpen}"
+#						fb-section='componentName' component-index='componentIndex' ng-show='isOpen'
+#						current-page='currentPage' form-number='formNumber'></div>
+#				</div>
+
+
 		popoverTemplate:
 			"""
 			<form>
