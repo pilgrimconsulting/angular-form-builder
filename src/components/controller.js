@@ -40,7 +40,7 @@ angular.module('builder.controller', ['builder.provider'])
 
 
 //TODO: зміна любого елемента форми
-                $scope.$watch('[label, show_label, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function () {
+                $scope.$watch('[label, show_label, repeatable, collapsable, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function () {
                     formObject.label = $scope.label;
                     formObject.show_label = $scope.show_label;
                     formObject.description = $scope.description;
@@ -55,6 +55,8 @@ angular.module('builder.controller', ['builder.provider'])
                     formObject.align = $scope.align;
                     formObject.style = $scope.style;
                     formObject.components = $scope.components;
+                    formObject.repeatable = $scope.repeatable;
+                    formObject.collapsable = $scope.collapsable;
                 }, true);
 
 

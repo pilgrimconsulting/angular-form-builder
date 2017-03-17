@@ -663,7 +663,7 @@ angular.module
                     formNumber: '='
                 },
                 template: "<div class='form-horizontal' >\n	" +
-                "<div style=\"min-height: 100px;\"\n " +
+                "<div\n " +
                 "class='fb-form-object-editable parent-section'\n " +
                 "ng-repeat=\"object in sectionObjects\"\n " +
                 "fb-form-object-editable=\"object\"\n " +
@@ -680,6 +680,8 @@ angular.module
                     }
                     $(element).addClass('fb-section');
                     scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
+
+                    $rootScope.hoverFormData = [];
 
                     return $drag.droppable($(element), {
                         move: function (e, isHover) {
