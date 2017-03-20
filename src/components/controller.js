@@ -47,7 +47,7 @@ angular.module('builder.controller', ['builder.provider'])
             };
 
             $scope.removeSection = function(currentPage, componentIndex) {
-                console.log(currentPage, componentIndex, $builder.forms);
+                $builder.removeFormObject(currentPage, componentIndex);
             };
 
             $scope.setupScope = function (formObject) {

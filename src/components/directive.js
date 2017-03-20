@@ -499,7 +499,7 @@ angular.module
                     input: '=ngModel',
                     "default": '=fbDefault'
                 },
-                template: "<div class='fb-form-object' ng-repeat=\"object in form\" fb-form-object=\"object\"></div>",
+                template: "<div class='fb-form-object' ng-repeat=\"object in form\" fb-form-object=\"object\" current-page='formNumber'></div>",
                 controller: 'fbFormController',
                 link: function (scope, element, attrs) {
                     var $builder, _base, _name;
@@ -526,13 +526,13 @@ angular.module
                         _base[_name] = [];
                     }
                     scope.form = $builder.forms[scope.formNumber];
+
                     return scope.jsonString = $builder.forms;
                 }
             };
         }
     ])
 
-    // TODO: BOTTOM FORM ELEMENT triggered every time we change page and this page have any section
     .directive('fbFormObject', [
         '$injector', function ($injector) {
             var $builder, $compile, $parse;
@@ -543,8 +543,11 @@ angular.module
                 restrict: 'A',
                 controller: 'fbFormObjectController',
                 link: function (scope, element, attrs) {
-
                     scope.formObject = $parse(attrs.fbFormObject)(scope);
+                    scope.componentIndex = scope.formObject.index;
+                    scope.componentName = scope.formObject.component;
+                    scope.currentPage = scope.formNumber;
+                    scope.previewMode = true;
                     scope.$component = $builder.components[scope.formObject.component];
 
                     scope.$on($builder.broadcastChannel.updateInput, function () {
@@ -569,7 +572,7 @@ angular.module
                     scope.$watch('inputText', function () {
                         return scope.updateInput(scope.inputText);
                     });
-                    scope.$watch(attrs.fbFormObject, function () {    // TODO 237 str. -  update inputed field
+                    scope.$watch(attrs.fbFormObject, function () {
 
                         return scope.copyObjectToScope(scope.formObject);
                     }, true);
@@ -648,7 +651,6 @@ angular.module
         }
     ])
 
-    //TODO: move components actions
     .directive('fbSection', [
         '$injector', '$compile', '$rootScope', function ($injector, $compile, $rootScope) {
             var $builder, $drag;
@@ -657,21 +659,22 @@ angular.module
             return {
                 restrict: 'A',
                 scope: {
+                    previewMode:'=',
                     fbSection: '=',
                     sectionIndex: '=componentIndex',
                     currentPage: '=',
                     formNumber: '='
                 },
                 template: "<div class='form-horizontal' >\n	" +
-                "<div\n " +
-                "class='fb-form-object-editable parent-section'\n " +
-                "ng-repeat=\"object in sectionObjects\"\n " +
-                "fb-form-object-editable=\"object\"\n " +
-                "fb-draggable='allow'\n " +
-                "section-index='sectionIndex'\n " +
-                "parent-section='true'\n " +
-                "ng-class='{\"fb-selected-frame\": selected}'\n	>\n " +
-                "</div>\n" +
+                    "<div\n " +
+                        "class='fb-form-object-editable parent-section'\n " +
+                        "ng-repeat=\"object in sectionObjects\"\n " +
+                        "fb-form-object-editable=\"object\"\n " +
+                        "fb-draggable='allow'\n " +
+                        "section-index='sectionIndex'\n " +
+                        "parent-section='true'\n " +
+                        "ng-class='{\"fb-selected-frame\": selected}'\n	>\n " +
+                    "</div>\n" +
                 "</div>",
                 link: function (scope, element) {
                     var hasParentSection, selectedFormItem, newIndex;
@@ -683,92 +686,94 @@ angular.module
 
                     $rootScope.hoverFormData = [];
 
-                    return $drag.droppable($(element), {
-                        move: function (e, isHover) {
-                            var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
+                    if(!scope.previewMode) {
+                        return $drag.droppable($(element), {
+                            move: function (e, isHover) {
+                                var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
 
-                            $builder.forms[scope.currentPage].map(function(e, i) {
-                                $rootScope.hoverFormData[i] = e;
-                                $rootScope.hoverFormData[i].hover = false;
-                            });
+                                $builder.forms[scope.currentPage].map(function(e, i) {
+                                    $rootScope.hoverFormData[i] = e;
+                                    $rootScope.hoverFormData[i].hover = false;
+                                });
 
-                            if($rootScope.hoverFormData[scope.sectionIndex]) $rootScope.hoverFormData[scope.sectionIndex].hover = true;
+                                if($rootScope.hoverFormData[scope.sectionIndex]) $rootScope.hoverFormData[scope.sectionIndex].hover = true;
 
-                            hasParentSection = $(isHover.element).hasClass('parent-section');
-                            selectedFormItem = isHover;
+                                hasParentSection = $(isHover.element).hasClass('parent-section');
+                                selectedFormItem = isHover;
 
-                            $formObjects = $(element).find('.parent-section.fb-form-object-editable:not(.empty,.dragging)');
-                            if ($formObjects.length === 0) {
-                                if ($(element).find('.parent-section.fb-form-object-editable.empty').length === 0) {
-                                    $(element).find('>div:first').append($("<div class='parent-section fb-form-object-editable empty'></div>"));
-                                }
-                                return;
-                            }
-
-                            positions = [];
-                            positions.push(-1000);
-                            for (index = _i = 0, _ref = $formObjects.length; _i < _ref; index = _i += 1) {
-                                $formObject = $($formObjects[index]);
-                                offset = $formObject.offset();
-                                height = $formObject.height();
-                                positions.push(offset.top + height / 2);
-                            }
-                            positions.push(positions[positions.length - 1] + 1000);
-
-                            for (index = _j = 1, _ref1 = positions.length; _j < _ref1; index = _j += 1) {
-                                if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
-
-                                    $(element).find('.empty').remove();
-                                    $empty = $("<div class='parent-section fb-form-object-editable empty'></div>");
-                                    if (index - 1 < $formObjects.length) {                                              //TODO: empty handler!!!
-                                        $empty.insertBefore($($formObjects[index - 1]));
-                                        newIndex = $($formObjects[index - 1]).index()-1;
-
-                                    } else {
-                                        $empty.insertAfter($($formObjects[index - 2]));
-                                        newIndex = $($formObjects[index - 2]).index()+1;
+                                $formObjects = $(element).find('.parent-section.fb-form-object-editable:not(.empty,.dragging)');
+                                if ($formObjects.length === 0) {
+                                    if ($(element).find('.parent-section.fb-form-object-editable.empty').length === 0) {
+                                        $(element).find('>div:first').append($("<div class='parent-section fb-form-object-editable empty'></div>"));
                                     }
-                                    break;
-                                }
-                            }
-                        },
-                        out: function (e, is) {
-                            if($rootScope.hoverFormData[scope.sectionIndex]) $rootScope.hoverFormData[scope.sectionIndex].hover = false;
-
-                            $("div.fb-form-object-editable").popover('hide');
-                        },
-                        up: function (e, isHover, draggable) {
-                            if (!$drag.isMouseMoved()) {
-                                $(element).find('.empty').remove();
-                                return;
-                            }
-
-                            var currentSectionComponents = $builder.forms[$builder.currentForm][scope.sectionIndex] ? $builder.forms[$builder.currentForm][scope.sectionIndex].components : null,
-                                itemIndex                = selectedFormItem && currentSectionComponents ? currentSectionComponents.indexOf(selectedFormItem.object.formObject) : -1;
-
-                            if (!isHover && draggable.mode === 'drag') {
-                                if(selectedFormItem && hasParentSection) {
-                                    if(!$rootScope.isHoverContainer) $builder.removeSectionObject($builder.currentForm, scope.sectionIndex, itemIndex);
+                                    return;
                                 }
 
-                                hasParentSection = false;
-
-                            } else if (isHover) {
-                                if (draggable.mode === 'mirror') {
-                                    $builder.insertSectionObject($builder.currentForm, scope.sectionIndex, newIndex, {
-                                        component: draggable.object.componentName
-                                    });
-                                    scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
-                                } else if (draggable.mode === 'drag' && itemIndex>=0) {
-                                    var oldIndex = draggable.object.formObject.index;
-
-                                    $builder.updateSectionObjectIndex(scope.formNumber, scope.sectionIndex, oldIndex, newIndex);
+                                positions = [];
+                                positions.push(-1000);
+                                for (index = _i = 0, _ref = $formObjects.length; _i < _ref; index = _i += 1) {
+                                    $formObject = $($formObjects[index]);
+                                    offset = $formObject.offset();
+                                    height = $formObject.height();
+                                    positions.push(offset.top + height / 2);
                                 }
-                            }
+                                positions.push(positions[positions.length - 1] + 1000);
 
-                            return $(element).find('.empty').remove();
-                        }
-                    });
+                                for (index = _j = 1, _ref1 = positions.length; _j < _ref1; index = _j += 1) {
+                                    if (e.pageY > positions[index - 1] && e.pageY <= positions[index]) {
+
+                                        $(element).find('.empty').remove();
+                                        $empty = $("<div class='parent-section fb-form-object-editable empty'></div>");
+                                        if (index - 1 < $formObjects.length) {                                              //TODO: empty handler!!!
+                                            $empty.insertBefore($($formObjects[index - 1]));
+                                            newIndex = $($formObjects[index - 1]).index()-1;
+
+                                        } else {
+                                            $empty.insertAfter($($formObjects[index - 2]));
+                                            newIndex = $($formObjects[index - 2]).index()+1;
+                                        }
+                                        break;
+                                    }
+                                }
+                            },
+                            out: function (e, is) {
+                                if($rootScope.hoverFormData[scope.sectionIndex]) $rootScope.hoverFormData[scope.sectionIndex].hover = false;
+
+                                $("div.fb-form-object-editable").popover('hide');
+                            },
+                            up: function (e, isHover, draggable) {
+                                if (!$drag.isMouseMoved()) {
+                                    $(element).find('.empty').remove();
+                                    return;
+                                }
+
+                                var currentSectionComponents = $builder.forms[$builder.currentForm][scope.sectionIndex] ? $builder.forms[$builder.currentForm][scope.sectionIndex].components : null,
+                                    itemIndex                = selectedFormItem && currentSectionComponents ? currentSectionComponents.indexOf(selectedFormItem.object.formObject) : -1;
+
+                                if (!isHover && draggable.mode === 'drag') {
+                                    if(selectedFormItem && hasParentSection) {
+                                        if(!$rootScope.isHoverContainer) $builder.removeSectionObject($builder.currentForm, scope.sectionIndex, itemIndex);
+                                    }
+
+                                    hasParentSection = false;
+
+                                } else if (isHover) {
+                                    if (draggable.mode === 'mirror') {
+                                        $builder.insertSectionObject($builder.currentForm, scope.sectionIndex, newIndex, {
+                                            component: draggable.object.componentName
+                                        });
+                                        scope.sectionObjects = $builder.getSectionObjects(scope.sectionIndex, scope.formNumber);
+                                    } else if (draggable.mode === 'drag' && itemIndex>=0) {
+                                        var oldIndex = draggable.object.formObject.index;
+
+                                        $builder.updateSectionObjectIndex(scope.formNumber, scope.sectionIndex, oldIndex, newIndex);
+                                    }
+                                }
+
+                                return $(element).find('.empty').remove();
+                            }
+                        });
+                    }
                 }
             };
         }

@@ -26,8 +26,6 @@ var path = null;
 
                 $formService.getForm(parentId, id)
                     .then(function(res) {
-                        console.log('RESPONSE: ', res);
-
                         var formData = res.data ? res.data.result : {};
 
                         $builder.receivedForm = formData;

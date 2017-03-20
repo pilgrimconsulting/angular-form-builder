@@ -614,7 +614,7 @@ Global.__fbComponents.section = ($builderProvider) ->
 		template:
 			"""
 			<div class="panel panel-default" ng-class='{"section-open": isOpen, "fb-selected-frame": selected}'>
-			{{componentIndex}}{{componentName}}|{{currentPage}}|{{formNumber}}
+			{{componentIndex}}|{{componentName}}|{{currentPage}}|{{formNumber}}|{{previewMode}}
 				<div class="panel-heading">
 					<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
 						<a role="button" ng-init='isOpen=true' is-open='true' style='cursor: pointer'
@@ -628,7 +628,7 @@ Global.__fbComponents.section = ($builderProvider) ->
 					</h4>
 				</div>
 				<div id="collapse_{{componentIndex}}" class="panel-collapse collapse " ng-class="{'in': collapsable ? isOpen : true}"
-						fb-section='componentName' component-index='componentIndex' ng-show='collapsable ? isOpen : true'
+						fb-section='componentName' preview-mode='previewMode' component-index='componentIndex' ng-show='collapsable ? isOpen : true'
 						current-page='currentPage' form-number='formNumber'></div>
 					<div ng-show="repeatable" class='form-group section-actions-container'>
 						<input type='button' ng-click="repeatSection(currentPage, componentIndex)" class='btn btn-primary' value='Repeat'/>
@@ -637,12 +637,6 @@ Global.__fbComponents.section = ($builderProvider) ->
 				</div>
 			</div>
   		"""
-
-#				<div id="collapse_{{componentIndex}}" class="panel-collapse collapse " ng-class="{'in': isOpen}"
-#						fb-section='componentName' component-index='componentIndex' ng-show='isOpen'
-#						current-page='currentPage' form-number='formNumber'></div>
-#				</div>
-
 
 		popoverTemplate:
 			"""
