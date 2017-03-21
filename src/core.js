@@ -24,7 +24,9 @@ var path = null;
                 var parentId    = $routeParams.parentId || 1,
                     id          = $routeParams.id;
 
-                $formService.getForm(parentId, id)
+                console.log(parentId, id);
+
+                $formService.getForm(parentId, 4)
                     .then(function(res) {
                         var formData = res.data ? res.data.result : {};
 

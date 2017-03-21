@@ -8,6 +8,8 @@ angular.module('formService', [])
                 var parentIdParam   = '?parentId=' + (parentId ? parentId : 1),
                     idParam         = id ? '&id=' + id : '';
 
+                console.log(1, parentIdParam, idParam);
+
                 return $http({
                     method: 'GET',
                     url:  appSettings.apiUrl + '/Get' + parentIdParam + idParam

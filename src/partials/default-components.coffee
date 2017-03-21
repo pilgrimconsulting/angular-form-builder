@@ -84,7 +84,7 @@ Global.__fbComponents.divider = ($builderProvider) ->
 					<label class='control-label'>Text</label>
 					<textarea type='text' ng-model="label" validator="[required]" class='form-control'/>
 				</div>
-					<hr/>
+				<hr/>
 				<div class='form-group'>
 					<input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
 					<input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
@@ -99,6 +99,7 @@ Global.__fbComponents.divider = ($builderProvider) ->
 	$builderProvider.registerComponent 'hint',
 		group: 'Default'
 		label: 'Hint'
+		description: 'Hint'
 		template:
 			"""
 			<div class="form-group" ng-if='simpleView'>
@@ -111,22 +112,36 @@ Global.__fbComponents.divider = ($builderProvider) ->
 				</div>
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
-				<div class="col-sm-12">
+
+				<label for="{{formName+index}}" class="control-label" ng-class="{'fb-required':required, 'col-sm-4': show_label}" ng-hide='!show_label'>{{label}}</label>
+				<div ng-class="{'col-sm-12': !show_label, 'col-sm-8': show_label}">
 					<div class="panel panel-default panel-spec">
 						<div class="panel-body hint-text">
-							Hint: {{label}}
+							Hint: {{description}}
 						</div>
 					</div>
 				</div>
+
 			</div>
 			"""
 		popoverTemplate:
 			"""
 			<form>
-				<div class="form-group">
-					<label class='control-label'>Hint</label>
-					<textarea type='text' ng-model="label" validator="[required]" class='form-control'/>
+				<div class="checkbox">
+					<label>
+						<input type='checkbox' ng-model='show_label' />
+						Show label
+					</label>
 				</div>
+				<div class="form-group" >
+					<label class='control-label'>Label</label>
+					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+				</div>
+				<div class="form-group">
+					<label class='control-label'>Description</label>
+					<input type='text' ng-model="description" class='form-control'/>
+				</div>
+
 					<hr/>
 				<div class='form-group'>
 					<input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>

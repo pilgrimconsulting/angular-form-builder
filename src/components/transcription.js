@@ -181,8 +181,11 @@ angular.module('transcription', [])
                         "name": null,
                         "title": "Page_"+pageIndex,
                         "showTitle": true,
-                        "extraProperties": {},
-                        "elements": []
+                        "elements": [],
+                        "extraProperties": {
+
+                        },
+                        "$type": ''
                     };
 
                     for (_j = 0, _len1 = formPage.length; _j < _len1; _j++) {
@@ -191,7 +194,11 @@ angular.module('transcription', [])
                             "id": formElement.index,
                             "name": null,
                             "title": formElement.label || null,
-                            "showTitle": formElement.show_label
+                            "showTitle": formElement.show_label,
+                            "extraProperties": {
+
+                            },
+                            "$type": ''
                         };
 
                         if (formElement.component === "section") {
@@ -207,7 +214,11 @@ angular.module('transcription', [])
                                         "id": item.id || null,
                                         "title": item.label || null,
                                         "isRequired": item.required,
-                                        "description": item.description || ''
+                                        "description": item.description || '',
+                                        "extraProperties": {
+
+                                        },
+                                        "$type": ''
                                     };
 
                                     options = item.options || [];
