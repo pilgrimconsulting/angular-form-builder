@@ -69,7 +69,7 @@ Global.__fbComponents.divider = ($builderProvider) ->
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
 				<div class="col-sm-12">
-					<div class="panel panel-default">
+					<div class="panel panel-default panel-spec">
 						<div class="panel-body">
 							{{label}}
 						</div>
@@ -92,7 +92,6 @@ Global.__fbComponents.divider = ($builderProvider) ->
 				</div>
 			</form>
 			"""
-
 
 	# ----------------------------------------
 	# Hint
