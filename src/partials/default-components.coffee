@@ -6,6 +6,50 @@ Global = this
 Global.__fbComponents.divider = ($builderProvider) ->
 #	return
 
+# ----------------------------------------
+# Header
+# ----------------------------------------
+	$builderProvider.registerComponent 'header',
+		group: 'Default'
+		label: 'Header'
+		show_label: yes
+		placeholder: 'placeholder'
+		required: no
+		template:
+			"""
+			<div class="form-group" ng-if='simpleView'>
+				<div class="col-sm-12">
+					<div class="panel panel-default">
+						<div class="panel-body text-center">
+							{{componentName ? componentName +' - '+ label : label}}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="form-group" ng-if='!simpleView'>
+				<div class="col-sm-12">
+						<div class="panel-body header-text">
+							{{label}}
+						</div>
+				</div>
+			</div>
+			"""
+		popoverTemplate:
+			"""
+			<form>
+				<div class="form-group">
+					<label class='control-label'>Header</label>
+					<textarea type='text' ng-model="label" validator="[required]" class='form-control'/>
+				</div>
+					<hr/>
+				<div class='form-group'>
+					<input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
+					<input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
+					<input type='button' ng-click="popover.remove($event)" class='btn btn-danger' value='Delete'/>
+				</div>
+			</form>
+			"""
+
 	# ----------------------------------------
 	# Text Divider
 	# ----------------------------------------
@@ -48,6 +92,52 @@ Global.__fbComponents.divider = ($builderProvider) ->
 				</div>
 			</form>
 			"""
+
+
+	# ----------------------------------------
+	# Hint
+	# ----------------------------------------
+	$builderProvider.registerComponent 'hint',
+		group: 'Default'
+		label: 'Hint'
+		template:
+			"""
+			<div class="form-group" ng-if='simpleView'>
+				<div class="col-sm-12">
+					<div class="panel panel-default">
+						<div class="panel-body text-center">
+							{{componentName ? componentName +' - '+ label : label}}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="form-group" ng-if='!simpleView'>
+				<div class="col-sm-12">
+					<div class="panel panel-default panel-spec">
+						<div class="panel-body hint-text">
+							Hint: {{label}}
+						</div>
+					</div>
+				</div>
+			</div>
+			"""
+		popoverTemplate:
+			"""
+			<form>
+				<div class="form-group">
+					<label class='control-label'>Hint</label>
+					<textarea type='text' ng-model="label" validator="[required]" class='form-control'/>
+				</div>
+					<hr/>
+				<div class='form-group'>
+					<input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
+					<input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
+					<input type='button' ng-click="popover.remove($event)" class='btn btn-danger' value='Delete'/>
+				</div>
+			</form>
+			"""
+
+
 
 Global.__fbComponents.default = ($builderProvider) ->
 	# ----------------------------------------
@@ -477,7 +567,6 @@ Global.__fbComponents.default = ($builderProvider) ->
 			</form>
 			"""
 
-
 Global.__fbComponents.image = ($builderProvider) ->
 	# ----------------------------------------
 	# image
@@ -601,6 +690,7 @@ Global.__fbComponents.carousel = ($builderProvider) ->
 Global.__fbComponents.section = ($builderProvider) ->
 	# ----------------------------------------
 	# section
+	# {{componentIndex}}|{{componentName}}|{{currentPage}}|{{formNumber}}|{{previewMode}}
 	# ----------------------------------------
 	$builderProvider.registerComponent 'section',
 		group: 'Special'
@@ -614,7 +704,6 @@ Global.__fbComponents.section = ($builderProvider) ->
 		template:
 			"""
 			<div class="panel panel-default" ng-class='{"section-open": isOpen, "fb-selected-frame": selected}'>
-			{{componentIndex}}|{{componentName}}|{{currentPage}}|{{formNumber}}|{{previewMode}}
 				<div class="panel-heading">
 					<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
 						<a role="button" ng-init='isOpen=true' is-open='true' style='cursor: pointer'
