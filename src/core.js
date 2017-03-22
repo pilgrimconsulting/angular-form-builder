@@ -28,7 +28,7 @@ var path = null;
                     .then(function(res) {
                         var formData = res.data ? res.data.result : {};
 
-                        console.log('formData', formData);
+                        console.log('FORM: ', formData);
 
                         $builder.receivedForm = formData;
                         $builder.formData = $transcription.getFormData(formData);
@@ -71,3 +71,26 @@ var path = null;
         ]);
 
 }).call(this);
+
+var btnSaveClick = function () {
+    debugger;
+    $.ajax({
+        url: path + 'GetMock',
+        type: 'GET',
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            debugger;
+            $.ajax({
+                url: path + 'Save',
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                data: JSON.stringify(data),
+                success: function (data) {
+                    window.location = path + data.result;
+                }
+            });
+        }
+    });
+
+}

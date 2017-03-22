@@ -6,7 +6,7 @@ angular.module('formService', [])
         this.getForm = (function () {
             return function(parentId, id) {
                 var parentIdParam   = '?parentId=' + (parentId ? parentId : 1),
-                    idParam         = '&id=' + 4// id ? '&id=' + id : '';
+                    idParam         = id ? '&id=' + id : ''; //'&id=' + 4
 
                 console.log(parentIdParam, idParam);
 

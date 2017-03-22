@@ -165,6 +165,32 @@ angular.module('transcription', [])
                 return variants;
             }
 
+            function setType(type) {
+                var casualItem  = "FormBuilder.Models.Item, FormBuilder",
+                    variantItem = "FormBuilder.Models.ItemVariant, FormBuilder",
+                    sectionItem = "FormBuilder.Models.Section, FormBuilder",
+                    itemType;
+
+                switch (type) {
+                    case 'section':
+                        itemType = sectionItem;
+                        break;
+                    case 'select':
+                        itemType = variantItem;
+                        break;
+                    case 'checkbox':
+                        itemType = variantItem;
+                        break;
+                    case 'radio':
+                        itemType = variantItem;
+                        break;
+                    default:
+                        itemType = casualItem;
+                        break;
+                }
+                return itemType;
+            }
+
             return function (jsonData, formData) {
                 var item, items, options, formPage, jsonPage, pageIndex, formElement, section, tempItem, tempObj, _i, _j, _len, _len1;
 
@@ -183,9 +209,9 @@ angular.module('transcription', [])
                         "showTitle": true,
                         "elements": [],
                         "extraProperties": {
-
+                            "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[FormBuilder.Models.ExtraProperty, FormBuilder]], mscorlib"
                         },
-                        "$type": ''
+                        "$type": "FormBuilder.Models.Page, FormBuilder"
                     };
 
                     for (_j = 0, _len1 = formPage.length; _j < _len1; _j++) {
@@ -196,9 +222,9 @@ angular.module('transcription', [])
                             "title": formElement.label || null,
                             "showTitle": formElement.show_label,
                             "extraProperties": {
-
+                                "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[FormBuilder.Models.ExtraProperty, FormBuilder]], mscorlib"
                             },
-                            "$type": ''
+                            "$type": setType(formElement.component)
                         };
 
                         if (formElement.component === "section") {
@@ -216,9 +242,9 @@ angular.module('transcription', [])
                                         "isRequired": item.required,
                                         "description": item.description || '',
                                         "extraProperties": {
-
+                                            "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[FormBuilder.Models.ExtraProperty, FormBuilder]], mscorlib"
                                         },
-                                        "$type": ''
+                                        "$type": setType(item.component)
                                     };
 
                                     options = item.options || [];
