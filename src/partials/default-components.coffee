@@ -615,7 +615,7 @@ Global.__fbComponents.image = ($builderProvider) ->
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label"
-					ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}} ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}"</label>
+					ng-class="{'fb-required':required}" ng-hide='!show_label' ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{label}}</label>
 				<div class='col-sm-8' ng-class="{'col-sm-offset-4': !show_label}">
 					<img class='img-thumbnail' ng-src='https://placeholdit.imgix.net/~text?txtsize=28&bg=cccccc&txt=200%C3%97200&w=200&h=200'/>
 				</div>
@@ -731,27 +731,31 @@ Global.__fbComponents.section = ($builderProvider) ->
 		repited: no
 		template:
 			"""
-			<div class="panel panel-default" ng-class='{"section-open": isOpen, "fb-selected-frame": selected}'>
-				<div class="panel-heading">
-					<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
-						<a role="button" ng-init='isOpen=true' is-open='true' style='cursor: pointer'
-							ng-click="isOpen = !isOpen; $event.stopPropagation();">
-							<span ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{show_label ? label : null}}</span>
-							<i class="pull-right glyphicon"
-								ng-show="collapsable"
-								ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-up': isOpen}"
-								ng-style="{top: show_label ? '0' : '-8px'}"></i>
-						</a>
-					</h4>
+			<div>
+				<div ng-show="repeatable" class='form-group section-actions-container'>
+					<input type='button' ng-click="repeatSection(currentPage, componentIndex)" class='btn btn-primary' value='Repeat'/>
+					<input ng-show="repited" type='button' ng-click="removeSection(currentPage, componentIndex)" class='btn btn-danger' value='Delete'/>
 				</div>
-				<div id="collapse_{{componentIndex}}" class="panel-collapse collapse " ng-class="{'in': collapsable ? isOpen : true}"
-						fb-section='componentName' preview-mode='previewMode' component-index='componentIndex' ng-show='collapsable ? isOpen : true'
-						current-page='currentPage' form-number='formNumber'></div>
-					<div ng-show="repeatable" class='form-group section-actions-container'>
-						<input type='button' ng-click="repeatSection(currentPage, componentIndex)" class='btn btn-primary' value='Repeat'/>
-						<input ng-show="repited" type='button' ng-click="removeSection(currentPage, componentIndex)" class='btn btn-danger' value='Delete'/>
+
+				<div class="panel panel-default" ng-class='{"section-open": isOpen, "fb-selected-frame": selected}'>
+					<div class="panel-heading">
+						<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
+							<a role="button" ng-init='isOpen=true' is-open='true' style='cursor: pointer'
+								ng-click="isOpen = !isOpen; $event.stopPropagation();">
+								<span ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{show_label ? label : null}}</span>
+								<i class="pull-right glyphicon"
+									ng-show="collapsable"
+									ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-up': isOpen}"
+									ng-style="{top: show_label ? '0' : '-8px'}"></i>
+							</a>
+						</h4>
+					</div>
+					<div id="collapse_{{componentIndex}}" class="panel-collapse collapse " ng-class="{'in': collapsable ? isOpen : true}"
+							fb-section='componentName' preview-mode='previewMode' component-index='componentIndex' ng-show='collapsable ? isOpen : true'
+							current-page='currentPage' form-number='formNumber'></div>
 					</div>
 				</div>
+
 			</div>
   		"""
 

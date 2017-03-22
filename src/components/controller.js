@@ -16,7 +16,26 @@ copyObjectToScope = function (object, scope) {
         if (key !== '$$hashKey') {
             scope[key] = value;
         }
+
+        if(key === 'components') {
+            //console.log(object[key]);
+
+            object[key].map(function(element, id) {
+
+                var k,
+                    v = {};
+                for (k in element) {
+                    if (k !== '$$hashKey') {
+                        v[k] = element[k];
+                    }
+                }
+
+                return v;
+            })
+        }
     }
+
+    //console.log(object)
 };
 
 angular.module('builder.controller', ['builder.provider'])
@@ -26,24 +45,40 @@ angular.module('builder.controller', ['builder.provider'])
             $builder = $injector.get('$builder');
 
             $scope.repeatSection = function(currentPage, componentIndex) {
-                var originalElement = $builder.forms[currentPage][componentIndex],
-                    newElementId    = componentIndex + 1,
-                    component       = {component: "section"};
+                var originalElement     = $builder.forms[currentPage][componentIndex],
+                    newElementId        = componentIndex,
+                    component           = {component: "section"};
 
                 $builder.insertFormObject(currentPage, newElementId, component);
 
                 var copiedElement = $builder.forms[currentPage][newElementId];
-                copiedElement.repited = true;
+                copiedElement.label = originalElement.label;
                 copiedElement.repeatable = originalElement.repeatable;
                 copiedElement.collapsable = originalElement.collapsable;
                 copiedElement.show_label = originalElement.show_label;
+                copiedElement.labelColor = originalElement.labelColor;
+                copiedElement.labelSize = originalElement.labelSize;
+                copiedElement.labelWeight = originalElement.labelWeight;
                 copiedElement.components = [];
+
+                originalElement.repited = true;
 
                 originalElement.components.map(function(item, index) {
                     $builder.insertSectionObject(currentPage, newElementId, index, {
-                        component: item.component
+                        component: item.component,
+                        options: item.options,
+                        label: item.label,
+                        description: item.description,
+                        show_label: item.show_label,
+                        labelColor: item.labelColor,
+                        labelSize: item.labelSize,
+                        labelWeight: item.labelWeight,
+                        placeholder: item.placeholder,
+                        required: item.required
                     });
                 });
+
+                $scope.setupScope(originalElement);
             };
 
             $scope.removeSection = function(currentPage, componentIndex) {

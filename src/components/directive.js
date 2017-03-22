@@ -507,9 +507,6 @@ angular.module
 
                     // TODO: when user select form (left side)
                     scope.$watch(function () {
-                        scope.form = $builder.forms[$builder.currentForm];
-                        scope.jsonString = $builder.forms;
-
                         return $builder.currentForm;
                     }, function (current, prev) {
                         var _base, _name;
@@ -573,6 +570,7 @@ angular.module
                         return scope.updateInput(scope.inputText);
                     });
                     scope.$watch(attrs.fbFormObject, function () {
+                        //console.log('TEST: ', scope.formObject);
 
                         return scope.copyObjectToScope(scope.formObject);
                     }, true);
