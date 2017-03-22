@@ -63,7 +63,7 @@ angular.module('builder.controller', ['builder.provider'])
                 copyObjectToScope(formObject, $scope);
                 $scope.optionsText = formObject.options.join('\n');
 
-                $scope.$watch('[label, show_label, repeatable, repited, collapsable, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function () {
+                $scope.$watch('[label, show_label, repeatable, repited, labelColor, labelWeight, labelSize, collapsable, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function () {
                     formObject.label = $scope.label;
                     formObject.show_label = $scope.show_label;
                     formObject.description = $scope.description;
@@ -81,7 +81,10 @@ angular.module('builder.controller', ['builder.provider'])
                     formObject.repeatable = $scope.repeatable;
                     formObject.collapsable = $scope.collapsable;
                     formObject.repited = $scope.repited;
-                }, true);
+                    formObject.labelColor = $scope.labelColor;
+                    formObject.labelWeight = $scope.labelWeight;
+                    formObject.labelSize = $scope.labelSize;
+                                }, true);
 
                 $scope.$watch('optionsText', function (text) {
                     var x;

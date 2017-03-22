@@ -863,4 +863,38 @@ angular.module
                 }
             };
         }
+    ])
+
+    .directive('labelStyles', [
+        '$injector', function ($injector) {
+            var $builder;
+            $builder = $injector.get('$builder');
+            return {
+                restrict: 'A',
+                scope: {
+                    labelColor: '=',
+                    labelWeight: '=',
+                    labelSize: '='
+                },
+                template: '<div class="select-group">' +
+                    '<div class="col-sm-4">' +
+                        '<label>Color</label>' +
+                        '<select ng-options="value for value in labelColors" id="{{formName+index}}" ng-model="labelColor" ng-init="labelColor = labelColors[0]" class="form-control label-select"/>' +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                        '<label>Weight</label>' +
+                        '<select ng-options="value for value in labelWeights" id="{{formName+index}}" ng-model="labelWeight" ng-init="labelWeight = labelWeights[0]" class="form-control label-select"/>' +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                        '<label>Size</label>' +
+                        '<select ng-options="obj.size as obj.name for obj in labelSizes" id="{{formName+index}}" ng-model="labelSize" ng-init="labelSize = labelSizes[0]" class="form-control label-select"/>' +
+                    '</div>' +
+                '</div>',
+                link: function (scope) {
+                    scope.labelColors = [ 'red', 'green', 'blue', 'yellow', 'black', 'grey' ];
+                    scope.labelWeights = [ 100, 200, 300, 400, 500, 600, 700, 800, 900 ];
+                    scope.labelSizes = [ {name: 'h1', size: '24px'}, {name:'h2', size: '22px'}, {name: 'h3', size: '20px'}, {name: 'h4', size: '18px'}, {name: 'h5', size: '16px'}, {name: 'h6', size: '14px'} ];
+                }
+            };
+        }
     ]);

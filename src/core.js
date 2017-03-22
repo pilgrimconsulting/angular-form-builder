@@ -12,7 +12,7 @@ var path = null;
     angular.module('app', ['builder', 'builder.components', 'validator.rules', 'ngAnimate', 'transcription', 'formService', 'ngRoute'])
 
         .constant("appSettings", {
-            "apiUrl": "http://louise.sunbay-ukraine.com:4000/Mpa/FormDesigner"
+            "apiUrl": "http://louise.sunbay-ukraine.com:3100/Mpa/FormDesigner"
         })
         .run([
             '$builder', '$drag', '$window', '$transcription', '$routeParams', '$formService', '$rootScope',
@@ -24,11 +24,11 @@ var path = null;
                 var parentId    = $routeParams.parentId || 1,
                     id          = $routeParams.id;
 
-                console.log(parentId, id);
-
-                $formService.getForm(parentId, 4)
+                $formService.getForm(parentId, id)
                     .then(function(res) {
                         var formData = res.data ? res.data.result : {};
+
+                        console.log('formData', formData);
 
                         $builder.receivedForm = formData;
                         $builder.formData = $transcription.getFormData(formData);

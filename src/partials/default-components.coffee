@@ -100,6 +100,9 @@ Global.__fbComponents.divider = ($builderProvider) ->
 		group: 'Default'
 		label: 'Hint'
 		description: 'Hint'
+		labelColor: 'black'
+		labelWeight: 500
+		labelSize: 	'14px'
 		template:
 			"""
 			<div class="form-group" ng-if='simpleView'>
@@ -112,8 +115,11 @@ Global.__fbComponents.divider = ($builderProvider) ->
 				</div>
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
-
-				<label for="{{formName+index}}" class="control-label" ng-class="{'fb-required':required, 'col-sm-4': show_label}" ng-hide='!show_label'>{{label}}</label>
+				<label for="{{formName+index}}"
+					class="control-label"
+					ng-class="{'fb-required':required, 'col-sm-4': show_label}"
+					ng-hide='!show_label'
+					ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{label}}</label>
 				<div ng-class="{'col-sm-12': !show_label, 'col-sm-8': show_label}">
 					<div class="panel panel-default panel-spec">
 						<div class="panel-body hint-text">
@@ -133,15 +139,15 @@ Global.__fbComponents.divider = ($builderProvider) ->
 						Show label
 					</label>
 				</div>
-				<div class="form-group" >
+				<div class="form-group">
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 				<div class="form-group">
 					<label class='control-label'>Description</label>
 					<input type='text' ng-model="description" class='form-control'/>
 				</div>
-
 					<hr/>
 				<div class='form-group'>
 					<input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
@@ -182,7 +188,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				</div>
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
-				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label' ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<input type="text" ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" placeholder="{{placeholder}}"/>
 					<p class='help-block'>{{description}}</p>
@@ -201,6 +207,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 				<div class="form-group">
 					<label class='control-label'>Description</label>
@@ -251,7 +258,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				</div>
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
-				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label' ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<textarea type="text" ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" rows='6' placeholder="{{placeholder}}"/>
 					<p class='help-block'>{{description}}</p>
@@ -270,6 +277,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 				<div class="form-group">
 					<label class='control-label'>Description</label>
@@ -318,7 +326,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				</div>
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
-				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label' ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<input type='hidden' ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}"/>
 					<div class='checkbox' ng-repeat="item in options track by $index">
@@ -342,6 +350,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 				<div class="form-group">
 					<label class='control-label'>Description</label>
@@ -391,7 +400,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				</div>
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
-				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label' ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<div ng-repeat="item in options track by $index" ng-class="{'radio-inline':inline}">
 						<label class="radio-label-text"><input name='{{formName+index}}' ng-model="$parent.inputText" validator-group="{{formName}}" value='{{item}}' type='radio'/>
@@ -414,6 +423,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 				<div class="form-group">
 					<label class='control-label'>Description</label>
@@ -461,7 +471,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				</div>
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
-				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label' ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<select ng-options="value for value in options" id="{{formName+index}}" class="form-control"
 						ng-model="inputText" ng-init="inputText = options[0]"/>
@@ -481,6 +491,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 				<div class="form-group">
 					<label class='control-label'>Description</label>
@@ -521,7 +532,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				</div>
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
-				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+				<label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}" ng-hide='!show_label' ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{label}}</label>
 				<div class="col-sm-8" ng-class="{'col-sm-offset-4': !show_label}">
 					<select ng-options="value for value in options" id="{{formName+index}}" class="form-control"
 						ng-model="inputText" ng-init="inputText = options[0]"/>
@@ -541,6 +552,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 				<div class="form-group">
 					<label class='control-label'>Description</label>
@@ -603,7 +615,7 @@ Global.__fbComponents.image = ($builderProvider) ->
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
 				<label for="{{formName+index}}" class="col-sm-4 control-label"
-					ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+					ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}} ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}"</label>
 				<div class='col-sm-8' ng-class="{'col-sm-offset-4': !show_label}">
 					<img class='img-thumbnail' ng-src='https://placeholdit.imgix.net/~text?txtsize=28&bg=cccccc&txt=200%C3%97200&w=200&h=200'/>
 				</div>
@@ -621,6 +633,7 @@ Global.__fbComponents.image = ($builderProvider) ->
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 				<hr/>
 				<div class='form-group'>
@@ -652,7 +665,7 @@ Global.__fbComponents.carousel = ($builderProvider) ->
 			</div>
 			<div class="form-group" ng-if='!simpleView'>
 				<div class='clearfix text-center margin-bottom-15'>
-					<label for="{{formName+index}}" class="col-sm-12" ng-class="{'fb-required':required}" ng-hide='!show_label'>{{label}}</label>
+					<label for="{{formName+index}}" class="col-sm-12" ng-class="{'fb-required':required}" ng-hide='!show_label' ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{label}}</label>
 				</div>
 				<div class='clearfix'>
 					<div class='col-sm-4 text-center'>
@@ -690,7 +703,8 @@ Global.__fbComponents.carousel = ($builderProvider) ->
 				</div>
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
-						<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 				<hr/>
 				<div class='form-group'>
@@ -722,11 +736,11 @@ Global.__fbComponents.section = ($builderProvider) ->
 					<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
 						<a role="button" ng-init='isOpen=true' is-open='true' style='cursor: pointer'
 							ng-click="isOpen = !isOpen; $event.stopPropagation();">
-							{{show_label ? label : null}}
+							<span ng-style="{color: labelColor, fontWeight: labelWeight, fontSize: labelSize}">{{show_label ? label : null}}</span>
 							<i class="pull-right glyphicon"
 								ng-show="collapsable"
-								ng-style="{top: show_label ? '0' : '-15px'}"
-								ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-up': isOpen}"></i>
+								ng-class="{'glyphicon-chevron-down': !isOpen, 'glyphicon-chevron-up': isOpen}"
+								ng-style="{top: show_label ? '0' : '-8px'}"></i>
 						</a>
 					</h4>
 				</div>
@@ -765,6 +779,7 @@ Global.__fbComponents.section = ($builderProvider) ->
 				<div class="form-group" >
 					<label class='control-label'>Label</label>
 					<input type='text' ng-model="label" validator="{{show_label ? '[required]' : ''}}" class='form-control'/>
+					<div label-styles label-color="labelColor" label-weight="labelWeight" label-size="labelSize"></div>
 				</div>
 					<hr/>
 				<div class='form-group'>
