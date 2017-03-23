@@ -731,13 +731,13 @@ Global.__fbComponents.section = ($builderProvider) ->
 		repited: no
 		template:
 			"""
-			<div>
+			<div ng-class='{"section-open": isOpen, "fb-selected-frame": selected}'>
 				<div ng-show="repeatable" class='form-group section-actions-container'>
 					<input type='button' ng-click="repeatSection(currentPage, componentIndex)" class='btn btn-primary' value='Repeat'/>
 					<input ng-show="repited" type='button' ng-click="removeSection(currentPage, componentIndex)" class='btn btn-danger' value='Delete'/>
 				</div>
 
-				<div class="panel panel-default" ng-class='{"section-open": isOpen, "fb-selected-frame": selected}'>
+				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h4 class="panel-title"><!-- collapse($event, isOpen, 'collapse', componentIndex);-->
 							<a role="button" ng-init='isOpen=true' is-open='true' style='cursor: pointer'
@@ -755,7 +755,6 @@ Global.__fbComponents.section = ($builderProvider) ->
 							current-page='currentPage' form-number='formNumber'></div>
 					</div>
 				</div>
-
 			</div>
   		"""
 
