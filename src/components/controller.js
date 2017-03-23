@@ -7,35 +7,13 @@ var copyObjectToScope,
         };
 
 copyObjectToScope = function (object, scope) {
-    /*
-     Copy object (ng-repeat="object in objects") to scope without `hashKey`.
-     */
     var key, value;
     for (key in object) {
         value = object[key];
         if (key !== '$$hashKey') {
             scope[key] = value;
         }
-
-        if(key === 'components') {
-            //console.log(object[key]);
-
-            object[key].map(function(element, id) {
-
-                var k,
-                    v = {};
-                for (k in element) {
-                    if (k !== '$$hashKey') {
-                        v[k] = element[k];
-                    }
-                }
-
-                return v;
-            })
-        }
     }
-
-    //console.log(object)
 };
 
 angular.module('builder.controller', ['builder.provider'])
