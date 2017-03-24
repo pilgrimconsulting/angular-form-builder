@@ -133,7 +133,7 @@ Global.__fbComponents.divider = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
@@ -198,7 +198,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
@@ -217,7 +217,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 					<label class='control-label'>Placeholder</label>
 					<input type='text' ng-model="placeholder" class='form-control'/>
 				</div>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model="required" />
 						Required</label>
@@ -268,7 +268,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
@@ -287,7 +287,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 					<label class='control-label'>Placeholder</label>
 					<input type='text' ng-model="placeholder" class='form-control'/>
 				</div>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model="required" />
 						Required</label>
@@ -341,7 +341,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
@@ -360,7 +360,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 					<label class='control-label'>Options</label>
 					<textarea class="form-control" rows="3" ng-model="optionsText"/>
 				</div>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model="required" />
 						Required
@@ -414,7 +414,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
@@ -433,7 +433,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 					<label class='control-label'>Options</label>
 					<textarea class="form-control" rows="3" ng-model="optionsText"/>
 				</div>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model="inline" />
 						radio-inline
@@ -482,7 +482,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
@@ -543,7 +543,7 @@ Global.__fbComponents.default = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
@@ -624,7 +624,7 @@ Global.__fbComponents.image = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
@@ -695,7 +695,7 @@ Global.__fbComponents.carousel = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
@@ -761,19 +761,19 @@ Global.__fbComponents.section = ($builderProvider) ->
 		popoverTemplate:
 			"""
 			<form>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='show_label' />
 						Show label
 					</label>
 				</div>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='repeatable' />
 						Repeatable
 					</label>
 				</div>
-				<div class="checkbox">
+				<div class="fb-checkbox">
 					<label>
 						<input type='checkbox' ng-model='collapsable' />
 						Collapsable

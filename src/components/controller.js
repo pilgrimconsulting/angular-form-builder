@@ -249,12 +249,57 @@ angular.module('builder.controller', ['builder.provider'])
             $scope.copyObjectToScope = function (object) {
                 return copyObjectToScope(object, $scope);
             };
-            return $scope.updateInput = function (value) {
 
-                /*
-                 Copy current scope.input[X] to $parent.input.
-                 @param value: The input value.
-                 */
+            $scope.setupScope = function (formObject) {
+                var component;
+                copyObjectToScope(formObject, $scope);
+                $scope.optionsText = formObject.options.join('\n');
+
+                $scope.$watch('[label, show_label, repeatable, repited, labelColor, labelWeight, labelSize, collapsable, description, placeholder, required, inline, options, validation, text, header, footer, align, style, components]', function () {
+                    formObject.label = $scope.label;
+                    formObject.show_label = $scope.show_label;
+                    formObject.description = $scope.description;
+                    formObject.placeholder = $scope.placeholder;
+                    formObject.required = $scope.required;
+                    formObject.inline = $scope.inline;
+                    formObject.options = $scope.options;
+                    formObject.validation = $scope.validation;
+                    formObject.text = $scope.text;
+                    formObject.header = $scope.header;
+                    formObject.footer = $scope.footer;
+                    formObject.align = $scope.align;
+                    formObject.style = $scope.style;
+                    formObject.components = $scope.components;
+                    formObject.repeatable = $scope.repeatable;
+                    formObject.collapsable = $scope.collapsable;
+                    formObject.repited = $scope.repited;
+                    formObject.labelColor = $scope.labelColor;
+                    formObject.labelWeight = $scope.labelWeight;
+                    formObject.labelSize = $scope.labelSize;
+                }, true);
+
+                $scope.$watch('optionsText', function (text) {
+                    var x;
+                    $scope.options = (function () {
+                        var _i, _len, _ref, _results;
+                        _ref = text.split('\n');
+                        _results = [];
+                        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                            x = _ref[_i];
+                            if (x.length > 0) {
+                                _results.push(x);
+                            }
+                        }
+                        return _results;
+                    })();
+
+                    return $scope.inputText = $scope.options[0];
+                });
+                component = $builder.components[formObject.component];
+                return $scope.validationOptions = component.validationOptions;
+            };
+
+            return $scope.updateInput = function (value) {
                 var input;
                 input = {
                     id: $scope.formObject.id,
@@ -263,7 +308,7 @@ angular.module('builder.controller', ['builder.provider'])
                     value: value != null ? value : ''
                 };
 
-                return $scope.$parent.input.splice($scope.$index, 1, input);
+                if($scope.$parent.input) $scope.$parent.input.splice($scope.$index, 1, input);
             };
         }
     ])

@@ -194,7 +194,7 @@ angular.module('transcription', [])
             return function (jsonData, formData) {
                 var item, items, options, formPage, jsonPage, pageIndex, formElement, section, tempItem, tempObj, _i, _j, _len, _len1;
 
-                jsonData["pages"] = [];
+                jsonData["Pages"] = [];
 
                 if (!formData.length) {
                     return jsonData;
@@ -203,12 +203,12 @@ angular.module('transcription', [])
                 for (pageIndex = _i = 0, _len = formData.length; _i < _len; pageIndex = ++_i) {
                     formPage = formData[pageIndex];
                     jsonPage = {
-                        "id": pageIndex.toString(),
-                        "name": null,
-                        "title": "Page_"+pageIndex,
-                        "showTitle": true,
-                        "elements": [],
-                        "extraProperties": {
+                        "Id": pageIndex.toString(),
+                        "Name": null,
+                        "Title": "Page_"+pageIndex,
+                        "ShowTitle": true,
+                        "Elements": [],
+                        "ExtraProperties": {
                             "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[FormBuilder.Models.ExtraProperty, FormBuilder]], mscorlib"
                         },
                         "$type": "FormBuilder.Models.Page, FormBuilder"
@@ -217,11 +217,11 @@ angular.module('transcription', [])
                     for (_j = 0, _len1 = formPage.length; _j < _len1; _j++) {
                         formElement = formPage[_j];
                         tempObj = {
-                            "id": formElement.index,
-                            "name": null,
-                            "title": formElement.label || null,
-                            "showTitle": formElement.show_label,
-                            "extraProperties": {
+                            "Id": formElement.index,
+                            "Name": null,
+                            "Title": formElement.label || null,
+                            "ShowTitle": formElement.show_label,
+                            "ExtraProperties": {
                                 "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[FormBuilder.Models.ExtraProperty, FormBuilder]], mscorlib"
                             },
                             "$type": setType(formElement.component)
@@ -230,18 +230,18 @@ angular.module('transcription', [])
                         if (formElement.component === "section") {
                             items = formElement.components;
 
-                            tempObj["items"] = (function () {
+                            tempObj["Items"] = (function () {
                                 var _k, _len2, _results;
                                 _results = [];
                                 for (_k = 0, _len2 = items.length; _k < _len2; _k++) {
                                     item = items[_k];
                                     tempItem = {
-                                        "inputType": this.vocabularyBackwards[item.component] || null,
-                                        "id": item.id || null,
-                                        "title": item.label || null,
-                                        "isRequired": item.required,
-                                        "description": item.description || '',
-                                        "extraProperties": {
+                                        "InputType": this.vocabularyBackwards[item.component] || null,
+                                        "Id": item.id || null,
+                                        "Title": item.label || null,
+                                        "IsRequired": item.required,
+                                        "Description": item.description || '',
+                                        "ExtraProperties": {
                                             "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[FormBuilder.Models.ExtraProperty, FormBuilder]], mscorlib"
                                         },
                                         "$type": setType(item.component)
@@ -258,18 +258,18 @@ angular.module('transcription', [])
                             options = formElement.options || [];
                             if (options.length)  tempObj["variants"] = setOptions(options);
 
-                            tempObj["inputType"] = _this.vocabulary[formElement.component] || null;
-                            tempObj["name"] = formElement.id;
-                            tempObj["title"] = formElement.label || null;
-                            tempObj["showTitle"] = formElement.show_label || null;
-                            tempObj["isRequired"] = formElement.required;
-                            tempObj["description"] = formElement.description || null;
+                            tempObj["InputType"] = _this.vocabulary[formElement.component] || null;
+                            tempObj["Name"] = formElement.id;
+                            tempObj["Title"] = formElement.label || null;
+                            tempObj["ShowTitle"] = formElement.show_label || null;
+                            tempObj["IsRequired"] = formElement.required;
+                            tempObj["Description"] = formElement.description || null;
                         }
 
-                        jsonPage["elements"].push(tempObj);
+                        jsonPage["Elements"].push(tempObj);
                     }
 
-                    jsonData["pages"].push(jsonPage)
+                    jsonData["Pages"].push(jsonPage)
                 }
 
                 return jsonData;

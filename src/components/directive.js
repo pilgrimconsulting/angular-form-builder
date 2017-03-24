@@ -44,45 +44,11 @@ angular.module
                         scope.formNumber = $builder.currentForm;
                         scope.currentPage = $builder.currentForm;
 
-                        //TODO: SET CURRENT form when new page added or page changed
                         return scope.formObjects = $builder.forms[scope.formNumber];
                     });
 
                     $(element).addClass('fb-builder');
-                    allowKey = 'Alt';
-                    keyHold = '';
-                    KeyDown = (function (_this) {
-                        return function (e) {
-                            var KeyID, keyName;
-                            KeyID = window.event ? event.keyCode : e.keyCode;
-                            switch (KeyID) {
-                                case 18:
-                                    keyName = "Alt";
-                                    break;
-                                case 17:
-                                    keyName = "Ctrl";
-                            }
-                            return keyHold = keyName;
-                        };
-                    })(this);
-                    KeyUp = (function (_this) {
-                        return function (e) {
-                            var KeyID, keyName;
-                            KeyID = window.event ? event.keyCode : e.keyCode;
-                            switch (KeyID) {
-                                case 18:
-                                    keyName = "Alt";
-                                    break;
-                                case 17:
-                                    keyName = "Ctrl";
-                            }
-                            if (keyHold === keyName) {
-                                return keyHold = "";
-                            }
-                        };
-                    })(this);
-                    document.onkeydown = KeyDown;
-                    document.onkeyup = KeyUp;
+
                     return $drag.droppable($(element), {  //TODO: DRAGGABLE ACTIONS
                         move: function (e, isHover) {
                             var $empty, $formObject, $formObjects, height, index, offset, positions, _i, _j, _ref, _ref1;
@@ -241,22 +207,6 @@ angular.module
                         return $(element).addClass("fb-selected-frame");
                     });
 
-                    /*$(element).on 'click', (e) ->
-                     e.preventDefault()
-                     if scope.component != 'section'
-                     if scope.sectionIndex != undefined
-                     firstIndex = 1
-                     secondIndex = scope.sectionIndex
-                     else
-                     firstIndex = 0
-                     else
-                     firstIndex = 1
-                     secondIndex = scope.componentIndex
-                     *			scope.selected = true
-                     $builder.selectFrame firstIndex, secondIndex
-                     console.log('CLICK', firstIndex, secondIndex, $builder.selectedPath, $builder.selectFrame())
-                     false
-                     */
                     $drag.draggable($(element), {
                         object: {
                             formObject: scope.formObject
@@ -266,7 +216,7 @@ angular.module
 
                     //TODO: Setup control panels for every form element
 
-                    scope.$watch('$component.popoverTemplate', function (template) { //TODO: !!!! $component.popoverTemplate - темплейт для сайд панелі
+                    scope.$watch('$component.popoverTemplate', function (template) {
                         if (!template) {
                             return;
                         }
@@ -566,13 +516,13 @@ angular.module
                             return scope.inputText = checked.join(', ');
                         }, true);
                     }
+
                     scope.$watch('inputText', function () {
                         return scope.updateInput(scope.inputText);
                     });
                     scope.$watch(attrs.fbFormObject, function () {
-                        //console.log('TEST: ', scope.formObject);
-
-                        return scope.copyObjectToScope(scope.formObject);
+                        scope.setupScope(scope.formObject);
+                        scope.copyObjectToScope(scope.formObject);
                     }, true);
                     scope.$watch('$component.template', function (template) {
                         var $input, $template, view;
@@ -591,7 +541,8 @@ angular.module
                     if (!scope.$component.arrayToText && scope.formObject.options.length > 0) {
                         scope.inputText = scope.formObject.options[0];
                     }
-                    return scope.$watch("default['" + scope.formObject.id + "']", function (value) {
+
+                    scope.$watch("default['" + scope.formObject.id + "']", function (value) {
                         if (!value) {
                             return;
                         }
@@ -668,6 +619,7 @@ angular.module
                         "class='fb-form-object-editable parent-section'\n " +
                         "ng-repeat=\"object in sectionObjects\"\n " +
                         "fb-form-object-editable=\"object\"\n " +
+                        "fb-form-object=\"object\"\n " +
                         "fb-draggable='allow'\n " +
                         "section-index='sectionIndex'\n " +
                         "parent-section='true'\n " +

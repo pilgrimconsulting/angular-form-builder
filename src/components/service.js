@@ -12,7 +12,7 @@ angular.module('formService', [])
 
                 return $http({
                     method: 'GET',
-                    url:  appSettings.apiUrl + '/Get' + parentIdParam + idParam
+                    url:  appSettings.apiUrl + '/GetMock' //'/Get' + parentIdParam + idParam
                 })
                     .then(function (response) {
                         return response;
@@ -27,7 +27,6 @@ angular.module('formService', [])
 
         this.saveForm = (function () {
             return function(data) {
-
                 console.log('TEST: ', data);
 
                 return $http({
